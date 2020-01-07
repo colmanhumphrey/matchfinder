@@ -1,13 +1,16 @@
 Package: matchfinder
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Title: Finding Best Matches Based on Predictability
+Version: 0.0.1
+Authors@R:
+    person(given = "Colman",
+           family = "Humphrey",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: What license it uses
+           email = "colmanhumphrey@gmail.com")
+Description: Finds the best set of matches to use in a bipartite (treatment/control) or non-bipartite setting,
+    where best refers to predictability.
+License: LGPL (>= 2.1)
 Encoding: UTF-8
 LazyData: true
+Suggests:
+    testthat (>= 2.1.0)
+RoxygenNote: 7.0.2
