@@ -147,6 +147,7 @@ sink_brier_bipartite_matches <- function(x_mat,
 #' @param briers_by_sinks List by number of sinks, each a vector
 #'   of Brier results. Basically a number for each match in
 #'   \code{matches_by_sinks}.
+#' @param x_mat Typical input matrix
 #' @param n_sinks Vector of number of sinks - probably could get this
 #'   directly from \code{matches_by_sinks}, but nice to be explicit.
 #' @param silent Do you want to suppress message output? Default
@@ -160,6 +161,7 @@ sink_brier_bipartite_matches <- function(x_mat,
 #' @export
 permutation_bipartite_matches <- function(matches_by_sinks,
                                           briers_by_sinks,
+                                          x_mat,
                                           n_sinks,
                                           silent = !interactive()) {
     best_brier_inds <- lapply(briers_by_sinks, function(x) {
