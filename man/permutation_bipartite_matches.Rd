@@ -8,6 +8,7 @@ permutation Brier scores and the best matches}
 permutation_bipartite_matches(
   matches_by_sinks,
   briers_by_sinks,
+  x_mat,
   n_sinks,
   silent = !interactive()
 )
@@ -19,6 +20,8 @@ of match results (a match list), for each weight vector.}
 \item{briers_by_sinks}{List by number of sinks, each a vector
 of Brier results. Basically a number for each match in
 \code{matches_by_sinks}.}
+
+\item{x_mat}{Typical input matrix}
 
 \item{n_sinks}{Vector of number of sinks - probably could get this
 directly from \code{matches_by_sinks}, but nice to be explicit.}

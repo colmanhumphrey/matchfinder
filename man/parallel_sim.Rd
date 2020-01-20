@@ -17,7 +17,6 @@ parallel_sim(
   num_cores = parallel::detectCores() - 1,
   iterations = 100L,
   names_list = NULL,
-  p_cut = c(1, 0.9, 0.8, 0.7, 0.6, 0.5),
   silent = !interactive()
 )
 }
