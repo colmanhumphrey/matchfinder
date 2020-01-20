@@ -178,6 +178,8 @@ paper_mean_functions <- function() {
 #' @return Function that accepts a \code{treat_vec}
 #'   and returns a vector of numbers.
 #' @author Colman Humphrey
+#'
+#' @export
 n_sink_generator <- function(start_frac = 0,
                              end_frac = 0.8,
                              length_out = 9) {
@@ -335,7 +337,8 @@ compute_sim_result <- function(x_generator = default_x_generator,
     permutation_results <- permutation_bipartite_matches(
         matches_by_sinks = sink_brier_matches[["matches_by_sinks"]],
         briers_by_sinks = sink_brier_matches[["briers_by_sinks"]],
-        n_sinks = c(0L, 4L),
+        x_mat = x_mat,
+        n_sinks = n_sinks,
         silent = silent)
 
     weighted_results <- lapply(
@@ -365,7 +368,7 @@ compute_sim_result <- function(x_generator = default_x_generator,
 #' @param mu_model_name Name of the mean generation model.
 #' @param n_rows How many rows were used.
 #' @param n_cols How many columns were used.
-#' @param p_cut Vector of one-sided permution p-values to use.
+#' @param num_weight_vectors How many weight vectors were used
 #' @return Data frame spreading results...
 #' @author Colman Humphrey
 #'
@@ -375,7 +378,61 @@ reshape_list_of_sims <- function(list_of_sims,
                                  mu_model_name,
                                  n_rows,
                                  n_cols,
-                                 p_cut) {
+                                 num_weight_vectors) {
+    list_of_sims <- lapply(1L:length(list_of_sims), function(j) {
+        if (is.null(list_of_sims[[j]][["id"]])) {
+            list_of_sims[[j]][["id"]] <- j
+        }
+        return(list_of_sims[[j]])
+    })
+
+    do.call(rbind, lapply(list_of_sims, function(sim_res) {
+        do.call(rbind, lapply(1L:length(sim_res[["weighted_results"]]), function(j) {
+            data.frame(
+                id = sim_res[["id"]],
+                treat_model = treat_model_name,
+                mu_model = mu_model_name,
+                p_brier =
+                    sim_res[["weighted_results"]][[j]][["permutation_brier"]],
+                raw_brier =
+                    sim_res[["weighted_results"]][[j]][["raw_brier"]],
+                n_rows = n_rows,
+                n_cols = n_cols,
+                num_weight_vectors = num_weight_vectors,
+                n_sinks = sim_res[["weighted_results"]][[j]][["n_sinks"]],
+                naive_est = sim_res[["naive_est"]],
+                propensity_est =
+                    sim_res[["propensity_results"]][[j]][["est"]],
+                mahal_est = sim_res[["mahal_results"]][[j]][["est"]],
+                weighted_est = sim_res[["weighted_results"]][[j]][["est"]]
+            )
+        }))
+    }))
+}
+
+
+#' Reshapes a list of simulations to a nice dataframe, by p-cut
+#'
+#' @inheritParams reshape_list_of_sims
+#' @param p_cut Vector of one-sided permution p-values to use.
+#' @return Data frame spreading results...
+#' @author Colman Humphrey
+#'
+#' @export
+reshape_p_cut_list <- function(list_of_sims,
+                               treat_model_name,
+                               mu_model_name,
+                               p_cut,
+                               n_rows,
+                               n_cols,
+                               num_weight_vectors) {
+    list_of_sims <- lapply(1L:length(list_of_sims), function(j) {
+        if (is.null(list_of_sims[[j]][["id"]])) {
+            list_of_sims[[j]][["id"]] <- j
+        }
+        return(list_of_sims[[j]])
+    })
+
     do.call(rbind, lapply(p_cut, function(p_cut_val) {
         do.call(rbind, lapply(list_of_sims, function(par_res) {
             p_briers <- unlist(lapply(
@@ -389,21 +446,23 @@ reshape_list_of_sims <- function(list_of_sims,
             }
 
             data.frame(
+                id = par_res[["id"]],
                 treat_model = treat_model_name,
                 mu_model = mu_model_name,
                 p_cut = p_cut_val,
                 p_brier =
-                    par_res$weighted_results[[given_cut_ind]]$permutation_brier,
+                    par_res[["weighted_results"]][[given_cut_ind]][["permutation_brier"]],
                 raw_brier =
-                    par_res$weighted_results[[given_cut_ind]]$raw_brier,
+                    par_res[["weighted_results"]][[given_cut_ind]][["raw_brier"]],
                 n_rows = n_rows,
                 n_cols = n_cols,
-                n_sinks = par_res$weighted_results[[given_cut_ind]]$n_sinks,
-                naive_est = par_res$naive_est,
+                num_weight_vectors = num_weight_vectors,
+                n_sinks = par_res[["weighted_results"]][[given_cut_ind]][["n_sinks"]],
+                naive_est = par_res[["naive_est"]],
                 propensity_est =
-                    par_res$propensity_results[[given_cut_ind]]$est,
-                mahal_est = par_res$mahal_results[[given_cut_ind]]$est,
-                weighted_est = par_res$weighted_results[[given_cut_ind]]$est
+                    par_res[["propensity_results"]][[given_cut_ind]][["est"]],
+                mahal_est = par_res[["mahal_results"]][[given_cut_ind]][["est"]],
+                weighted_est = par_res[["weighted_results"]][[given_cut_ind]][["est"]]
             )
         }))
     }))
@@ -430,7 +489,6 @@ parallel_sim <- function(x_generator = default_x_generator,
                          num_cores = parallel::detectCores() - 1,
                          iterations = 100L,
                          names_list = NULL,
-                         p_cut = c(1, 0.9, 0.8, 0.7, 0.6, 0.5),
                          silent = !interactive()) {
     sims <- parallel::mclapply(1L:iterations, function(j) {
         if (!silent) {
@@ -447,19 +505,4 @@ parallel_sim <- function(x_generator = default_x_generator,
                            num_weight_vectors = num_weight_vectors,
                            silent = silent)
     }, mc.cores = num_cores)
-    ## treat_model_name <- ifelse(
-    ##     is.null(names_list[["treat_model"]]),
-    ##     deparse(substitute(treat_prob_generator)),
-    ##     names_list[["treat_model"]])
-    ## mu_model_name <- ifelse(
-    ##     is.null(names_list[["mu_model"]]),
-    ##     deparse(substitute(mean_generator)),
-    ##     names_list[["mu_model"]])
-
-    ## reshape_list_of_sims(sims,
-    ##                      treat_model_name = treat_model_name,
-    ##                      mu_model_name = mu_model_name,
-    ##                      n_rows = n_rows,
-    ##                      n_cols = n_cols,
-    ##                      p_cut = p_cut)
 }
