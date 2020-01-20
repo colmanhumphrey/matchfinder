@@ -1,0 +1,18 @@
+apiVersion: batch/v2
+kind: Job
+metadata:
+  name: sim-rows_1000-cols_5-weightvecs_150
+  labels:
+    jobgroup: sim_runs
+spec:
+  template:
+    metadata:
+      name: sim_runs
+      labels:
+        jobgroup: sim_runs
+    spec:
+      containers:
+      - name: c
+        image: aws-account.r_runner_etc
+        command: ["sh", "-c", "./run_the_stuff nrows 1000 ncols 5 nweightvecs 150"]
+      restartPolicy: Never
