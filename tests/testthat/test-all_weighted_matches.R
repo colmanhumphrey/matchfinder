@@ -261,6 +261,7 @@ test_that("testing permutation_bipartite_matches", {
     permutation_result <- permutation_bipartite_matches(
         matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
         briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        x_mat = x_mat,
         n_sinks = c(0L, 4L))
 
     perm_briers <- permutation_result[["permutation_brier_scores"]]

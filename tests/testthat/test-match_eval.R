@@ -115,7 +115,7 @@ test_that("testing brier_score_split", {
                                    design = "cross_all",
                                    train_fraction = 0.7,
                                    match_predict_xgb)
-    expect_true(abs(brier_res - 0.25) < 0.1)
+    expect_true(abs(brier_res - 0.25) < 0.125)
 })
 
 
@@ -140,7 +140,7 @@ test_that("testing brier_score_cv", {
                                 match_predict_xgb)
 
     ## little tighter than with split
-    expect_true(abs(brier_res - 0.28) < 0.06)
+    expect_true(abs(brier_res - 0.28) < 0.1)
 })
 
 

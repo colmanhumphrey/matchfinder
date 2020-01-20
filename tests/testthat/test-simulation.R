@@ -125,7 +125,7 @@ test_that("testing n_sink_generator", {
 })
 
 
-test_that("testing compute_sim_result and sim_unwrap", {
+test_that("testing compute_sim_result and reshape funcs", {
     sim_results <- compute_sim_result(
         x_generator = default_x_generator,
         treat_prob_generator =
@@ -157,26 +157,71 @@ test_that("testing compute_sim_result and sim_unwrap", {
     expect_equal(lengths(sim_results[["weighted_results"]]),
                  c(4L, 4L))
 
+    n_sink_vec <- unlist(lapply(
+        sim_results[["weighted_results"]],
+        function(x){
+            x[["n_sinks"]]
+        }))
+    expect_equal(n_sink_vec[1L], 0L)
+    expect_true(abs(n_sink_vec[1L] < 19L) < 2L)
+
     flat_sims <- reshape_list_of_sims(
         list(sim_results, sim_results),
         treat_model_name = "logistic",
         mu_model_name = "linear",
         n_rows = 100L,
         n_cols = 3L,
-        p_cut = c(1, 0.9))
+        num_weight_vectors = 5L)
 
     expect_equal(dim(flat_sims),
-                 c(4L, 12L))
+                 c(4L, 13L))
+
+    expect_true(typeof(flat_sims[["n_sinks"]]) %in% c("integer", "double"))
+    flat_sims[["n_sinks"]] <- NULL
 
     expect_equal(unlist(lapply(flat_sims, typeof)),
-                 c(treat_model = "character",
+                 c(id = "integer",
+                   treat_model = "character",
+                   mu_model = "character",
+                   p_brier = "double",
+                   raw_brier = "double",
+                   n_rows = "integer",
+                   n_cols = "integer",
+                   num_weight_vectors = "integer",
+                   ## n_sinks = "integer",
+                   naive_est = "double",
+                   propensity_est = "double",
+                   mahal_est = "double",
+                   weighted_est = "double"))
+
+
+    flat_with_p_cut <- reshape_p_cut_list(
+        list(sim_results, sim_results),
+        treat_model_name = "logistic",
+        mu_model_name = "linear",
+        p_cut = c(1, 0.9),
+        n_rows = 100L,
+        n_cols = 3L,
+        num_weight_vectors = 5L)
+
+    expect_equal(dim(flat_with_p_cut),
+                 c(4L, 14L))
+
+    expect_true(typeof(flat_with_p_cut[["n_sinks"]]) %in%
+                c("integer", "double"))
+    flat_with_p_cut[["n_sinks"]] <- NULL
+
+    expect_equal(unlist(lapply(flat_with_p_cut, typeof)),
+                 c(id = "integer",
+                   treat_model = "character",
                    mu_model = "character",
                    p_cut = "double",
                    p_brier = "double",
                    raw_brier = "double",
                    n_rows = "integer",
                    n_cols = "integer",
-                   n_sinks = "integer",
+                   num_weight_vectors = "integer",
+                   ## n_sinks = "integer",
                    naive_est = "double",
                    propensity_est = "double",
                    mahal_est = "double",
