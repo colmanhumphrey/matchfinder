@@ -1,14 +1,33 @@
-library(matchfinder)
-library(xgboost)
+#!/usr/bin/env Rscript
 
-n_row_values <- c(500L, 1000L, 2000L, 4000L)
-n_col_values <- c(5L, 10L, 20L)
-num_weight_vecs <- 300L
+library(docopt)
+
+doc_string <- "
+
+Usage:
+./paper_sims nrows <n_rows> ncols <n_cols> nweightvecs <num_weight_vec>
+./paper_sims [options]
+
+Options:
+  -h, --help    display this page
+  -x, --usage   show some examples
+"
+
 
 ##------------------------------------
 
-treat_funcs <- paper_treatment_functions(treat_mean = 0.425)
+library(matchfinder)
+library(snowflaker)
+library(xgboost)
+
+##------------------------------------
+
+treat_funcs <- paper_treatment_functions(target_mean = 0.425)
 mu_funcs <- paper_mean_functions()
+
+n_rows <- arguments[["n_rows"]]
+n_cols <- arguments[["n_cols"]]
+num_weight_vec <- arguments[["num_weight_vec"]]
 
 ##------------------------------------
 
@@ -53,3 +72,29 @@ for (treat_func_name in names(treat_funcs)) {
 }
 
 full_frame_output <- do.call(rbind, full_frame_list)
+
+output_list <- list(
+    result_list = result_list,
+    full_frame_output = full_frame_output)
+
+##------------------------------------
+## send to S3
+
+uuid <- paste(sample(c(letters, 0:9), 30), collapse = "")
+s3_file <- glue::glue("
+sim_res/nrow_{n_rows}/ncol_{n_cols}/nweightvec_{num_weight_vec}/\\
+sim_{uuid}.rds
+",
+n_rows = n_rows,
+n_cols = n_cols,
+num_weight_vec = num_weight_vec,
+uuid = uuid)
+
+temp_file <- tempfile(fileext = ".rds")
+saveRDS(output_list, file = temp_file)
+on.exit({unlink(temp_file)})
+snowflaker::local_to_s3(local_file = temp_file,
+                        s3_file = paste0("r_sims/", s3_file),
+                        s3_bucket = "via-nyc-data-science")
+
+##------------------------------------
