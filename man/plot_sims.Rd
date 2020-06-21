@@ -4,7 +4,7 @@
 \alias{plot_sims}
 \title{Plotting sim results}
 \usage{
-plot_sims(all_results, cut_y = 0.5)
+plot_sims(all_results, cut_y = 0.8)
 }
 \description{
 long_results_list should have length four:
