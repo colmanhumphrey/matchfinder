@@ -4,8 +4,8 @@
 #'
 #' @param x_mat input/design matrix (already rank-adjusted etc)
 #' @param cov_x the (potentially rank-adjusted) covariance of \code{x_mat}.
-#'   This means it's possible that \code{cov(x_mat)} is not equal to \code{cov_x};
-#'   see \code{covariance_with_ranks} for more details.
+#'   This means it's possible that \code{cov(x_mat)} is not equal to
+#'   \code{cov_x}; see \code{covariance_with_ranks} for more details.
 #' @param weight_list list of weight vectors. See `generate_random_weights` to
 #'   automatically generate a reasonable set of vectors.
 #' @param treat_vec Logical (or 1/0) vector, indicating treatment (or control).
@@ -29,7 +29,7 @@ all_bipartite_matches <- function(x_mat,
                                   caliper_list = gen_caliper_list(),
                                   propensity_list = match_propensity_list(NULL),
                                   sqrt_mahal = TRUE,
-                                  tol_val = NULL){
+                                  tol_val = NULL) {
     if (!is.null(propensity_list)) {
         if (!is.null(caliper_list)) {
             stop("don't use both `caliper_list` and `propensity_list`: ",
@@ -47,7 +47,7 @@ all_bipartite_matches <- function(x_mat,
             x_mat = x_mat,
             treat_vec = treat_vec,
             propensity_list = propensity_list[prop_list_names])
-        caliper_list = gen_caliper_list(
+        caliper_list <- gen_caliper_list(
             caliper_vec = prop_score,
             caliper_max = sd(prop_score) * propensity_list[["caliper_sd_mult"]],
             continuous_mult = propensity_list[["continuous_mult"]])
