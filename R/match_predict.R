@@ -23,23 +23,23 @@ match_predict_xgb <- function(train_test_list,
     }
 
     xgb_train <- xgboost::xgb.DMatrix(
-                              train_test_list[["x_train"]],
-                              label = train_test_list[["y_train"]]
-                          )
+        train_test_list[["x_train"]],
+        label = train_test_list[["y_train"]]
+    )
 
     xgb_test <- xgboost::xgb.DMatrix(
-                             train_test_list[["x_test"]],
-                             label = train_test_list[["y_test"]]
-                         )
+        train_test_list[["x_test"]],
+        label = train_test_list[["y_test"]]
+    )
 
     train_res <- xgboost::xgb.train(
-                              params = params,
-                              data = xgb_train,
-                              nrounds = nrounds,
-                              nthread = nthread,
-                              objective = "binary:logistic",
-                              ...
-                          )
+        params = params,
+        data = xgb_train,
+        nrounds = nrounds,
+        nthread = nthread,
+        objective = "binary:logistic",
+        ...
+    )
 
     predict(train_res, newdata = xgb_test)
 }

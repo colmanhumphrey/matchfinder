@@ -9,16 +9,18 @@
 #'
 #' @export
 covariance_with_ranks <- function(x_mat,
-                                  rank_cols = NULL){
+                                  rank_cols = NULL) {
     if (!is.matrix(x_mat)) {
         stop("x_mat must be a matrix")
     }
 
     ## convert to ranks
-    x_mat <- ranked_x(x_mat,
-                      rank_cols)
+    x_mat <- ranked_x(
+        x_mat,
+        rank_cols
+    )
 
-    cov_x <- cov(x_mat)    
+    cov_x <- cov(x_mat)
 
     if (is.null(rank_cols)) {
         return(cov_x)

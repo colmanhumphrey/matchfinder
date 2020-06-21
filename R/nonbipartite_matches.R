@@ -25,8 +25,10 @@ gen_tolerance_list <- function(tolerance_vec = NULL,
                                tolerance_max = NULL) {
     if (is.null(tolerance_vec)) {
         if (!is.null(tolerance_min) || !is.null(tolerance_max)) {
-            stop("can't set `tolerance_{min, max}` without setting ",
-                 "`tolerance_vec`")
+            stop(
+                "can't set `tolerance_{min, max}` without setting ",
+                "`tolerance_vec`"
+            )
         }
         return(NULL)
     }
@@ -64,8 +66,9 @@ tolerance_to_caliper_list <- function(tolerance_list,
     stopifnot(is_tf(use_min))
 
     cal_max <- ifelse(use_min,
-                      tolerance_list[["tolerance_min"]],
-                      tolerance_list[["tolerance_max"]])
+        tolerance_list[["tolerance_min"]],
+        tolerance_list[["tolerance_max"]]
+    )
     gen_caliper_list(
         caliper_vec = tolerance_list[["tolerance_vec"]],
         caliper_max = cal_max,
@@ -127,11 +130,13 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #' @export
 nonbipartite_matches <- function(dist_mat,
                                  tolerance_list = gen_tolerance_list(),
-                                 match_method = c("with_replacement",
-                                                  "optimal",
-                                                  "greedy"),
+                                 match_method = c(
+                                     "with_replacement",
+                                     "optimal",
+                                     "greedy"
+                                 ),
                                  n_sinks = NULL,
-                                 keep_all_with_replacement = FALSE){
+                                 keep_all_with_replacement = FALSE) {
     stopifnot(is.matrix(dist_mat))
     stopifnot(min(dist_mat) >= 0)
 
@@ -139,7 +144,7 @@ nonbipartite_matches <- function(dist_mat,
 
     if (nrow(dist_mat) != ncol(dist_mat) ||
         sum(abs(dist_mat - t(dist_mat)), na.rm = TRUE) >
-        (0.001 * max(ifelse(dist_mat == Inf, 0, dist_mat)))){
+            (0.001 * max(ifelse(dist_mat == Inf, 0, dist_mat)))) {
         stop("dist_mat should be square and symmetric", call. = FALSE)
     }
 
@@ -147,28 +152,36 @@ nonbipartite_matches <- function(dist_mat,
     if (!is.null(tolerance_list)) {
         if (length(tolerance_list[["tolerance_vec"]]) != nrow(dist_mat)) {
             stop("`tolerance_vec` must be the same length as the ",
-                 "dimensions of `dist_mat`", call. = FALSE)
+                "dimensions of `dist_mat`",
+                call. = FALSE
+            )
         }
 
         temp_dist <- create_caliper(
             caliper_list = tolerance_to_caliper_list(tolerance_list,
-                                                     use_min = TRUE),
-            treat_vec = NULL)
-        dist_mat[temp_dist == 0] = Inf
+                use_min = TRUE
+            ),
+            treat_vec = NULL
+        )
+        dist_mat[temp_dist == 0] <- Inf
 
         if (!is.null(tolerance_list[["tolerance_max"]])) {
             temp_dist <- create_caliper(
                 caliper_list = tolerance_to_caliper_list(tolerance_list,
-                                                         use_min = FALSE),
-                treat_vec = NULL)
-            dist_mat[temp_dist > 0] = Inf
+                    use_min = FALSE
+                ),
+                treat_vec = NULL
+            )
+            dist_mat[temp_dist > 0] <- Inf
         }
     } else {
         if (missing(tolerance_list)) {
             warning("assuming that all pairs are matchable, ",
-                    "not neccesarily correct. If this is what you want, ",
-                    "you can silence this warning by explicitly supplying ",
-                    "`tolerance_vec = NULL`", call. = FALSE)
+                "not neccesarily correct. If this is what you want, ",
+                "you can silence this warning by explicitly supplying ",
+                "`tolerance_vec = NULL`",
+                call. = FALSE
+            )
         }
 
         ## no self-matching
@@ -179,34 +192,38 @@ nonbipartite_matches <- function(dist_mat,
 
     if (!is.null(n_sinks)) {
         stopifnot(is.numeric(n_sinks) &&
-                  min(n_sinks) >= 0L &&
-                  !any(is.na(n_sinks)) &&
-                  length(unique(n_sinks)) == length(n_sinks))
+            min(n_sinks) >= 0L &&
+            !any(is.na(n_sinks)) &&
+            length(unique(n_sinks)) == length(n_sinks))
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     if (match_method == "with_replacement") {
         return(simple_sink_wrap(
             with_replacement_nbp_match(
                 dist_mat,
                 tolerance_list[["tolerance_vec"]],
-                keep_all = keep_all_with_replacement),
+                keep_all = keep_all_with_replacement
+            ),
             n_sinks
         ))
     }
 
     if (match_method == "greedy") {
         return(simple_sink_wrap(
-            greedy_nbp_match(dist_mat,
-                             tolerance_list[["tolerance_vec"]]),
+            greedy_nbp_match(
+                dist_mat,
+                tolerance_list[["tolerance_vec"]]
+            ),
             n_sinks
         ))
     }
 
     optimal_nbp_sink_wrap(dist_mat,
-                          tolerance_vec = NULL,
-                          n_sinks = n_sinks)
+        tolerance_vec = NULL,
+        n_sinks = n_sinks
+    )
 }
 
 
@@ -216,7 +233,8 @@ with_replacement_nbp_match <- function(dist_mat,
                                        tolerance_vec,
                                        keep_all = FALSE) {
     tol_small <- which(outer(tolerance_vec, tolerance_vec, "-") <= 0,
-                       arr.ind = TRUE)
+        arr.ind = TRUE
+    )
     dist_mat[tol_small] <- Inf
 
     min_index <- min_different_rank(dist_mat)
@@ -224,15 +242,19 @@ with_replacement_nbp_match <- function(dist_mat,
     match_list <- list(
         treat_index = 1:nrow(dist_mat),
         control_index = min_index,
-        distance = dist_mat[cbind(1:nrow(dist_mat),
-                                  min_index)])
+        distance = dist_mat[cbind(
+            1:nrow(dist_mat),
+            min_index
+        )]
+    )
 
     if (!keep_all) {
         ## while this seems arbitrary, not limiting to half would mean this
         ## would give twice as many pairs as all other results
         keep_ind <- rank(match_list[["distance"]],
-                         ties.method = "random") <= (nrow(dist_mat) / 2)
-        match_list <- lapply(match_list, function(x){
+            ties.method = "random"
+        ) <= (nrow(dist_mat) / 2)
+        match_list <- lapply(match_list, function(x) {
             x[keep_ind]
         })
     }
@@ -242,15 +264,19 @@ with_replacement_nbp_match <- function(dist_mat,
 }
 #' @inheritParams with_replacement_nbp_match
 #' @keywords internal
-remove_duplicates <- function(match_list){
-    min_ind <- pmin(match_list[["treat_index"]],
-                    match_list[["control_index"]])
-    max_ind <- pmax(match_list[["treat_index"]],
-                    match_list[["control_index"]])
+remove_duplicates <- function(match_list) {
+    min_ind <- pmin(
+        match_list[["treat_index"]],
+        match_list[["control_index"]]
+    )
+    max_ind <- pmax(
+        match_list[["treat_index"]],
+        match_list[["control_index"]]
+    )
 
     duplicated_ind <- duplicated(cbind(min_ind, max_ind))
 
-    lapply(match_list, function(x){
+    lapply(match_list, function(x) {
         x[!duplicated_ind]
     })
 }
@@ -259,16 +285,18 @@ remove_duplicates <- function(match_list){
 #' @keywords internal
 greedy_nbp_match <- function(dist_mat,
                              tolerance_vec) {
-
     min_vals <- apply(dist_mat, 1, min)
 
     result_mat <- matrix(NA, nrow = nrow(dist_mat), ncol = 3)
 
     while (min(min_vals) < Inf) {
-        random_value <- sample(1:length(min_vals), size = 1,
-                               prob = 1 / (min_vals + 1))
+        random_value <- sample(1:length(min_vals),
+            size = 1,
+            prob = 1 / (min_vals + 1)
+        )
         match_ind <- which(rank(dist_mat[random_value, ],
-                                ties.method = "random") == 1L)
+            ties.method = "random"
+        ) == 1L)
 
         if (tolerance_vec[random_value] < tolerance_vec[match_ind]) {
             result_mat[random_value, 1] <- match_ind
@@ -288,9 +316,11 @@ greedy_nbp_match <- function(dist_mat,
     }
     result_mat <- result_mat[!is.na(result_mat[, 1]), ]
 
-    list(treat_index = result_mat[, 1],
-         control_index = result_mat[, 2],
-         distance = result_mat[, 3])
+    list(
+        treat_index = result_mat[, 1],
+        control_index = result_mat[, 2],
+        distance = result_mat[, 3]
+    )
 }
 #' @inheritParams nonbipartite_matches
 #' @keywords internal
@@ -299,13 +329,17 @@ optimal_nbp_match <- function(dist_mat,
                               n_sinks = 0) {
     ## create the match (timely usually)
     nbp_match <- nbpMatching::nonbimatch(
-                                  add_nbp_sinks(dist_mat = dist_mat,
-                                                n_sinks = n_sinks))
+        add_nbp_sinks(
+            dist_mat = dist_mat,
+            n_sinks = n_sinks
+        )
+    )
 
     ## fix it; remove sinks etc etc
     fix_nbp_match(nbp_match,
-                  nrow_match = nrow(dist_mat),
-                  tolerance_vec)
+        nrow_match = nrow(dist_mat),
+        tolerance_vec
+    )
 }
 
 
@@ -320,24 +354,32 @@ optimal_nbp_match <- function(dist_mat,
 #' @param n_sinks How many potential matches to throw away?
 #' @keywords internal
 add_nbp_sinks <- function(dist_mat,
-                          n_sinks = 0L){
+                          n_sinks = 0L) {
     if ((nrow(dist_mat) + n_sinks) %% 2L != 0L) {
-        warning("There must be an even number of elements (including sinks); ",
-                "adding an extra sink")
+        warning(
+            "There must be an even number of elements (including sinks); ",
+            "adding an extra sink"
+        )
         n_sinks <- n_sinks + 1L
     }
 
-    if(n_sinks > 0){
-        distmat_add_zeros <- matrix(0,
-                                    nrow(dist_mat) + n_sinks,
-                                    ncol(dist_mat) + n_sinks)
-        distmat_add_zeros[1:nrow(dist_mat),
-                          1:ncol(dist_mat)] = dist_mat
+    if (n_sinks > 0) {
+        distmat_add_zeros <- matrix(
+            0,
+            nrow(dist_mat) + n_sinks,
+            ncol(dist_mat) + n_sinks
+        )
+        distmat_add_zeros[
+            1:nrow(dist_mat),
+            1:ncol(dist_mat)
+        ] <- dist_mat
         ## they can't match each other:
-        distmat_add_zeros[1:n_sinks + nrow(dist_mat),
-                          1:n_sinks + ncol(dist_mat)] = Inf
+        distmat_add_zeros[
+            1:n_sinks + nrow(dist_mat),
+            1:n_sinks + ncol(dist_mat)
+        ] <- Inf
     } else {
-        distmat_add_zeros = dist_mat
+        distmat_add_zeros <- dist_mat
     }
 
     ## get in format
@@ -357,12 +399,14 @@ add_nbp_sinks <- function(dist_mat,
 #' @keywords internal
 fix_nbp_match <- function(nbp_match,
                           nrow_match,
-                          tolerance_vec = NULL){
+                          tolerance_vec = NULL) {
     halves <- nbp_match[["halves"]][, c("Group1.Row", "Group2.Row", "Distance")]
     names(halves) <- c("treat_index", "control_index", "distance")
 
-    nonphantom_ind <- pmax(halves[["treat_index"]],
-                           halves[["control_index"]]) <= nrow_match
+    nonphantom_ind <- pmax(
+        halves[["treat_index"]],
+        halves[["control_index"]]
+    ) <= nrow_match
     noninf_ind <- halves[["distance"]] != Inf
 
     halves <- halves[nonphantom_ind & noninf_ind, ]
@@ -371,7 +415,8 @@ fix_nbp_match <- function(nbp_match,
 
     reorder_nbp(
         as.list(halves),
-        tolerance_vec)
+        tolerance_vec
+    )
 }
 #' Reorders list first by treat index, then within pairs by
 #' highest tol val if given
@@ -380,9 +425,9 @@ fix_nbp_match <- function(nbp_match,
 #'
 #' @keywords internal
 reorder_nbp <- function(match_list,
-                        tolerance_vec = NULL){
+                        tolerance_vec = NULL) {
     treat_order <- order(match_list[["treat_index"]])
-    match_list <- lapply(match_list, function(x){
+    match_list <- lapply(match_list, function(x) {
         x[treat_order]
     })
 
@@ -392,11 +437,13 @@ reorder_nbp <- function(match_list,
 
         return(list(
             treat_index = ifelse(larger_ind,
-                                 match_list[["treat_index"]],
-                                 match_list[["control_index"]]),
+                match_list[["treat_index"]],
+                match_list[["control_index"]]
+            ),
             control_index = ifelse(larger_ind,
-                                   match_list[["control_index"]],
-                                   match_list[["treat_index"]]),
+                match_list[["control_index"]],
+                match_list[["treat_index"]]
+            ),
             distance = match_list[["distance"]]
         ))
     }

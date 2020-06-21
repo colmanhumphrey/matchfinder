@@ -16,8 +16,9 @@ x_from_cov <- function(cov_mat,
     n_cols <- nrow(cov_mat)
 
     base_normal_mat <- matrix(rnorm(n_rows * n_cols),
-                              nrow = n_rows,
-                              ncol = n_cols)
+        nrow = n_rows,
+        ncol = n_cols
+    )
 
     base_normal_mat %*% chol_cov
 }
@@ -39,8 +40,10 @@ target_mean_expit <- function(target_mean,
         mean(expit(linear_vector + alpha_value))
     }
 
-    alpha_value <- binary_search(target_value = target_mean,
-                                 monotone_function = mono_func)
+    alpha_value <- binary_search(
+        target_value = target_mean,
+        monotone_function = mono_func
+    )
 
     expit(linear_vector + alpha_value)
 }
@@ -60,8 +63,10 @@ example_treat_prob_generator <- function(x_mat) {
 
     if (ncol(x_mat) > 1) {
         numer <- numer + sign(x_mat[, 2]) / 2 +
-            x_mat %*% rnorm(n = ncol(x_mat),
-                            mean = 0, sd = 0.1)
+            x_mat %*% rnorm(
+                n = ncol(x_mat),
+                mean = 0, sd = 0.1
+            )
     }
 
     expit(numer)
@@ -77,9 +82,11 @@ example_treat_prob_generator <- function(x_mat) {
 #'
 #' @export
 example_mean_generator <- function(x_mat) {
-    b_vec <- rnorm(n = ncol(x_mat),
-                   mean = 0,
-                   sd = 0.3)
+    b_vec <- rnorm(
+        n = ncol(x_mat),
+        mean = 0,
+        sd = 0.3
+    )
 
     linear_part <- x_mat %*% b_vec
 
@@ -107,14 +114,17 @@ example_mean_generator <- function(x_mat) {
 #' @export
 default_x_generator <- function(n_rows,
                                 n_cols) {
-    sig_mat_pre = matrix(stats::runif((n_cols - 1) * n_cols, 0, 0.1),
-                         n_cols, n_cols - 1)
-    sig_mat_cov = sig_mat_pre %*% t(sig_mat_pre) +
+    sig_mat_pre <- matrix(
+        stats::runif((n_cols - 1) * n_cols, 0, 0.1),
+        n_cols, n_cols - 1
+    )
+    sig_mat_cov <- sig_mat_pre %*% t(sig_mat_pre) +
         diag(x = stats::runif(n_cols, 0, 0.3))
-    sig_mat_cor = stats::cov2cor(sig_mat_cov)
+    sig_mat_cor <- stats::cov2cor(sig_mat_cov)
 
     x_from_cov(sig_mat_cor,
-               n_rows = n_rows)
+        n_rows = n_rows
+    )
 }
 
 

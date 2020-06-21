@@ -106,18 +106,20 @@
 #' @author Colman Humphrey
 predict_prepare <- function(x_mat,
                             index_list,
-                            design = c("cross_all",
-                                       "cross_random",
-                                       "differences_random",
-                                       "differences_plain")) {
+                            design = c(
+                                "cross_all",
+                                "cross_random",
+                                "differences_random",
+                                "differences_plain"
+                            )) {
     design <- match.arg(design)
 
     stopifnot(length(index_list[["treat_train"]]) ==
-              length(index_list[["control_train"]]) &&
-              length(index_list[["treat_test"]]) ==
-              length(index_list[["control_test"]]))
+        length(index_list[["control_train"]]) &&
+        length(index_list[["treat_test"]]) ==
+            length(index_list[["control_test"]]))
 
-    ##------------------------------------
+    ## ------------------------------------
 
     treat_train_ind <- index_list[["treat_train"]]
     control_train_ind <- index_list[["control_train"]]
@@ -125,7 +127,7 @@ predict_prepare <- function(x_mat,
     treat_test_ind <- index_list[["treat_test"]]
     control_test_ind <- index_list[["control_test"]]
 
-    ##------------------------------------
+    ## ------------------------------------
 
     x_treat_train <- x_mat[treat_train_ind, , drop = FALSE]
     x_control_train <- x_mat[control_train_ind, , drop = FALSE]
@@ -138,7 +140,7 @@ predict_prepare <- function(x_mat,
 
     ## y_train_full <-
 
-    ##------------------------------------
+    ## ------------------------------------
 
     if (design %in% c("cross_random", "differences_random")) {
         ## basically exactly half in each
@@ -161,17 +163,22 @@ predict_prepare <- function(x_mat,
         train_order <- 1L:(length(treat_train_ind) * 2L)
         test_order <- 1L:length(treat_test_ind)
 
-        y_train = rep(c(1L, 0L),
-                      each = length(treat_train_ind))
-        y_test = rep(1L, times = length(treat_test_ind))
+        y_train <- rep(c(1L, 0L),
+            each = length(treat_train_ind)
+        )
+        y_test <- rep(1L, times = length(treat_test_ind))
     } else {
         treat_right_train <- !treat_left_train
         treat_right_test <- !treat_left_test
 
-        train_order <- order(c(train_index[treat_left_train],
-                               train_index[treat_right_train]))
-        test_order <- order(c(test_index[treat_left_test],
-                              test_index[treat_right_test]))
+        train_order <- order(c(
+            train_index[treat_left_train],
+            train_index[treat_right_train]
+        ))
+        test_order <- order(c(
+            test_index[treat_left_test],
+            test_index[treat_right_test]
+        ))
 
         y_train <- treat_left_train * 1L
         y_test <- treat_left_test * 1L
@@ -179,33 +186,43 @@ predict_prepare <- function(x_mat,
 
     if (design %in% c("cross_all", "cross_random")) {
         ## these will "cross" the rows, and use all
-        gen_design_mat <- function(x, y){
+        gen_design_mat <- function(x, y) {
             cbind(x, y)
         }
     } else {
         ## differences regime
-        gen_design_mat <- function(x, y){
+        gen_design_mat <- function(x, y) {
             x - y
         }
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
-    x_tc_train <- gen_design_mat(x_treat_train[treat_left_train, , drop = FALSE],
-                                 x_control_train[treat_left_train, , drop = FALSE])
-    x_ct_train <- gen_design_mat(x_control_train[treat_right_train, , drop = FALSE],
-                                 x_treat_train[treat_right_train, , drop = FALSE])
+    x_tc_train <- gen_design_mat(
+        x_treat_train[treat_left_train, , drop = FALSE],
+        x_control_train[treat_left_train, , drop = FALSE]
+    )
+    x_ct_train <- gen_design_mat(
+        x_control_train[treat_right_train, , drop = FALSE],
+        x_treat_train[treat_right_train, , drop = FALSE]
+    )
 
-    x_tc_test <- gen_design_mat(x_treat_test[treat_left_test, , drop = FALSE],
-                                x_control_test[treat_left_test, , drop = FALSE])
-    x_ct_test <- gen_design_mat(x_control_test[treat_right_test, , drop = FALSE],
-                                x_treat_test[treat_right_test, , drop = FALSE])
+    x_tc_test <- gen_design_mat(
+        x_treat_test[treat_left_test, , drop = FALSE],
+        x_control_test[treat_left_test, , drop = FALSE]
+    )
+    x_ct_test <- gen_design_mat(
+        x_control_test[treat_right_test, , drop = FALSE],
+        x_treat_test[treat_right_test, , drop = FALSE]
+    )
 
     ## combining to form full input
-    list(x_train = rbind(x_tc_train, x_ct_train)[train_order, , drop = FALSE],
-         x_test = rbind(x_tc_test, x_ct_test)[test_order, , drop = FALSE],
-         y_train = y_train,
-         y_test = y_test)
+    list(
+        x_train = rbind(x_tc_train, x_ct_train)[train_order, , drop = FALSE],
+        x_test = rbind(x_tc_test, x_ct_test)[test_order, , drop = FALSE],
+        y_train = y_train,
+        y_test = y_test
+    )
 }
 
 
@@ -246,8 +263,10 @@ generate_train_test_split <- function(match_list,
 
     train_index <- all_index %in%
         sample(all_index, size = floor(train_fraction * length_index))
-    index_list_from_match(match_list,
-                          train_index)
+    index_list_from_match(
+        match_list,
+        train_index
+    )
 }
 
 
@@ -265,7 +284,9 @@ generate_k_fold_index <- function(match_list,
     fold_res <- fold_indexing(length_index, num_folds)
 
     lapply(fold_res, function(inds) {
-        index_list_from_match(match_list,
-                              !(all_index %in% inds))
+        index_list_from_match(
+            match_list,
+            !(all_index %in% inds)
+        )
     })
 }

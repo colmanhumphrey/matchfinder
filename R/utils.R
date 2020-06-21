@@ -6,8 +6,10 @@
 #'
 #' @keywords internal
 min_different_rank <- function(dist_mat) {
-    min_blocked_rank(dist_mat,
-                     1L:nrow(dist_mat))
+    min_blocked_rank(
+        dist_mat,
+        1L:nrow(dist_mat)
+    )
 }
 
 
@@ -52,8 +54,10 @@ fixed_sample <- function(x, ...) x[sample.int(length(x), ...)]
 unique_size_sub <- function(primary, unique) {
     sub_sample <- fixed_sample(primary, unique, replace = FALSE)
 
-    c(sub_sample,
-      fixed_sample(sub_sample, length(primary) - unique, replace = TRUE))
+    c(
+        sub_sample,
+        fixed_sample(sub_sample, length(primary) - unique, replace = TRUE)
+    )
 }
 
 
@@ -64,7 +68,7 @@ unique_size_sub <- function(primary, unique) {
 #' @author Colman Humphrey
 #'
 #' @keywords internal
-is_tf <- function(x){
+is_tf <- function(x) {
     is.logical(x) && length(x) == 1L && !is.na(x)
 }
 
@@ -85,11 +89,12 @@ fold_indexing <- function(index_length,
     sub_length <- index_length - gap_len
 
     cut_indices <- seq(1L, sub_length + 1L,
-                       length.out = num_folds + 1L) +
+        length.out = num_folds + 1L
+    ) +
         cumsum(c(0L, rep(1L, gap_len), rep(0L, num_folds - gap_len)))
 
-    lapply(1L:num_folds, function(j){
-        random_index[cut_indices[j] : (cut_indices[j + 1L] - 1L)]
+    lapply(1L:num_folds, function(j) {
+        random_index[cut_indices[j]:(cut_indices[j + 1L] - 1L)]
     })
 }
 
@@ -125,24 +130,28 @@ swap_pairs <- function(match_list,
 
     primary_list <- list(
         treat_index = ifelse(!swap,
-                             match_list[["treat_index"]],
-                             match_list[["control_index"]]),
+            match_list[["treat_index"]],
+            match_list[["control_index"]]
+        ),
         control_index = ifelse(swap,
-                               match_list[["treat_index"]],
-                               match_list[["control_index"]])
+            match_list[["treat_index"]],
+            match_list[["control_index"]]
         )
+    )
 
     if (all(c("treat_index_within", "control_index_within") %in%
-            names(match_list))) {
+        names(match_list))) {
         primary_list[["treat_index_within"]] <-
             ifelse(!swap,
-                   match_list[["treat_index_within"]],
-                   match_list[["control_index_within"]])
+                match_list[["treat_index_within"]],
+                match_list[["control_index_within"]]
+            )
 
         primary_list[["control_index_within"]] <-
             ifelse(swap,
-                   match_list[["treat_index_within"]],
-                   match_list[["control_index_within"]])
+                match_list[["treat_index_within"]],
+                match_list[["control_index_within"]]
+            )
 
         primary_list <- primary_list[c(1L, 3L, 2L, 4L)]
     }
@@ -163,7 +172,7 @@ swap_pairs <- function(match_list,
 #' @keywords internal
 rank_integer_index <- function(rank_cols, x_mat) {
     if (is.null(rank_cols)) {
-        return(vector('integer', 0L))
+        return(vector("integer", 0L))
     }
 
     if (all(rank_cols %in% 1L:ncol(x_mat))) {
@@ -208,10 +217,11 @@ ranked_x <- function(x_mat,
                      rank_cols = NULL,
                      ties_method = "average") {
     ## convert to ranks
-    for (rank_change in rank_integer_index(rank_cols, x_mat)){
+    for (rank_change in rank_integer_index(rank_cols, x_mat)) {
         ## divides by nrow, better scaling
         x_mat[, rank_change] <- rank(x_mat[, rank_change],
-                                     ties.method = ties_method) / nrow(x_mat)
+            ties.method = ties_method
+        ) / nrow(x_mat)
     }
 
     x_mat
@@ -226,25 +236,29 @@ ranked_x <- function(x_mat,
 near_given_match <- function(find_vec,
                              given_index) {
     ## runif breaks ties randomly between orders for same element
-    order_tol <- order(find_vec,
-                       runif(length(find_vec)))
+    order_tol <- order(
+        find_vec,
+        runif(length(find_vec))
+    )
 
     given_order_index <- match(given_index, order_tol)
 
-    ##----------------
+    ## ----------------
     ## find the nearest elements above our given_index
 
     ## the pmin is to avoid indexing above the vector
     ## won't happen in a proper match, since all controls need a higher
     ## tol treat
     ## but just in case / in cases with many ties or whatever
-    above_index <- order_tol[pmin(given_order_index + 1L,
-                                  length(order_tol))]
+    above_index <- order_tol[pmin(
+        given_order_index + 1L,
+        length(order_tol)
+    )]
     tol_above <- find_vec[above_index]
     ## if our control is the max, we won't use above... of course
     tol_above[given_order_index == length(order_tol)] <- Inf
 
-    ##----------------
+    ## ----------------
     ## find the nearest elements below our control index
 
     ## here, we do need this pmax even in proper matches:
@@ -254,12 +268,13 @@ near_given_match <- function(find_vec,
     ## if our control is the min, we won't be using below... of course
     tol_below[given_order_index == 1L] <- Inf
 
-    ##----------------
+    ## ----------------
     ## note that the above Infs cannot co-occur, so we're good
 
     given_tolerance <- find_vec[given_index]
     ifelse(abs(tol_above - given_tolerance) > abs(given_tolerance - tol_below),
-           below_index, above_index)
+        below_index, above_index
+    )
 }
 
 #' exp / 1 + exp
@@ -276,7 +291,7 @@ expit <- function(x) {
 #' This is useful for generating pairwise distance matrices
 #' @param mat a matrix
 #' @keywords internal
-sym_mat <- function(mat){
+sym_mat <- function(mat) {
     sym <- mat + t(mat)
     diag(sym) <- 0
     sym
@@ -314,25 +329,27 @@ binary_search <- function(target_value,
     }
     if (monotone_function(test_bounds[1L]) >
         monotone_function(test_bounds[2L])) {
-        return(binary_search(target_value = -target_value,
-                             monotone_function = function(x){
-                                 -monotone_function(x)
-                             },
-                             init_bounds = init_bounds,
-                             max_iters = max_iters))
+        return(binary_search(
+            target_value = -target_value,
+            monotone_function = function(x) {
+                -monotone_function(x)
+            },
+            init_bounds = init_bounds,
+            max_iters = max_iters
+        ))
     }
 
     if (is.null(init_bounds)) {
         if (monotone_function(0) > target_value) {
             upper_bound <- 0
             lower_bound <- -1
-            while(monotone_function(lower_bound) > target_value) {
+            while (monotone_function(lower_bound) > target_value) {
                 lower_bound <- lower_bound * 1.1 - 1
             }
         } else {
             lower_bound <- 0
             upper_bound <- 1
-            while(monotone_function(upper_bound) < target_value) {
+            while (monotone_function(upper_bound) < target_value) {
                 upper_bound <- upper_bound * 1.1 + 1
             }
         }
@@ -345,14 +362,14 @@ binary_search <- function(target_value,
     }
 
     stopifnot(sign(monotone_function(lower_bound) - target_value) *
-              sign(monotone_function(upper_bound) - target_value) == -1L)
+        sign(monotone_function(upper_bound) - target_value) == -1L)
 
     input_val <- (lower_bound + upper_bound) / 2
     mono_val <- monotone_function(input_val)
 
     iters <- 0L
 
-    while(abs(mono_val - target_value) > error_gap && iters < max_iters) {
+    while (abs(mono_val - target_value) > error_gap && iters < max_iters) {
         if (mono_val > target_value) {
             upper_bound <- input_val
         } else {

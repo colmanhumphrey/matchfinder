@@ -30,8 +30,10 @@ generate_simulation_input <- function(n_rows = 500L,
                                           example_mean_generator,
                                       error_generator =
                                           default_error_generator) {
-    x_mat <- x_generator(n_rows = n_rows,
-                         n_cols = n_cols)
+    x_mat <- x_generator(
+        n_rows = n_rows,
+        n_cols = n_cols
+    )
 
     treat_prob <- treat_prob_generator(x_mat)
     treat_vec <- rbinom(length(treat_prob), 1, treat_prob)
@@ -67,7 +69,7 @@ generate_simulation_input <- function(n_rows = 500L,
 #' @export
 paper_treatment_functions <- function(target_mean = 0.425) {
     stopifnot(length(target_mean) == 1 &&
-              0 < target_mean && target_mean < 1)
+        0 < target_mean && target_mean < 1)
 
     constant_treat_prob <- function(x_mat) {
         rep(target_mean, nrow(x_mat))
@@ -77,8 +79,10 @@ paper_treatment_functions <- function(target_mean = 0.425) {
         coef_vec <- rnorm(ncol(x_mat), 0, 0.2)
         lin_vec <- c(x_mat %*% coef_vec)
 
-        target_mean_expit(target_mean = target_mean,
-                          linear_vector = lin_vec)
+        target_mean_expit(
+            target_mean = target_mean,
+            linear_vector = lin_vec
+        )
     }
 
     sparse_treat_prob <- function(x_mat) {
@@ -87,19 +91,22 @@ paper_treatment_functions <- function(target_mean = 0.425) {
         min_gap <- min(target_mean, 1 - target_mean) / 2
 
         ifelse(sign(median_adjusted) > 0,
-               target_mean + min_gap,
-               target_mean - min_gap)
+            target_mean + min_gap,
+            target_mean - min_gap
+        )
     }
 
     sparse_nonlin_treat_prob <- function(x_mat) {
         mean_adj <- (x_mat[, 1] - mean(x_mat[, 1])) / (sd(x_mat[, 1]) * 2) + 1
         numer <- mean_adj^3 - mean_adj^2
 
-        target_mean_expit(target_mean = target_mean,
-                          linear_vector = numer)
+        target_mean_expit(
+            target_mean = target_mean,
+            linear_vector = numer
+        )
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     list(
         constant_treat_prob = constant_treat_prob,
@@ -157,7 +164,7 @@ paper_mean_functions <- function() {
         lin_vec - mean(lin_vec)
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     list(
         constant_mu = constant_mu,
@@ -184,8 +191,8 @@ n_sink_generator <- function(start_frac = 0,
                              end_frac = 0.8,
                              length_out = 9) {
     stopifnot(length(start_frac) == 1L &&
-              length(end_frac) == 1L &&
-              length(length_out) == 1L)
+        length(end_frac) == 1L &&
+        length(length_out) == 1L)
     stopifnot(0 <= start_frac && start_frac <= 1)
     stopifnot(0 <= end_frac && end_frac <= 1)
     stopifnot(length_out >= 1L)
@@ -200,9 +207,11 @@ n_sink_generator <- function(start_frac = 0,
     function(treat_vec) {
         num_treat <- sum(treat_vec)
 
-        floor(seq(from = floor(start_frac * num_treat),
-                  to = floor(end_frac * num_treat),
-                  length.out = length_out))
+        floor(seq(
+            from = floor(start_frac * num_treat),
+            to = floor(end_frac * num_treat),
+            length.out = length_out
+        ))
     }
 }
 
@@ -242,13 +251,14 @@ compute_sim_result <- function(x_generator = default_x_generator,
                                n_cols = 5L,
                                num_weight_vectors = 100L,
                                silent = !interactive()) {
-
-    sim_data <- generate_simulation_input(n_rows = n_rows,
-                                          n_cols = n_cols,
-                                          x_generator = x_generator,
-                                          treat_prob_generator = treat_prob_generator,
-                                          mean_generator = mean_generator,
-                                          error_generator = error_generator)
+    sim_data <- generate_simulation_input(
+        n_rows = n_rows,
+        n_cols = n_cols,
+        x_generator = x_generator,
+        treat_prob_generator = treat_prob_generator,
+        mean_generator = mean_generator,
+        error_generator = error_generator
+    )
 
     x_mat <- sim_data[["x_mat"]]
     y_vector <- sim_data[["y_vec"]]
@@ -259,28 +269,32 @@ compute_sim_result <- function(x_generator = default_x_generator,
     n_sinks <- n_sink_gen(treat_vec)
     match_list_est_func <- (function(y_vector, treat_vec) {
         function(match_list) {
-            match_estimate(match_list = match_list,
-                           y_vector = y_vector,
-                           treat_vec = treat_vec)
+            match_estimate(
+                match_list = match_list,
+                y_vector = y_vector,
+                treat_vec = treat_vec
+            )
         }
     })(y_vector, treat_vec)
 
     list_est_func <- (function(n_sinks) {
         function(match_lists) {
-            Map(function(n_sink, match_list) {
-                list(
-                    n_sinks = n_sink,
-                    est = match_list_est_func(match_list)
-                )
-            },
-            n_sinks,
-            match_lists)
+            Map(
+                function(n_sink, match_list) {
+                    list(
+                        n_sinks = n_sink,
+                        est = match_list_est_func(match_list)
+                    )
+                },
+                n_sinks,
+                match_lists
+            )
         }
     })(n_sinks)
 
     naive_est <- mean(y_vector[treat_vec == 1]) - mean(y_vector[treat_vec == 0])
 
-    ##------------------------------------
+    ## ------------------------------------
 
     if (!silent) {
         message("propensity matches")
@@ -294,11 +308,12 @@ compute_sim_result <- function(x_generator = default_x_generator,
             propensity_function = propensity_score_linear,
             oos_propensity = FALSE
         ),
-        n_sinks = n_sinks)
+        n_sinks = n_sinks
+    )
 
     propensity_ests <- list_est_func(propensity_matches)
 
-    ##------------------------------------
+    ## ------------------------------------
 
     if (!silent) {
         message("mahal matches")
@@ -310,11 +325,12 @@ compute_sim_result <- function(x_generator = default_x_generator,
         weight_list = list(rep(1 / n_cols, times = n_cols)),
         treat_vec = treat_vec,
         match_method = match_method,
-        n_sinks = n_sinks)[[1]]
+        n_sinks = n_sinks
+    )[[1]]
 
     mahal_ests <- list_est_func(mahal_matches)
 
-    ##------------------------------------
+    ## ------------------------------------
 
     if (!silent) {
         message("all weighted matches")
@@ -323,7 +339,8 @@ compute_sim_result <- function(x_generator = default_x_generator,
     weight_list <- generate_random_weights(
         prior_weights = rep(1 / n_cols, times = n_cols),
         number_vectors = num_weight_vectors,
-        minimum_weights = rep(1 / (3 * n_cols), times = n_cols))
+        minimum_weights = rep(1 / (3 * n_cols), times = n_cols)
+    )
 
     sink_brier_matches <- sink_brier_bipartite_matches(
         x_mat = x_mat,
@@ -332,14 +349,16 @@ compute_sim_result <- function(x_generator = default_x_generator,
         treat_vec = treat_vec,
         match_method = match_method,
         n_sinks = n_sinks,
-        silent = silent)
+        silent = silent
+    )
 
     permutation_results <- permutation_bipartite_matches(
         matches_by_sinks = sink_brier_matches[["matches_by_sinks"]],
         briers_by_sinks = sink_brier_matches[["briers_by_sinks"]],
         x_mat = x_mat,
         n_sinks = n_sinks,
-        silent = silent)
+        silent = silent
+    )
 
     weighted_results <- lapply(
         permutation_results[["best_matches"]],
@@ -348,16 +367,19 @@ compute_sim_result <- function(x_generator = default_x_generator,
                 n_sinks = match_results[["n_sinks"]],
                 raw_brier = match_results[["raw_brier"]],
                 permutation_brier = match_results[["permutation_brier"]],
-                est = match_list_est_func(match_results[["match_list"]]))
-        })
+                est = match_list_est_func(match_results[["match_list"]])
+            )
+        }
+    )
 
-    ##------------------------------------
+    ## ------------------------------------
 
     list(
         naive_est = naive_est,
         propensity_results = propensity_ests,
         mahal_results = mahal_ests,
-        weighted_results = weighted_results)
+        weighted_results = weighted_results
+    )
 }
 
 
@@ -438,7 +460,8 @@ reshape_p_cut_list <- function(list_of_sims,
             p_briers <- unlist(lapply(
                 par_res[["weighted_results"]], function(x) {
                     x[["permutation_brier"]]
-                }))
+                }
+            ))
             if (all(p_briers > p_cut_val)) {
                 given_cut_ind <- which.min(p_briers)
             } else {
@@ -494,15 +517,17 @@ parallel_sim <- function(x_generator = default_x_generator,
         if (!silent) {
             print(paste0("iteration ", j, "/", iterations))
         }
-        compute_sim_result(x_generator = x_generator,
-                           treat_prob_generator = treat_prob_generator,
-                           mean_generator = mean_generator,
-                           error_generator = error_generator,
-                           n_sink_gen = n_sink_gen,
-                           match_method = match_method,
-                           n_rows = n_rows,
-                           n_cols = n_cols,
-                           num_weight_vectors = num_weight_vectors,
-                           silent = silent)
+        compute_sim_result(
+            x_generator = x_generator,
+            treat_prob_generator = treat_prob_generator,
+            mean_generator = mean_generator,
+            error_generator = error_generator,
+            n_sink_gen = n_sink_gen,
+            match_method = match_method,
+            n_rows = n_rows,
+            n_cols = n_cols,
+            num_weight_vectors = num_weight_vectors,
+            silent = silent
+        )
     }, mc.cores = num_cores)
 }

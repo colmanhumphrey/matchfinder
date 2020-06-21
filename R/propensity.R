@@ -30,7 +30,7 @@ gen_propensity_list <- function(propensity_function = propensity_score_xgb,
     } else {
         n_folds <- ifelse(is.null(n_folds), 5L, n_folds)
         stopifnot(is.numeric(n_folds) && length(n_folds) == 1L &&
-                  !is.na(n_folds))
+            !is.na(n_folds))
     }
 
     list(
@@ -86,35 +86,44 @@ match_propensity_list <- function(propensity_function = propensity_score_xgb,
 #' @export
 propensity_bipartite_matches <- function(x_mat,
                                          treat_vec,
-                                         match_method = c("with_replacement",
-                                                          "optimal",
-                                                          "greedy"),
+                                         match_method = c(
+                                             "with_replacement",
+                                             "optimal",
+                                             "greedy"
+                                         ),
                                          propensity_list = gen_propensity_list(),
                                          n_sinks = 0,
                                          caliper_list = gen_caliper_list(),
                                          sqrt_mahal = TRUE,
-                                         tol_val = NULL){
+                                         tol_val = NULL) {
     ## in case of logical
     treat_vec <- treat_vec * 1L
 
     ## generate propensity score
-    prop_score <- propensity_score(x_mat = x_mat,
-                                   treat_vec = treat_vec,
-                                   propensity_list = propensity_list)
-    prop_dist_mat <- abs(outer(prop_score[treat_vec == 1],
-                               prop_score[treat_vec == 0],
-                               "-"))
+    prop_score <- propensity_score(
+        x_mat = x_mat,
+        treat_vec = treat_vec,
+        propensity_list = propensity_list
+    )
+    prop_dist_mat <- abs(outer(
+        prop_score[treat_vec == 1],
+        prop_score[treat_vec == 0],
+        "-"
+    ))
 
-    if(!is.null(caliper_list)){
+    if (!is.null(caliper_list)) {
         prop_dist_mat <- prop_dist_mat + create_caliper(caliper_list,
-                                                        treat_vec = treat_vec)
+            treat_vec = treat_vec
+        )
     }
 
-    bipartite_matches(dist_mat = prop_dist_mat,
-                      treat_vec = treat_vec,
-                      match_method = match_method,
-                      n_sinks = n_sinks,
-                      tol_val = tol_val)
+    bipartite_matches(
+        dist_mat = prop_dist_mat,
+        treat_vec = treat_vec,
+        match_method = match_method,
+        n_sinks = n_sinks,
+        tol_val = tol_val
+    )
 }
 
 #' Propensity match for nbp
@@ -123,29 +132,36 @@ propensity_bipartite_matches <- function(x_mat,
 propensity_nonbipartite_matches <- function(x_mat,
                                             tolerance_list = gen_tolerance_list(),
                                             propensity_list = gen_propensity_list(),
-                                            match_method = c("with_replacement",
-                                                             "optimal",
-                                                             "greedy"),
+                                            match_method = c(
+                                                "with_replacement",
+                                                "optimal",
+                                                "greedy"
+                                            ),
                                             n_sinks = 0,
                                             caliper_list = gen_caliper_list(),
                                             sqrt_mahal = TRUE,
                                             keep_all_with_replacement = FALSE) {
     ## generate propensity score
-    prop_score <- propensity_score(x_mat = x_mat,
-                                   treat_vec = tolerance_list[["tolerance_vec"]],
-                                   propensity_list = propensity_list)
+    prop_score <- propensity_score(
+        x_mat = x_mat,
+        treat_vec = tolerance_list[["tolerance_vec"]],
+        propensity_list = propensity_list
+    )
     prop_dist_mat <- abs(outer(prop_score, prop_score, "-"))
 
-    if(!is.null(caliper_list)){
+    if (!is.null(caliper_list)) {
         prop_dist_mat <- prop_dist_mat + create_caliper(caliper_list,
-                                                        treat_vec = treat_vec)
+            treat_vec = treat_vec
+        )
     }
 
-    nonbipartite_matches(dist_mat = prop_dist_mat,
-                         tolerance_list = tolerance_list,
-                         match_method = match_method,
-                         n_sinks = n_sinks,
-                         keep_all_with_replacement = keep_all_with_replacement)
+    nonbipartite_matches(
+        dist_mat = prop_dist_mat,
+        tolerance_list = tolerance_list,
+        match_method = match_method,
+        n_sinks = n_sinks,
+        keep_all_with_replacement = keep_all_with_replacement
+    )
 }
 
 
@@ -179,7 +195,7 @@ propensity_score <- function(x_mat,
         return(propensity_function(train_treat_list))
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     fold_res <- fold_indexing(nrow(x_mat), propensity_list[["n_folds"]])
 
@@ -216,10 +232,11 @@ propensity_score_xgb <- function(train_test_list,
                                  params = list(eta = 0.1, max.depth = 3),
                                  ...) {
     match_predict_xgb(train_test_list,
-                      nrounds = nrounds,
-                      nthread = nthread,
-                      params = params,
-                      ...)
+        nrounds = nrounds,
+        nthread = nthread,
+        params = params,
+        ...
+    )
 }
 
 

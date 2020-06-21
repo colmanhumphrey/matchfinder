@@ -32,7 +32,7 @@ gen_caliper_list <- function(caliper_vec = NULL,
 
     if (length(continuous_mult) > 1L) {
         stop("`continuous_mult` should be length one")
-    }    
+    }
 
     return(list(
         caliper_vec = caliper_vec,
@@ -58,7 +58,7 @@ gen_caliper_list <- function(caliper_vec = NULL,
 #'
 #' @export
 create_caliper <- function(caliper_list,
-                           treat_vec = NULL){
+                           treat_vec = NULL) {
     if (is.null(treat_vec)) {
         caliper_treat <- caliper_list[["caliper_vec"]]
         caliper_control <- caliper_list[["caliper_vec"]]
@@ -74,8 +74,9 @@ create_caliper <- function(caliper_list,
     }
 
     abs_caliper_diff <- abs(outer(caliper_treat,
-                                  caliper_control,
-                                  FUN = '-')) - caliper_list[["caliper_max"]]
+        caliper_control,
+        FUN = "-"
+    )) - caliper_list[["caliper_max"]]
     abs_caliper_diff[abs_caliper_diff < 0] <- 0
 
     continuous_mult <- caliper_list[["continuous_mult"]]
@@ -84,7 +85,7 @@ create_caliper <- function(caliper_list,
         penalty_mat <- continuous_mult * abs_caliper_diff
     } else {
         penalty_mat <- abs_caliper_diff
-        penalty_mat[penalty_mat > 0] = Inf
+        penalty_mat[penalty_mat > 0] <- Inf
     }
 
     penalty_mat

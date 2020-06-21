@@ -49,8 +49,8 @@ weighted_mahal <- function(x_mat,
                            weight_vec = NULL,
                            treat_vec = NULL,
                            sqrt_mahal = TRUE,
-                           partial_index = NULL){
-    if(!is.null(partial_index) && !is.null(treat_vec)){
+                           partial_index = NULL) {
+    if (!is.null(partial_index) && !is.null(treat_vec)) {
         stop("Supply at most one of treat_vec and partial_index", call. = FALSE)
     }
     if (!is.matrix(x_mat)) {
@@ -59,7 +59,7 @@ weighted_mahal <- function(x_mat,
 
     chol_cov <- chol(cov_x)
 
-    if(is.null(weight_vec)){
+    if (is.null(weight_vec)) {
         weight_vec <- rep(1 / ncol(x_mat), times = ncol(x_mat))
     } else {
         if (length(weight_vec) != ncol(x_mat)) {
@@ -71,9 +71,8 @@ weighted_mahal <- function(x_mat,
 
     ymat_sumsq <- colSums(weighted_ymat^2)
 
-    if(!is.null(treat_vec) || !is.null(partial_index)){
-
-        if(!is.null(treat_vec)){
+    if (!is.null(treat_vec) || !is.null(partial_index)) {
+        if (!is.null(treat_vec)) {
             ## in case it's logical...:
             treat_vec <- treat_vec * 1
 
@@ -88,19 +87,21 @@ weighted_mahal <- function(x_mat,
             weighted_ymat[, col_index]
 
         mahal_mat <- outer(ymat_sumsq[row_index],
-                          ymat_sumsq[col_index], FUN = '+') -
+            ymat_sumsq[col_index],
+            FUN = "+"
+        ) -
             2 * crossprod_weighted
     } else {
         crossprod_weighted <- t(weighted_ymat) %*% weighted_ymat
 
-        mahal_mat <- outer(ymat_sumsq, ymat_sumsq, FUN = '+') -
+        mahal_mat <- outer(ymat_sumsq, ymat_sumsq, FUN = "+") -
             2 * crossprod_weighted
     }
 
     ## correcting for e.g. system tol (well, working with doubles)
     mahal_mat <- pmax(mahal_mat, 0)
 
-    if(sqrt_mahal){
+    if (sqrt_mahal) {
         mahal_mat <- sqrt(mahal_mat)
     }
 
@@ -131,29 +132,34 @@ mahal_imbalance <- function(x_mat,
                             match_list_list = NULL) {
     if (sum(is.null(match_list), is.null(match_list_list)) != 1L) {
         stop("provide exactly one of `match_list` or `match_list_list`",
-             call. = FALSE)
+            call. = FALSE
+        )
     }
 
     chol_cov <- chol(cov_x)
 
-    if(is.null(weight_vec)){
+    if (is.null(weight_vec)) {
         weight_vec <- rep(1 / ncol(x_mat), times = ncol(x_mat))
     }
 
     if (is.null(match_list)) {
-        return(mahal_imbalance_list(x_mat,
-                                    match_list,
-                                    chol_mat,
-                                    weight_vec,
-                                    sqrt_mahal))
+        return(mahal_imbalance_list(
+            x_mat,
+            match_list,
+            chol_mat,
+            weight_vec,
+            sqrt_mahal
+        ))
     }
 
-    unlist(lapply(match_list_list, function(x){
-        mahal_imbalance_list(x_mat,
-                             x,
-                             chol_mat,
-                             weight_vec,
-                             sqrt_mahal)
+    unlist(lapply(match_list_list, function(x) {
+        mahal_imbalance_list(
+            x_mat,
+            x,
+            chol_mat,
+            weight_vec,
+            sqrt_mahal
+        )
     }))
 }
 
@@ -170,9 +176,11 @@ mahal_imbalance_list <- function(x_mat,
                                  weight_vec,
                                  sqrt_mahal) {
     x_diff_vec <- colMeans(x_mat[match_list[["treat_index"]], ] -
-                           x_mat[match_list[["control_index"]], ])
-    y_vec <- forwardsolve(diag(1 / weight_vec) %*% t(chol_mat),
-                          x_diff_vec)
+        x_mat[match_list[["control_index"]], ])
+    y_vec <- forwardsolve(
+        diag(1 / weight_vec) %*% t(chol_mat),
+        x_diff_vec
+    )
     if (sqrt_mahal) {
         return(sqrt(sum(y_vec^2)))
     }

@@ -22,9 +22,11 @@ all_bipartite_matches <- function(x_mat,
                                   cov_x,
                                   weight_list,
                                   treat_vec,
-                                  match_method = c("with_replacement",
-                                                   "optimal",
-                                                   "greedy"),
+                                  match_method = c(
+                                      "with_replacement",
+                                      "optimal",
+                                      "greedy"
+                                  ),
                                   n_sinks = 0,
                                   caliper_list = gen_caliper_list(),
                                   propensity_list = match_propensity_list(NULL),
@@ -32,48 +34,58 @@ all_bipartite_matches <- function(x_mat,
                                   tol_val = NULL) {
     if (!is.null(propensity_list)) {
         if (!is.null(caliper_list)) {
-            stop("don't use both `caliper_list` and `propensity_list`: ",
-                 " If you do want both, create the combined caliper separately")
+            stop(
+                "don't use both `caliper_list` and `propensity_list`: ",
+                " If you do want both, create the combined caliper separately"
+            )
         }
 
         ## in case of logical
         treat_vec <- treat_vec * 1L
 
         ## generate propensity score
-        prop_list_names <- c("propensity_function",
-                             "oos_propensity",
-                             "n_folds")
+        prop_list_names <- c(
+            "propensity_function",
+            "oos_propensity",
+            "n_folds"
+        )
         prop_score <- propensity_score(
             x_mat = x_mat,
             treat_vec = treat_vec,
-            propensity_list = propensity_list[prop_list_names])
+            propensity_list = propensity_list[prop_list_names]
+        )
         caliper_list <- gen_caliper_list(
             caliper_vec = prop_score,
             caliper_max = sd(prop_score) * propensity_list[["caliper_sd_mult"]],
-            continuous_mult = propensity_list[["continuous_mult"]])
+            continuous_mult = propensity_list[["continuous_mult"]]
+        )
     }
 
     if (!is.null(caliper_list)) {
         caliper_dist_mat <- create_caliper(caliper_list,
-                                           treat_vec = treat_vec)
+            treat_vec = treat_vec
+        )
     }
 
     lapply(weight_list, function(weight_vec) {
         w_dist_mat <- weighted_mahal(x_mat,
-                                     cov_x = cov_x,
-                                     weight_vec = weight_vec,
-                                     treat_vec = treat_vec,
-                                     sqrt_mahal = sqrt_mahal)
+            cov_x = cov_x,
+            weight_vec = weight_vec,
+            treat_vec = treat_vec,
+            sqrt_mahal = sqrt_mahal
+        )
 
-        if(!is.null(caliper_list)){
+        if (!is.null(caliper_list)) {
             w_dist_mat <- w_dist_mat + caliper_dist_mat
         }
 
-        bipartite_matches(dist_mat = w_dist_mat,
-                          treat_vec = treat_vec,
-                          match_method = match_method,
-                          n_sinks = n_sinks,
-                          tol_val = tol_val)
+        bipartite_matches(
+            dist_mat = w_dist_mat,
+            treat_vec = treat_vec,
+            match_method = match_method,
+            n_sinks = n_sinks,
+            tol_val = tol_val
+        )
     })
 }
 
@@ -91,9 +103,11 @@ sink_brier_bipartite_matches <- function(x_mat,
                                          cov_x,
                                          weight_list,
                                          treat_vec,
-                                         match_method = c("with_replacement",
-                                                          "optimal",
-                                                          "greedy"),
+                                         match_method = c(
+                                             "with_replacement",
+                                             "optimal",
+                                             "greedy"
+                                         ),
                                          n_sinks = 0,
                                          caliper_list = gen_caliper_list(),
                                          propensity_list = match_propensity_list(NULL),
@@ -108,7 +122,8 @@ sink_brier_bipartite_matches <- function(x_mat,
         weight_list = weight_list,
         treat_vec = treat_vec,
         match_method = match_method,
-        n_sinks = n_sinks)
+        n_sinks = n_sinks
+    )
 
     ## reorder: by sink instead of by weight vector
     all_by_sinks <- setNames(lapply(n_sinks, function(x) {
@@ -122,13 +137,15 @@ sink_brier_bipartite_matches <- function(x_mat,
     }
 
     ## get all brier scores for all results
-    briers_by_sinks <- lapply(all_by_sinks, function(x){
+    briers_by_sinks <- lapply(all_by_sinks, function(x) {
         if (!silent) {
             print(x[[1]]["num_sinks"])
         }
         unlist(lapply(x, function(y) {
-            brier_score_cv(x_mat,
-                           y)
+            brier_score_cv(
+                x_mat,
+                y
+            )
         }))
     })
 
@@ -178,7 +195,8 @@ permutation_bipartite_matches <- function(matches_by_sinks,
         }
         best_brier_ind <- best_brier_inds[[j]]
         permutation_brier(x_mat,
-                          match_list = matches_by_sinks[[j]][[best_brier_ind]])
+            match_list = matches_by_sinks[[j]][[best_brier_ind]]
+        )
     })
 
     ## compute the permutation score for each match
@@ -197,7 +215,7 @@ permutation_bipartite_matches <- function(matches_by_sinks,
         best_brier_ind <- best_brier_inds[[j]]
 
         stopifnot(permutation_brier_scores[[j]][best_brier_ind] ==
-                  min(permutation_brier_scores[[j]]))
+            min(permutation_brier_scores[[j]]))
 
         list(
             n_sinks = n_sinks[j],
@@ -224,33 +242,41 @@ all_nonbipartite_matches <- function(x_mat,
                                      cov_x,
                                      weight_list,
                                      tolerance_list = gen_tolerance_list(),
-                                     match_method = c("with_replacement",
-                                                      "optimal",
-                                                      "greedy"),
+                                     match_method = c(
+                                         "with_replacement",
+                                         "optimal",
+                                         "greedy"
+                                     ),
                                      n_sinks = 0,
                                      caliper_list = gen_caliper_list(),
                                      propensity_list =
                                          match_propensity_list(NULL),
                                      sqrt_mahal = TRUE,
-                                     keep_all_with_replacement = FALSE){
+                                     keep_all_with_replacement = FALSE) {
     if (!is.null(propensity_list)) {
         if (!is.null(caliper_list)) {
-            stop("don't use both `caliper_list` and `propensity_list`: ",
-                 " If you do want both, create the combined caliper separately")
+            stop(
+                "don't use both `caliper_list` and `propensity_list`: ",
+                " If you do want both, create the combined caliper separately"
+            )
         }
 
         ## generate propensity score
-        prop_list_names <- c("propensity_function",
-                             "oos_propensity",
-                             "n_folds")
+        prop_list_names <- c(
+            "propensity_function",
+            "oos_propensity",
+            "n_folds"
+        )
         prop_score <- propensity_score(
             x_mat = x_mat,
             treat_vec = tolerance_list[["tolerance_vec"]],
-            propensity_list = propensity_list[prop_list_names])
-        caliper_list = gen_caliper_list(
+            propensity_list = propensity_list[prop_list_names]
+        )
+        caliper_list <- gen_caliper_list(
             caliper_vec = prop_score,
             caliper_max = sd(prop_score) * propensity_list[["caliper_sd_mult"]],
-            continuous_mult = propensity_list[["continuous_mult"]])
+            continuous_mult = propensity_list[["continuous_mult"]]
+        )
     }
 
     if (!is.null(caliper_list)) {
@@ -259,18 +285,21 @@ all_nonbipartite_matches <- function(x_mat,
 
     lapply(weight_list, function(weight_vec) {
         w_dist_mat <- weighted_mahal(x_mat,
-                                     cov_x = cov_x,
-                                     weight_vec = weight_vec,
-                                     sqrt_mahal = sqrt_mahal)
+            cov_x = cov_x,
+            weight_vec = weight_vec,
+            sqrt_mahal = sqrt_mahal
+        )
 
-        if(!is.null(caliper_list)){
+        if (!is.null(caliper_list)) {
             w_dist_mat <- w_dist_mat + caliper_dist_mat
         }
 
-        nonbipartite_matches(dist_mat = w_dist_mat,
-                             tolerance_list = tolerance_list,
-                             match_method = match_method,
-                             n_sinks = n_sinks,
-                             keep_all_with_replacement = keep_all_with_replacement)
+        nonbipartite_matches(
+            dist_mat = w_dist_mat,
+            tolerance_list = tolerance_list,
+            match_method = match_method,
+            n_sinks = n_sinks,
+            keep_all_with_replacement = keep_all_with_replacement
+        )
     })
 }

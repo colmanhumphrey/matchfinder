@@ -22,20 +22,22 @@ bipartite_match_sd <- function(x_mat,
                                use_all_controls = TRUE,
                                sqrt_mahal = TRUE) {
     if (!is.null(caliper_list) && !is.null(propensity_list)) {
-        stop("don't use both `caliper_list` and `propensity_list`: ",
-             " If you do want both, create the combined caliper separately")
+        stop(
+            "don't use both `caliper_list` and `propensity_list`: ",
+            " If you do want both, create the combined caliper separately"
+        )
     }
-    ##------------------------------------
+    ## ------------------------------------
     ## two variance components
 
-    ##------------------------------------
+    ## ------------------------------------
     ## V1 easy: usual variance
     ## exists if matches are made without replacement
 
     var_difference <- var(y_vector[match_list[["treat_index"]]] -
-                          y_vector[match_list[["control_index"]]])
+        y_vector[match_list[["control_index"]]])
 
-    ##----------------
+    ## ----------------
     ## V2 harder: the added variance from using repeats
 
     all_unique_controls <- !any(duplicated(match_list[["control_index"]]))
@@ -48,17 +50,21 @@ bipartite_match_sd <- function(x_mat,
             treat_vec <- treat_vec * 1L
 
             ## generate propensity score
-            prop_list_names <- c("propensity_function",
-                                 "oos_propensity",
-                                 "n_folds")
+            prop_list_names <- c(
+                "propensity_function",
+                "oos_propensity",
+                "n_folds"
+            )
             prop_score <- propensity_score(
                 x_mat = x_mat,
                 treat_vec = treat_vec,
-                propensity_list = propensity_list[prop_list_names])
-            caliper_list = gen_caliper_list(
+                propensity_list = propensity_list[prop_list_names]
+            )
+            caliper_list <- gen_caliper_list(
                 caliper_vec = prop_score,
                 caliper_max = sd(prop_score) * propensity_list[["caliper_sd_mult"]],
-                continuous_mult = propensity_list[["continuous_mult"]])
+                continuous_mult = propensity_list[["continuous_mult"]]
+            )
         } # else caliper list is as it was
 
         var_repeated <- gen_bipartite_repeated_variance(
@@ -70,10 +76,11 @@ bipartite_match_sd <- function(x_mat,
             caliper_list = caliper_list,
             weight_vec = weight_vec,
             use_all_controls = use_all_controls,
-            sqrt_mahal = sqrt_mahal)
+            sqrt_mahal = sqrt_mahal
+        )
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     var_total <- var_difference + var_repeated
 
@@ -99,18 +106,22 @@ gen_bipartite_repeated_variance <- function(x_mat,
 
     ## the second term should actually be K_{sq,i},
     ## but when using just one control, we have K_i = K_{sq,i}
-    k_sq_minus_k = count_frame[["count"]]^2 - count_frame[["count"]]
+    k_sq_minus_k <- count_frame[["count"]]^2 - count_frame[["count"]]
 
     unique_control_index <- as.numeric(as.character(
-        count_frame[["control_index"]]))
+        count_frame[["control_index"]]
+    ))
 
     use_all_controls <- ifelse(is.null(use_all_controls),
-                               TRUE, use_all_controls)
+        TRUE, use_all_controls
+    )
 
-    ##------------------------------------
+    ## ------------------------------------
 
-    control_within_all_index <- match(unique_control_index,
-                                      all_control_index)
+    control_within_all_index <- match(
+        unique_control_index,
+        all_control_index
+    )
 
     if (use_all_controls) {
         control_controls <- all_control_index
@@ -118,33 +129,43 @@ gen_bipartite_repeated_variance <- function(x_mat,
         control_controls <- unique_control_index
     }
 
-    blocked_ind <- match(unique_control_index,
-                         control_controls)
-    partial_index <- list(unique_control_index,
-                          control_controls)
+    blocked_ind <- match(
+        unique_control_index,
+        control_controls
+    )
+    partial_index <- list(
+        unique_control_index,
+        control_controls
+    )
 
-    control_dist_mat <- weighted_mahal(x_mat = x_mat,
-                                       cov_x = cov_x,
-                                       weight_vec = weight_vec,
-                                       sqrt_mahal = sqrt_mahal,
-                                       partial_index = partial_index)
+    control_dist_mat <- weighted_mahal(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_vec = weight_vec,
+        sqrt_mahal = sqrt_mahal,
+        partial_index = partial_index
+    )
 
     if (!is.null(caliper_list)) {
         caliper_full <- create_caliper(caliper_list)
         control_dist_mat <- control_dist_mat +
-            caliper_full[cbind(partial_index[[1]],
-                               partial_index[[2]])]
+            caliper_full[cbind(
+                partial_index[[1]],
+                partial_index[[2]]
+            )]
     }
 
-    min_control_match <- min_blocked_rank(control_dist_mat,
-                                          blocked_ind)
+    min_control_match <- min_blocked_rank(
+        control_dist_mat,
+        blocked_ind
+    )
 
     control_match <- control_controls[min_control_match]
 
-    ##------------------------------------
+    ## ------------------------------------
 
     sigma_xw_sq <- 0.5 * (y_vector[unique_control_index] -
-                          y_vector[control_match])^2
+        y_vector[control_match])^2
 
     ## total variance due to rep
     sum(k_sq_minus_k * sigma_xw_sq) / (length(control_index) - 1)
@@ -166,45 +187,54 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
 
     ## the second term should actually be K_{sq,i},
     ## but when using just one control, we have K_i = K_{sq,i}
-    k_sq_minus_k = count_frame[["count"]]^2 - count_frame[["count"]]
+    k_sq_minus_k <- count_frame[["count"]]^2 - count_frame[["count"]]
 
     unique_control_index <- as.numeric(as.character(
-        count_frame[["control_index"]]))
+        count_frame[["control_index"]]
+    ))
 
-    ##------------------------------------
+    ## ------------------------------------
 
-    partial_index <- list(unique_control_index,
-                          1L:nrow(x_mat))
+    partial_index <- list(
+        unique_control_index,
+        1L:nrow(x_mat)
+    )
 
-    control_dist_mat <- weighted_mahal(x_mat = x_mat,
-                                       cov_x = cov_x,
-                                       weight_vec = weight_vec,
-                                       sqrt_mahal = sqrt_mahal,
-                                       partial_index = partial_index)
+    control_dist_mat <- weighted_mahal(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_vec = weight_vec,
+        sqrt_mahal = sqrt_mahal,
+        partial_index = partial_index
+    )
 
     if (!is.null(caliper_list)) {
         caliper_full <- create_caliper(caliper_list)
         control_dist_mat <- control_dist_mat +
-            caliper_full[cbind(partial_index[[1]],
-                               partial_index[[2]])]
+            caliper_full[cbind(
+                partial_index[[1]],
+                partial_index[[2]]
+            )]
     }
 
     min_control_match <- min_blocked_rank(control_dist_mat,
-                                          blocked_ind = unique_control_index)
+        blocked_ind = unique_control_index
+    )
 
-    ##----------------
+    ## ----------------
 
     tolerance_match <- near_given_match(
         tolerance_list[["tolerance_vec"]],
-        given_index = unique_control_index)
+        given_index = unique_control_index
+    )
 
-    ##----------------
+    ## ----------------
 
     avg_y_control_controls <- (y_vector[min_control_match] +
-                               y_vector[tolerance_match]) / 2
+        y_vector[tolerance_match]) / 2
     avg_y_control_tols <- (
         tolerance_list[["tolerance_vec"]][min_control_match] +
-        tolerance_list[["tolerance_vec"]][tolerance_match]) / 2
+            tolerance_list[["tolerance_vec"]][tolerance_match]) / 2
 
     y_diffs <- y_vector[unique_control_index] -
         avg_y_control_controls
@@ -217,7 +247,7 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
     } else {
         sorted_tol <- sort(unique(tolerance_list[["tolerance_vec"]]))
         min_tol_diff <- min(sorted_tol[2L:length(sorted_tol)] -
-                            sorted_tol[1L:(length(sorted_tol) - 1L)])
+            sorted_tol[1L:(length(sorted_tol) - 1L)])
         tol_diffs <- pmax(tol_diffs, min_tol_diff)
     }
 
@@ -225,9 +255,9 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
         tol_diffs <- pmin(tol_diffs, tolerance_list[["tolerance_max"]])
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
-    sigma_xw_sq_both <- (2/3) * (y_diffs / tol_diffs)^2
+    sigma_xw_sq_both <- (2 / 3) * (y_diffs / tol_diffs)^2
 
     sum(k_sq_minus_k * sigma_xw_sq_both) / (length(control_index) - 1)
 }
@@ -260,7 +290,7 @@ nonbipartite_match_sd_scaled <- function(x_mat,
                                          sqrt_mahal = TRUE) {
     ## two variance components
 
-    ##------------------------------------
+    ## ------------------------------------
     ## V1 easy: usual variance
     ## exists if matches are made without replacement
 
@@ -271,7 +301,7 @@ nonbipartite_match_sd_scaled <- function(x_mat,
 
     var_difference <- var(y_diffs / tol_diffs)
 
-    ##----------------
+    ## ----------------
     ## V2 harder: the added variance from using repeats
 
     all_unique_controls <- !any(duplicated(match_list[["control_index"]]))
@@ -288,10 +318,11 @@ nonbipartite_match_sd_scaled <- function(x_mat,
             caliper_list = caliper_list,
             weight_vec = weight_vec,
             use_all_controls = use_all_controls,
-            sqrt_mahal = sqrt_mahal)
+            sqrt_mahal = sqrt_mahal
+        )
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     var_total <- var_difference + var_repeated
 

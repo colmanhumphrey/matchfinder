@@ -14,18 +14,19 @@
 #'
 #' @keywords internal
 simple_sink_wrap <- function(simple_match_list,
-                             n_sinks = NULL){
+                             n_sinks = NULL) {
     if (is.null(n_sinks)) {
         n_sinks <- 0
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     dist_ranks <- rank(simple_match_list[["distance"]],
-                       ties.method = "random")
-    setNames(lapply(n_sinks, function(sink_val){
+        ties.method = "random"
+    )
+    setNames(lapply(n_sinks, function(sink_val) {
         keep_ind <- dist_ranks <= (length(dist_ranks) - sink_val)
-        match_list <- lapply(simple_match_list, function(x){
+        match_list <- lapply(simple_match_list, function(x) {
             x[keep_ind]
         })
         match_list[["num_sinks"]] <- sink_val
@@ -47,18 +48,20 @@ simple_sink_wrap <- function(simple_match_list,
 optimal_sink_wrap <- function(dist_mat,
                               treat_vec,
                               n_sinks,
-                              tol_val){
+                              tol_val) {
     if (is.null(n_sinks)) {
         n_sinks <- 0
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     setNames(lapply(n_sinks, function(sink_val) {
-        match_list <- optimal_match(dist_mat,
-                                    treat_vec,
-                                    sink_val,
-                                    tol_val)
+        match_list <- optimal_match(
+            dist_mat,
+            treat_vec,
+            sink_val,
+            tol_val
+        )
         match_list$num_sinks <- sink_val
         match_list
     }), n_sinks)
@@ -78,12 +81,13 @@ optimal_nbp_sink_wrap <- function(dist_mat,
         n_sinks <- 0
     }
 
-    ##------------------------------------
+    ## ------------------------------------
 
     setNames(lapply(n_sinks, function(sink_val) {
         match_list <- optimal_nbp_match(dist_mat,
-                                        tolerance_vec = tolerance_vec,
-                                        n_sinks = sink_val)
+            tolerance_vec = tolerance_vec,
+            n_sinks = sink_val
+        )
         match_list[["num_sinks"]] <- sink_val
         match_list
     }), n_sinks)
