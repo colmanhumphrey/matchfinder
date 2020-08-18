@@ -14,10 +14,10 @@ test_that("testing all_bipartite_matches", {
     y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
     cov_x <- covariance_with_ranks(x_mat)
 
-    some_dist_mat = weighted_mahal(x_mat,
-                                   cov_x = cov_x,
-                                   weight_vec = c(0.66, 0.33),
-                                   treat_vec = treat_vec)
+    some_dist_mat <- weighted_mahal(x_mat,
+                                    cov_x = cov_x,
+                                    weight_vec = c(0.66, 0.33),
+                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,
@@ -30,20 +30,20 @@ test_that("testing all_bipartite_matches", {
                                             match_method = "with_replacement",
                                             n_sinks = c(0L, 4L))
 
-    zero_wr_matches <- lapply(all_wr_matches, function(x){
+    zero_wr_matches <- lapply(all_wr_matches, function(x) {
         x[["0"]]
     })
-    four_wr_matches <- lapply(all_wr_matches, function(x){
+    four_wr_matches <- lapply(all_wr_matches, function(x) {
         x[["4"]]
     })
 
-    zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x){
+    zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x) {
         !any(duplicated(x[["treat_index"]]))
     }))
-    zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x){
+    zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x) {
         sum(x[["distance"]])
     }))
-    zero_wr_length <- unlist(lapply(zero_wr_matches, function(x){
+    zero_wr_length <- unlist(lapply(zero_wr_matches, function(x) {
         length(x[["treat_index"]])
     }))
 
@@ -58,7 +58,8 @@ test_that("testing all_bipartite_matches", {
         n_sinks = 0
     )[["0"]]
 
-    expect_true(abs(mean(zero_wr_dist / sum(some_match[["distance"]])) - 1) < 0.2)
+    expect_true(abs(mean(zero_wr_dist /
+                         sum(some_match[["distance"]])) - 1) < 0.2)
 
     random_dist <- mean(some_dist_mat[
         cbind(1L:nrow(some_dist_mat),
@@ -101,7 +102,8 @@ test_that("testing all_bipartite_matches", {
         n_sinks = 0
     )[["0"]]
 
-    expect_true(abs(mean(zero_opt_dist / sum(some_match[["distance"]])) - 1) < 0.3)
+    expect_true(abs(mean(zero_opt_dist /
+                         sum(some_match[["distance"]])) - 1) < 0.3)
 
     random_dist <- mean(some_dist_mat[
         cbind(1L:nrow(some_dist_mat),

@@ -87,8 +87,8 @@ test_that("testing errors", {
         n_sinks = 0),
         NA)
 
-    ## tolerance_vec length must be = rows = cols of dist_mat, and must be logical
-    ## or numeric
+    ## tolerance_vec length must be = rows = cols of dist_mat,
+    ## and must be logical or numeric
     expect_error(nonbipartite_matches(
         dist_mat = sym_mat(matrix(runif(100), 10, 10)),
         tolerance_list = gen_tolerance_list(rep(c(0, 1), times = c(4, 4)))))
@@ -168,8 +168,8 @@ test_that("testing nonbipartite_matches", {
         "optimal" = opt_res
     )
 
-    is_ordered <- unlist(lapply(all_res_list, function(x){
-        ranks <- rank(unlist(lapply(x, function(y){
+    is_ordered <- unlist(lapply(all_res_list, function(x) {
+        ranks <- rank(unlist(lapply(x, function(y) {
             length(y[["treat_index"]])
         })), ties.method = "first") # first to penalise accidental ties
         isTRUE(all.equal(unname(ranks), c(3L, 2L, 1L)))
@@ -182,13 +182,13 @@ test_that("testing nonbipartite_matches", {
         x[["0"]]
     })
     ## should get all matched up
-    zero_len <- unlist(lapply(zero_list, function(x){
+    zero_len <- unlist(lapply(zero_list, function(x) {
         length(x[["treat_index"]])
     }))
     expect_true(all(zero_len == 10L))
 
     ## order of dists should be wr < optimal < greedy
-    zero_dists <- unlist(lapply(zero_list, function(x){
+    zero_dists <- unlist(lapply(zero_list, function(x) {
         sum(x[["distance"]])
     }))
     expect_true(zero_dists["with_replacement"] < zero_dists["optimal"])
@@ -199,13 +199,13 @@ test_that("testing nonbipartite_matches", {
     eight_list <- lapply(all_res_list, function(x) {
         x[[3]]
     })
-    eight_len <- unlist(lapply(eight_list, function(x){
+    eight_len <- unlist(lapply(eight_list, function(x) {
         length(x[["treat_index"]])
     }))
     expect_true(all(eight_len == 8L))
 
     ## order of dists should be wr < optimal < greedy
-    eight_dists <- unlist(lapply(eight_list, function(x){
+    eight_dists <- unlist(lapply(eight_list, function(x) {
         sum(x[["distance"]])
     }))
     expect_true(eight_dists["with_replacement"] < eight_dists["optimal"])
@@ -316,10 +316,10 @@ test_that("testing optimal_nbp_match", {
     greedy_res_list <- lapply(1:50, function(j) {
         greedy_nbp_match(dist_mat, tolerance_vec = tolerance_vec)
     })
-    dist_vec <- unlist(lapply(greedy_res_list, function(x){
+    dist_vec <- unlist(lapply(greedy_res_list, function(x) {
         sum(x[["distance"]])
     }))
-    num_pairs <- unlist(lapply(greedy_res_list, function(x){
+    num_pairs <- unlist(lapply(greedy_res_list, function(x) {
         length(x[["distance"]])
     }))
 
@@ -356,7 +356,7 @@ test_that("testing optimal_nbp_match", {
 
     full_dist <- opt_full[["distance"]]
     keep_8 <- rank(full_dist, ties.method = "first") <= 8L
-    opt_8_from_full <- lapply(opt_full, function(x){
+    opt_8_from_full <- lapply(opt_full, function(x) {
         x[keep_8]
     })
 
@@ -465,7 +465,7 @@ test_that("testing reorder_nbp", {
                  numeric(0))
 
     expect_equal(rank(reordered[["treat_index"]]),
-                 1L:length(treat_index))
+                 seq_len(length(treat_index)))
 
     expect_equal(reordered[["control_index"]],
                  control_index[order(treat_index)])
@@ -481,7 +481,7 @@ test_that("testing reorder_nbp", {
         distance = runif(40L)
     )
 
-    tolerance_vec = 1L:100L
+    tolerance_vec <- 1L:100L
 
     reordered_both <- reorder_nbp(match_list,
                                   tolerance_vec)
@@ -491,7 +491,8 @@ test_that("testing reorder_nbp", {
                         c(reordered_both[["treat_index"]],
                           reordered_both[["control_index"]])),
                 integer(0))
-    expect_equal(setdiff(reordered_both[["distance"]], match_list[["distance"]]),
+    expect_equal(setdiff(reordered_both[["distance"]],
+                         match_list[["distance"]]),
                  numeric(0))
 
     ## because tolerance_vec is increasing

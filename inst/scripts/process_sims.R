@@ -2,7 +2,8 @@ library(readr)
 library(dplyr)
 library(matchfinder)
 
-sims <- read_csv("~/r-packages/data/matchfinder_sims_output.csv")
+sims <- read_csv(paste0("~/r-packages/data/matchfinder/simulations/",
+                        "matchfinder_sims_output.csv"))
 
 ##------------------------------------
 ## while we shouldn't of course delete any rows,
@@ -18,7 +19,8 @@ plot_num <- function(num_delete) {
                   weighted_est = max(abs(weighted_est))) %>%
         filter(rank(-abs(propensity_est), ties.method = "first") <= num_delete |
                rank(-abs(mahal_est), ties.method = "first") <= num_delete |
-               rank(-abs(weighted_est), ties.method = "first") <= num_delete) %>%
+               rank(-abs(weighted_est),
+                    ties.method = "first") <= num_delete) %>%
         pull(id) %>%
         unique()
 
@@ -38,6 +40,8 @@ plot_num <- function(num_delete) {
     plot_sims(plot_list)
     dev.off()
 }
+
+plot_num(60)
 
 for (j in (0:10) * 20) {
     plot_num(j)
