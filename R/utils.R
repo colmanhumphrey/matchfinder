@@ -41,7 +41,7 @@ min_blocked_rank <- function(dist_mat,
 
 
 #' example from ?sample, when length could be one
-#' @keywords internal
+#' @export
 fixed_sample <- function(x, ...) x[sample.int(length(x), ...)]
 
 

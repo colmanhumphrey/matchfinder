@@ -9,4 +9,3 @@ fixed_sample(x, ...)
 \description{
 example from ?sample, when length could be one
 }
-\keyword{internal}
