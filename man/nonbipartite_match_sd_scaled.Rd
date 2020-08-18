@@ -20,8 +20,8 @@ nonbipartite_match_sd_scaled(
 \item{x_mat}{input/design matrix (already rank-adjusted etc)}
 
 \item{cov_x}{the (potentially rank-adjusted) covariance of \code{x_mat}.
-This means it's possible that \code{cov(x_mat)} is not equal to \code{cov_x};
-see \code{covariance_with_ranks} for more details.}
+This means it's possible that \code{cov(x_mat)} is not equal to
+\code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
 \item{y_vector}{Outcome vector (not used in match generation).x}
 
