@@ -2,6 +2,7 @@ old/
 docs
 inst/doc
 **/.Rproj.user
+*.Rproj
 .Rproj.user
 *.Rproj.user*
 .Rproj.user/
