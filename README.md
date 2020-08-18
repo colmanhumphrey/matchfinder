@@ -56,48 +56,50 @@ remotes::install_github("ColmanHumphrey/matchfinder")
 We'll work through two small examples, one bipartite, one
 non-bipartite.
 
-```r
-## We'll load the library in either case
-library(matchfinder)
-```
-
 ### Bipartite
 
 ```r
-    rows <- 100L
-    num_weight_vecs <- 5L
-    x_mat <- cbind(rnorm(rows),
-                   runif(rows))
-    treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
-                                             45L)
-    y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
-    cov_x <- covariance_with_ranks(x_mat)
+library(matchfinder)
 
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
+rows <- 100L
+num_weight_vecs <- 5L
+x_mat <- cbind(rnorm(rows),
+               runif(rows))
+treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
+                                         45L)
+y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
+cov_x <- covariance_with_ranks(x_mat)
 
-    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
-                                           number_vectors = num_weight_vecs,
-                                           minimum_weights = c(0.1, 0.1))
+some_dist_mat <- weighted_mahal(x_mat,
+    cov_x = cov_x,
+    weight_vec = c(0.66, 0.33),
+    treat_vec = treat_vec
+)
 
-    all_wr_matches <- all_bipartite_matches(x_mat = x_mat,
-                                            cov_x = cov_x,
-                                            weight_list = weight_vecs,
-                                            treat_vec = treat_vec,
-                                            match_method = "with_replacement",
-                                            n_sinks = c(0L, 4L))
+weight_vecs <- generate_random_weights(
+    prior_weights = c(2, 1),
+    number_vectors = num_weight_vecs,
+    minimum_weights = c(0.1, 0.1)
+)
 
-    sink_brier_wr_matches <- sink_brier_bipartite_matches(
-        x_mat = x_mat,
-        cov_x = cov_x,
-        weight_list = weight_vecs,
-        treat_vec = treat_vec,
-        match_method = "with_replacement",
-        n_sinks = c(0L, 4L),
-        silent = TRUE)
+all_wr_matches <- all_bipartite_matches(
+    x_mat = x_mat,
+    cov_x = cov_x,
+    weight_list = weight_vecs,
+    treat_vec = treat_vec,
+    match_method = "with_replacement",
+    n_sinks = c(0L, 4L)
+)
 
+sink_brier_wr_matches <- sink_brier_bipartite_matches(
+    x_mat = x_mat,
+    cov_x = cov_x,
+    weight_list = weight_vecs,
+    treat_vec = treat_vec,
+    match_method = "with_replacement",
+    n_sinks = c(0L, 4L),
+    silent = TRUE
+)
 ```
 
 
