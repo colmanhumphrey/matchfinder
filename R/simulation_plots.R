@@ -108,22 +108,23 @@ generate_plot_list <- function(full_plot_frame,
 }
 
 
-#' Plotting sim results
-#'
-#' long_results_list should have length four:
-#' n = 500, 1000, 2000, 4000
-#' each should then have length four:
-#' p = 5, 10, 20, 40
-#' each should then have length 16:
-#' models (a, b, c, d) vs (a, b, c, d)
-#'
-#' plan: four plots, one for each N value
+##' Plotting simulation results. Plan: four plots, one for each N value
+##'
+##' @param all_results result from \code{generate_plot_list}
+##' @param y_rel where to limit y to above and below (length two vector)
+##' @return Nothing, just plots to the device
+##' @author Colman Humphrey
+##'
+##' @export
 plot_sims <- function(all_results,
-                      cut_y = 0.8) {
+                      y_rel = c(0.1, 0.4)) {
+    x_push <- 0.15
+    y_push <- 0.15
+
     plot(
         x = 0, y = 0,
-        xlim = c(0, 3),
-        ylim = c(0, 2.8),
+        xlim = c(-x_push / 3, 2 + x_push * 4),
+        ylim = c(0, 2 + y_push * 1),
         col = rgb(0, 0, 0, 0),
         xlab = "",
         ylab = "",
@@ -133,86 +134,81 @@ plot_sims <- function(all_results,
     par(xpd = TRUE)
     par(mar = c(1, 1, 1, 1))
 
-    x_push <- 0.4
-    y_push <- 0.6
-
     plot_results_block(all_results[["2000"]],
         x_lim = c(0, 0.95),
         y_lim = c(0, 0.95),
-        cut_y
+        y_rel
     )
     plot_results_block(all_results[["4000"]],
         x_lim = c(1.05, 2) + x_push,
         y_lim = c(0, 0.95),
-        cut_y
+        y_rel
     )
     plot_results_block(all_results[["500"]],
         x_lim = c(0, 0.95),
         y_lim = c(1.05, 2) + y_push,
-        cut_y
+        y_rel
     )
     plot_results_block(all_results[["1000"]],
         x_lim = c(1.05, 2) + x_push,
         y_lim = c(1.05, 2) + y_push,
-        cut_y
+        y_rel
     )
 
     ## add legends, overall title
     text(
-        x = c(0.475, 1.525, 0.475, 1.525) + c(0, x_push, 0, x_push),
-        y = c(2, 2, 0.95, 0.95) + c(y_push, y_push, 0, 0) + 0.25,
+        x = c(0.475, 1.525, 0.475, 1.525) + x_push * c(0, 1, 0, 1),
+        y = c(2, 2, 0.95, 0.95) + c(y_push, y_push, 0, 0),
         adj = c(0.5, 0.5),
-        labels = paste("n = ", c(500, 1000, 2000, 4000))
+        labels = paste("n = ", c(500, 1000, 2000, 4000)),
+        cex = 1.2
     )
 
-    y_seq <- seq(1.4, 2.3, length.out = 5)
+    y_seq <- seq(1.1 + y_push, 1.5 + y_push, length.out = 3)
     col_vec <- c(
-        rgb(0, 0, 0, 0.5),
-        rgb(0, 0, 0, 1),
         rgb(0.7, 0.3, 0.2, 1),
         rgb(0.2, 0.8, 0.4),
         rgb(0.3, 0.1, 0.9, 1)
     )
 
     segments(
-        x0 = rep(2 + x_push * 1.3, 5),
-        x1 = rep(2 + x_push * 1.8, 5),
+        x0 = rep(2 + x_push * 2, 3),
+        x1 = rep(2 + x_push * 2.8, 3),
         y0 = y_seq,
         col = col_vec,
-        lty = c(2, 2, 1, 1, 1)
+        lty = c(1, 1, 1)
     )
     points(
-        x = rep(2 + x_push * 1.55, 5),
+        x = rep(2 + x_push * 2.4, 3),
         y = y_seq,
-        pch = c(NA, 20, 20, 20, 20), ,
+        pch = c(20, 20, 20), ,
         col = col_vec
     )
     text(
-        x = rep(2 + x_push * 1.9, 5),
+        x = rep(2 + x_push * 2.9, 3),
         y = y_seq,
         adj = c(0, 0.5),
         labels = c(
-            "naive CI bounds", "naive", "propensity",
-            "mahal", "Our Method"
+            "Propensity", "Mahalanobis", "Our Method"
         )
     )
 
     rect(
-        xleft = 2 + x_push * 1.535,
-        xright = 2 + x_push * 1.565,
+        xleft = 2 + x_push * 2.385,
+        xright = 2 + x_push * 2.415,
         ybottom = 0.8,
         ytop = 1.05,
         col = 1, border = NA
     )
     points(
-        x = 2 + x_push * 1.55,
+        x = 2 + x_push * 2.4,
         y = 0.925,
         pch = 20,
         cex = 1.8
     )
 
     text(
-        x = rep(2 + x_push * 1.9, 2),
+        x = rep(2 + x_push * 2.9, 2),
         y = c(0.95, 0.88),
         adj = c(0, 0.5),
         cex = c(1, 0.8),
@@ -223,26 +219,32 @@ plot_sims <- function(all_results,
 plot_results_block <- function(n_results,
                                x_lim,
                                y_lim,
-                               cut_y = 1,
+                               y_rel = c(0, 1),
                                rect_width = 0.006,
                                x_shift = 0.015) {
-    n_results$high_naive <- n_results$rmse_naive + 2 * n_results$se_naive
-    n_results$low_naive <- pmax(n_results$rmse_naive - 2 * n_results$se_naive, 0)
-    n_results$high_propensity <- n_results$rmse_propensity + 2 * n_results$se_propensity
-    n_results$low_propensity <- pmax(n_results$rmse_propensity - 2 * n_results$se_propensity, 0)
+    n_results$high_naive <- n_results$rmse_naive +
+        2 * n_results$se_naive
+    n_results$low_naive <- pmax(n_results$rmse_naive -
+                                2 * n_results$se_naive, 0)
+    n_results$high_propensity <- n_results$rmse_propensity +
+        2 * n_results$se_propensity
+    n_results$low_propensity <- pmax(n_results$rmse_propensity -
+                                     2 * n_results$se_propensity, 0)
     n_results$high_mahal <- n_results$rmse_mahal + 2 * n_results$se_mahal
     n_results$low_mahal <- pmax(n_results$rmse_mahal - 2 * n_results$se_mahal, 0)
     n_results$high_weighted <- n_results$rmse_weighted + 2 * n_results$se_weighted
     n_results$low_weighted <- pmax(n_results$rmse_weighted - 2 * n_results$se_weighted, 0)
 
-    max_height <- min(
-        max(
-            max(n_results[["high_propensity"]]),
-            max(n_results[["high_mahal"]]),
-            max(n_results[["high_weighted"]])
-        ) * 1.05,
-        cut_y
-    )
+    max_height <- y_rel[2]
+
+    ## max_height <- min(
+    ##     max(
+    ##         max(n_results[["high_propensity"]]),
+    ##         max(n_results[["high_mahal"]]),
+    ##         max(n_results[["high_weighted"]])
+    ##     ) * 1.05,
+    ##     y_rel
+    ## )
     min_x <- min(n_results[["p_cut"]])
 
     x_adj <- function(x) {
@@ -280,6 +282,14 @@ plot_results_block <- function(n_results,
         cex = 0.5
     )
 
+    text(
+        x = x_adj((min_x + 1) / 2),
+        y = y_adj(-y_ax_adj * 5),
+        labels = expression("p"["cut"]),
+        adj = c(0.5, 0.5),
+        cex = 1
+    )
+
     segments(
         x0 = x_adj(min_x - x_ax_adj),
         y0 = y_adj(0),
@@ -293,15 +303,24 @@ plot_results_block <- function(n_results,
     y_tick_seq <- y_adj(y_tick_pre_seq)
     segments(
         y0 = y_tick_seq,
-        x0 = x_adj(min_x - x_ax_adj * 2),
+        x0 = x_adj(min_x - x_ax_adj * 1.5),
         x1 = x_adj(min_x - x_ax_adj)
     )
     text(
-        x = x_adj(min_x - x_ax_adj * 3),
+        x = x_adj(min_x - x_ax_adj * 2),
         y = y_tick_seq,
         labels = round(y_tick_pre_seq, 2),
         adj = c(0.5, 0.5),
         cex = 0.5
+    )
+
+    text(
+        x = x_adj(min_x - x_ax_adj * 3),
+        y = y_adj(max_height / 2),
+        labels = "RMSE",
+        adj = c(0.5, 0.5),
+        cex = 1,
+        srt = 90
     )
 
     par(xpd = FALSE)
@@ -309,32 +328,32 @@ plot_results_block <- function(n_results,
     ## ------------------------------------
     ## naive, may not even show!
 
-    naive_mean <- n_results[["rmse_naive"]][1]
-    naive_high <- n_results[["high_naive"]][1]
-    naive_low <- n_results[["low_naive"]][1]
+    ## naive_mean <- n_results[["rmse_naive"]][1]
+    ## naive_high <- n_results[["high_naive"]][1]
+    ## naive_low <- n_results[["low_naive"]][1]
 
-    if (naive_mean / max_height < 1.1) {
-        segments(
-            x0 = x_lim[1],
-            x1 = x_lim[2],
-            y0 = y_adj(naive_mean),
-            lty = 2, col = 1, lwd = 1
-        )
-        segments(
-            x0 = x_lim[1],
-            x1 = x_lim[2],
-            y0 = y_adj(naive_high),
-            lwd = 0.7,
-            lty = 2, col = rgb(0, 0, 0, 0.5)
-        )
-        segments(
-            x0 = x_lim[1],
-            x1 = x_lim[2],
-            y0 = y_adj(naive_low),
-            lwd = 0.7,
-            lty = 2, col = rgb(0, 0, 0, 0.5)
-        )
-    }
+    ## if (naive_mean / max_height < 1.1) {
+    ##     segments(
+    ##         x0 = x_lim[1],
+    ##         x1 = x_lim[2],
+    ##         y0 = y_adj(naive_mean),
+    ##         lty = 2, col = 1, lwd = 1
+    ##     )
+    ##     segments(
+    ##         x0 = x_lim[1],
+    ##         x1 = x_lim[2],
+    ##         y0 = y_adj(naive_high),
+    ##         lwd = 0.7,
+    ##         lty = 2, col = rgb(0, 0, 0, 0.5)
+    ##     )
+    ##     segments(
+    ##         x0 = x_lim[1],
+    ##         x1 = x_lim[2],
+    ##         y0 = y_adj(naive_low),
+    ##         lwd = 0.7,
+    ##         lty = 2, col = rgb(0, 0, 0, 0.5)
+    ##     )
+    ## }
 
     ## ------------------------------------
     ## propensity
@@ -404,8 +423,9 @@ plot_results_block <- function(n_results,
     rect(
         xleft = x_adj(min_x - 3 * rect_width - x_shift),
         xright = x_adj(1.1),
-        ybottom = y_adj(cut_y * 1.05),
+        ybottom = y_adj(y_rel[2] * 1.05),
         ytop = 50,
         border = NA, col = rgb(1, 1, 1, 1)
     )
+
 }

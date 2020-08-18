@@ -2,18 +2,21 @@
 % Please edit documentation in R/simulation_plots.R
 \name{plot_sims}
 \alias{plot_sims}
-\title{Plotting sim results}
+\title{Plotting simulation results. Plan: four plots, one for each N value}
 \usage{
-plot_sims(all_results, cut_y = 0.8)
+plot_sims(all_results, y_rel = c(0.1, 0.4))
+}
+\arguments{
+\item{all_results}{result from \code{generate_plot_list}}
+
+\item{y_rel}{where to limit y to above and below (length two vector)}
+}
+\value{
+Nothing, just plots to the device
 }
 \description{
-long_results_list should have length four:
-n = 500, 1000, 2000, 4000
-each should then have length four:
-p = 5, 10, 20, 40
-each should then have length 16:
-models (a, b, c, d) vs (a, b, c, d)
+Plotting simulation results. Plan: four plots, one for each N value
 }
-\details{
-plan: four plots, one for each N value
+\author{
+Colman Humphrey
 }
