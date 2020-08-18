@@ -205,7 +205,7 @@ test_that("testing permutation_brier", {
                                    design = "cross_all",
                                    train_fraction = 0.7,
                                    match_predict_xgb)
-    expect_true(brier_res < 0.15)
+    expect_true(brier_res < 0.2)
 
     ## now get the dist:
     perm_res <- permutation_brier(x_mat,
