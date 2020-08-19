@@ -104,6 +104,8 @@
 #'     \item{\code{y_test}}{Test outcome vector}
 #' }
 #' @author Colman Humphrey
+#'
+#' @export
 predict_prepare <- function(x_mat,
                             index_list,
                             design = c(
@@ -236,6 +238,8 @@ predict_prepare <- function(x_mat,
 #' @return returns an \code{index_list} object, see
 #'   \code{predict_prepare}
 #' @author Colman Humphrey
+#'
+#' @export
 index_list_from_match <- function(match_list,
                                   train_index) {
     list(
@@ -254,6 +258,8 @@ index_list_from_match <- function(match_list,
 #' @param train_fraction fraction (between 0 and 1) to
 #'   use for training data (and the rest for test)
 #' @author Colman Humphrey
+#'
+#' @export
 generate_train_test_split <- function(match_list,
                                       train_fraction = 0.7) {
     stopifnot(train_fraction >= 0 && train_fraction <= 1)
@@ -276,6 +282,8 @@ generate_train_test_split <- function(match_list,
 #' @param match_list typical \code{match_list} entry
 #' @param num_folds how many folds you want, default 5
 #' @author Colman Humphrey
+#'
+#' @export
 generate_k_fold_index <- function(match_list,
                                   num_folds = 5L) {
     length_index <- length(match_list[["treat_index"]])
