@@ -48,7 +48,11 @@
   Without Replacement, OptimallyMinimum total distance
 
 If you're happy to allow units to be the control multiple times,
-then the first way is fast and optimal." />
+then the first way is fast and optimal.
+If not, you have to trade off speed vs optimality. Greedy runs
+over all units in a random order, so if you want to run greedy a bunch of
+times and take the best, it would still be (likely) much faster than
+running optimal matching." />
 
 
 
@@ -125,7 +129,11 @@ then the first way is fast and optimal." />
   <dt>Without Replacement, Optimally</dt><dd><p>Minimum total distance</p></dd>
 
 </dl><p>If you're happy to allow units to be the control multiple times,
-then the first way is fast and optimal.</p>
+then the first way is fast and optimal.
+If not, you have to trade off speed vs optimality. Greedy runs
+over all units in a random order, so if you want to run greedy a bunch of
+times and take the best, it would still be (likely) much faster than
+running optimal matching.</p>
     </div>
 
     <pre class="usage"><span class='fu'>nonbipartite_matches</span>(
@@ -190,11 +198,7 @@ down to using half by default.</p></td>
   with an extra element: the number of sinks used.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>If not, you have to trade off speed vs optimality. Greedy runs
-over all units in a random order, so if you want to run greedy a bunch of
-times and take the best, it would still be (likely) much faster than
-running optimal matching.</p>
-<p>NOTE:
+    <p>NOTE:
 with sinks -
 the optimal match gives "half" the number of sinks you might expect.
 If you have a pool of 400 matchable things,
@@ -202,7 +206,9 @@ NBP gives you 200 matches if no sinks.
 If you say sinks = 20 FOR OPTIMAL,
 you'll get 190 matches, not 180.
 We leave this behaviour in so that this algorithm
-can generate expected results if someone is used to nbpmatch</p>
+can generate expected results if someone is used to nbpmatch
+Further, note that we don't allow equality on the tolerance vector
+if used.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

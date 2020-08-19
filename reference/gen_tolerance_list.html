@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simple wrapper to unify tolerance input — gen_tolerance_list • matchfinder</title>
+<title>Wrapper to unify tolerance input, along with minor checks — gen_tolerance_list • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,12 @@
 
 
 
-<meta property="og:title" content="Simple wrapper to unify tolerance input — gen_tolerance_list" />
-<meta property="og:description" content="Simple wrapper to unify tolerance input" />
+<meta property="og:title" content="Wrapper to unify tolerance input, along with minor checks — gen_tolerance_list" />
+<meta property="og:description" content="Note that we will always block equal equality on the tolerance
+vec, hence why tolerance_min being NULL is equivalent
+to zero. For more sophisticated behaviour, you may want to
+directly control the caliper list or weighted distance matrix
+in the functions that generate matches." />
 
 
 
@@ -103,13 +107,17 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simple wrapper to unify tolerance input</h1>
+    <h1>Wrapper to unify tolerance input, along with minor checks</h1>
     
     <div class="hidden name"><code>gen_tolerance_list.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Simple wrapper to unify tolerance input</p>
+    <p>Note that we will always block equal equality on the tolerance
+vec, hence why <code>tolerance_min</code> being <code>NULL</code> is equivalent
+to zero. For more sophisticated behaviour, you may want to
+directly control the caliper list or weighted distance matrix
+in the functions that generate matches.</p>
     </div>
 
     <pre class="usage"><span class='fu'>gen_tolerance_list</span>(
