@@ -286,6 +286,15 @@ all_nonbipartite_matches <- function(x_mat,
         caliper_dist_mat <- create_caliper(caliper_list)
     }
 
+    if (missing(tolerance_list)) {
+        warning("assuming that all pairs are matchable, ",
+                "not neccesarily correct. If this is what you want, ",
+                "you can silence this warning by explicitly supplying ",
+                "`tolerance_vec = NULL`",
+                call. = FALSE
+                )
+    }
+
     lapply(weight_list, function(weight_vec) {
         w_dist_mat <- weighted_mahal(x_mat,
             cov_x = cov_x,
