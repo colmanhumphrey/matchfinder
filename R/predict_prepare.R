@@ -7,7 +7,7 @@
 #' This function should also have a property resembling:
 #' \deqn{f(x, y) = 1 - f(y, x)} since there's an inherent symmetry
 #' in the pairs: if you knew which of the two came first, there'd
-#' be nothing to do. In fact, the defition of \eqn{f} would likely be
+#' be nothing to do. In fact, the definition of \eqn{f} would likely be
 #' to predict if (WLOG) \eqn{x} is the treated unit or not.
 #'
 #' This function gives various potential design matrix shapes
@@ -135,8 +135,8 @@ predict_prepare <- function(x_mat,
     x_treat_test <- x_mat[treat_test_ind, , drop = FALSE]
     x_control_test <- x_mat[control_test_ind, , drop = FALSE]
 
-    train_index <- 1L:length(treat_train_ind)
-    test_index <- 1L:length(treat_test_ind)
+    train_index <- seq_len(length(treat_train_ind))
+    test_index <- seq_len(length(treat_test_ind))
 
     ## y_train_full <-
 
@@ -160,8 +160,8 @@ predict_prepare <- function(x_mat,
         treat_right_train <- rep(TRUE, times = length(treat_train_ind))
         treat_right_test <- rep(FALSE, times = length(treat_test_ind))
 
-        train_order <- 1L:(length(treat_train_ind) * 2L)
-        test_order <- 1L:length(treat_test_ind)
+        train_order <- seq_len(length(treat_train_ind) * 2L)
+        test_order <- seq_len(length(treat_test_ind))
 
         y_train <- rep(c(1L, 0L),
             each = length(treat_train_ind)

@@ -110,7 +110,8 @@ sink_brier_bipartite_matches <- function(x_mat,
                                          ),
                                          n_sinks = 0,
                                          caliper_list = gen_caliper_list(),
-                                         propensity_list = match_propensity_list(NULL),
+                                         propensity_list =
+                                             match_propensity_list(NULL),
                                          sqrt_mahal = TRUE,
                                          silent = !interactive(),
                                          tol_val = NULL) {
@@ -189,7 +190,9 @@ permutation_bipartite_matches <- function(matches_by_sinks,
         message("running permutations, will be a little slow")
     }
 
-    permutation_briers <- lapply(1L:length(n_sinks), function(j) {
+    ## As discussed in the corresponding paper, we only compute the permutation
+    ## scores on the best match, because each run takes so much time.
+    permutation_briers <- lapply(seq_len(length(n_sinks)), function(j) {
         if (!silent) {
             n_sinks[j]
         }
@@ -200,7 +203,7 @@ permutation_bipartite_matches <- function(matches_by_sinks,
     })
 
     ## compute the permutation score for each match
-    permutation_brier_scores <- lapply(1L:length(n_sinks), function(j) {
+    permutation_brier_scores <- lapply(seq_len(length(n_sinks)), function(j) {
         permutation_vec <- permutation_briers[[j]]
         unlist(lapply(briers_by_sinks[[j]], function(x) {
             mean(x <= permutation_vec)
@@ -211,7 +214,7 @@ permutation_bipartite_matches <- function(matches_by_sinks,
     ## the lowest value will just be the best
     ## so will highest brier
 
-    best_matches <- lapply(1L:length(n_sinks), function(j) {
+    best_matches <- lapply(seq_len(length(n_sinks)), function(j) {
         best_brier_ind <- best_brier_inds[[j]]
 
         stopifnot(permutation_brier_scores[[j]][best_brier_ind] ==
@@ -247,7 +250,7 @@ all_nonbipartite_matches <- function(x_mat,
                                          "optimal",
                                          "greedy"
                                      ),
-                                     n_sinks = 0,
+                                     n_sinks = 0L,
                                      caliper_list = gen_caliper_list(),
                                      propensity_list =
                                          match_propensity_list(NULL),

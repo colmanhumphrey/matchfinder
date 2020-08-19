@@ -106,8 +106,8 @@ test_that("testing all_bipartite_matches", {
                          sum(some_match[["distance"]])) - 1) < 0.3)
 
     random_dist <- mean(some_dist_mat[
-        cbind(1L:nrow(some_dist_mat),
-              fixed_sample(1L:ncol(some_dist_mat),
+        cbind(seq_len(nrow(some_dist_mat)),
+              fixed_sample(seq_len(ncol(some_dist_mat)),
                            nrow(some_dist_mat)))
     ])
     expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
@@ -242,10 +242,10 @@ test_that("testing permutation_bipartite_matches", {
     y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
     cov_x <- covariance_with_ranks(x_mat)
 
-    some_dist_mat = weighted_mahal(x_mat,
-                                   cov_x = cov_x,
-                                   weight_vec = c(0.66, 0.33),
-                                   treat_vec = treat_vec)
+    some_dist_mat <- weighted_mahal(x_mat,
+                                    cov_x = cov_x,
+                                    weight_vec = c(0.66, 0.33),
+                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,

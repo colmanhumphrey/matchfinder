@@ -179,7 +179,7 @@ permutation_brier <- function(x_mat,
 
     ## ------------------------------------
 
-    full_index <- 1L:length(match_list[["treat_index"]])
+    full_index <- seq_len(length(match_list[["treat_index"]]))
 
     unlist(lapply(1L:num_permutations, function(i) {
         swaps <- full_index %in% sample(full_index,

@@ -57,7 +57,7 @@ test_that("testing predict_prepare", {
     first_pair <- cbind(x_mat[index_list[["treat_train"]][1], , drop = FALSE],
                         x_mat[index_list[["control_train"]][1], , drop = FALSE])
     first_pair_rev <- first_pair[, c(3, 4, 1, 2), drop = FALSE]
-    if (prep_result[["y_train"]][1] == 1){
+    if (prep_result[["y_train"]][1] == 1) {
         rel_pair <- first_pair
     } else {
         rel_pair <- first_pair_rev
@@ -84,7 +84,7 @@ test_that("testing predict_prepare", {
     first_pair <- x_mat[index_list[["treat_train"]][1], , drop = FALSE] -
         x_mat[index_list[["control_train"]][1], , drop = FALSE]
     first_pair_rev <- -first_pair
-    if (prep_result[["y_train"]][1] == 1){
+    if (prep_result[["y_train"]][1] == 1) {
         rel_pair <- first_pair
     } else {
         rel_pair <- first_pair_rev
@@ -170,16 +170,16 @@ test_that("testing generate_k_fold_index", {
 
     res_list_list <- generate_k_fold_index(match_list, 5L)
 
-    res_treat_train <- lapply(res_list_list, function(x){
+    res_treat_train <- lapply(res_list_list, function(x) {
         x[["treat_train"]]
     })
-    res_control_train <- lapply(res_list_list, function(x){
+    res_control_train <- lapply(res_list_list, function(x) {
         x[["control_train"]]
     })
-    res_treat_test <- lapply(res_list_list, function(x){
+    res_treat_test <- lapply(res_list_list, function(x) {
         x[["treat_test"]]
     })
-    res_control_test <- lapply(res_list_list, function(x){
+    res_control_test <- lapply(res_list_list, function(x) {
         x[["control_test"]]
     })
 
