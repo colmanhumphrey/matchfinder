@@ -61,6 +61,42 @@ test_that("testing gen_tolerance_list", {
             caliper_max = 3,
             continuous_mult = 1),
         cal_max_list)
+
+    ##------------------------------------
+    ## can't use negative min or max, and min must be less than max
+
+    expect_error(
+        gen_tolerance_list(
+            tolerance_vec = c(1, 2, 10),
+            tolerance_min = 2,
+            tolerance_max = 3
+        ),
+        NA
+    )
+
+    expect_error(
+        gen_tolerance_list(
+            tolerance_vec = c(1, 2, 10),
+            tolerance_min = -2,
+            tolerance_max = 3
+        )
+    )
+
+    expect_error(
+        gen_tolerance_list(
+            tolerance_vec = c(1, 2, 10),
+            tolerance_min = 2,
+            tolerance_max = -3
+        )
+    )
+
+    expect_error(
+        gen_tolerance_list(
+            tolerance_vec = c(1, 2, 10),
+            tolerance_min = 3,
+            tolerance_max = 2
+        )
+    )
 })
 
 

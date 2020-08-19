@@ -1,5 +1,10 @@
-#' Simple wrapper to unify tolerance input
+#' Wrapper to unify tolerance input, along with minor checks
 #'
+#' Note that we will always block equal equality on the tolerance
+#' vec, hence why \code{tolerance_min} being \code{NULL} is equivalent
+#' to zero. For more sophisticated behaviour, you may want to
+#' directly control the caliper list or weighted distance matrix
+#' in the functions that generate matches.
 #' @param tolerance_vec Default NULL; numeric "continuous treatment"
 #'   vector that we use to form
 #'   non-bipartite matches: units i and j can be matched if
@@ -39,10 +44,32 @@ gen_tolerance_list <- function(tolerance_vec = NULL,
         if (length(tolerance_min) > 1) {
             stop("`tolerance_min` should be length one (for now) or NULL")
         }
+
+        if (tolerance_min < 0) {
+            if (abs(tolerance_min) > sqrt(.Machine$double.eps)) {
+                stop("`tolerance_min` should be non-negative")
+            }
+            ## in this case it's given as negative, but barely
+            ## so we'll just use zero
+            tolerance_min <- 0
+        }
     }
 
-    if (!is.null(tolerance_max) && length(tolerance_max) > 1) {
-        stop("`tolerance_max` should be length one (for now) or NULL")
+    if (!is.null(tolerance_max)) {
+        if (length(tolerance_max) > 1) {
+            stop("`tolerance_max` should be length one (for now) or NULL")
+        }
+
+        if (tolerance_max < sqrt(.Machine$double.eps)) {
+            stop("`tolerance_max` should be strictly positive")
+        }
+
+        if (!is.null(tolerance_min) && tolerance_max < tolerance_min) {
+            stop(
+                "If both given, ",
+                "`tolerance_max` must be greater than `tolerance_min`"
+            )
+        }
     }
 
     return(list(
@@ -51,6 +78,8 @@ gen_tolerance_list <- function(tolerance_vec = NULL,
         tolerance_max = tolerance_max
     ))
 }
+
+
 #' Converts tolerance list to caliper list
 #' @inheritParams gen_caliper_list
 #' @param tolerance_list Result from \code{gen_tolerance_list}
@@ -88,7 +117,6 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #' }
 #' If you're happy to allow units to be the control multiple times,
 #' then the first way is fast and optimal.
-#'
 #' If not, you have to trade off speed vs optimality. Greedy runs
 #' over all units in a random order, so if you want to run greedy a bunch of
 #' times and take the best, it would still be (likely) much faster than
@@ -103,7 +131,8 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #' you'll get 190 matches, not 180.
 #' We leave this behaviour in so that this algorithm
 #' can generate expected results if someone is used to nbpmatch
-#'
+#' Further, note that we don't allow equality on the tolerance vector
+#' if used.
 #' @inheritParams all_nonbipartite_matches
 #' @inheritParams bipartite_matches
 #' @param n_sinks Vector of sinks per match. Note that this is NOT the same
@@ -145,15 +174,15 @@ nonbipartite_matches <- function(dist_mat,
     if (nrow(dist_mat) != ncol(dist_mat) ||
         sum(abs(dist_mat - t(dist_mat)), na.rm = TRUE) >
             (0.001 * max(ifelse(dist_mat == Inf, 0, dist_mat)))) {
-        stop("dist_mat should be square and symmetric", call. = FALSE)
+        stop("dist_mat should be square and symmetric")
     }
 
     ## dealing with tolerance:
     if (!is.null(tolerance_list)) {
         if (length(tolerance_list[["tolerance_vec"]]) != nrow(dist_mat)) {
-            stop("`tolerance_vec` must be the same length as the ",
-                "dimensions of `dist_mat`",
-                call. = FALSE
+            stop(
+                "`tolerance_vec` must be the same length as the ",
+                "dimensions of `dist_mat`"
             )
         }
 
@@ -240,10 +269,10 @@ with_replacement_nbp_match <- function(dist_mat,
     min_index <- min_different_rank(dist_mat)
 
     match_list <- list(
-        treat_index = 1:nrow(dist_mat),
+        treat_index = seq_len(nrow(dist_mat)),
         control_index = min_index,
         distance = dist_mat[cbind(
-            1:nrow(dist_mat),
+            seq_len(nrow(dist_mat)),
             min_index
         )]
     )
@@ -290,7 +319,7 @@ greedy_nbp_match <- function(dist_mat,
     result_mat <- matrix(NA, nrow = nrow(dist_mat), ncol = 3)
 
     while (min(min_vals) < Inf) {
-        random_value <- sample(1:length(min_vals),
+        random_value <- sample(seq_len(length(min_vals)),
             size = 1,
             prob = 1 / (min_vals + 1)
         )
