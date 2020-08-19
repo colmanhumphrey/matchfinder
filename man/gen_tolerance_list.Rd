@@ -2,7 +2,7 @@
 % Please edit documentation in R/nonbipartite_matches.R
 \name{gen_tolerance_list}
 \alias{gen_tolerance_list}
-\title{Simple wrapper to unify tolerance input}
+\title{Wrapper to unify tolerance input, along with minor checks}
 \usage{
 gen_tolerance_list(
   tolerance_vec = NULL,
@@ -34,7 +34,11 @@ Either \code{NULL}, or a list with the same names as the input,
   with validated values.
 }
 \description{
-Simple wrapper to unify tolerance input
+Note that we will always block equal equality on the tolerance
+vec, hence why \code{tolerance_min} being \code{NULL} is equivalent
+to zero. For more sophisticated behaviour, you may want to
+directly control the caliper list or weighted distance matrix
+in the functions that generate matches.
 }
 \author{
 Colman Humphrey

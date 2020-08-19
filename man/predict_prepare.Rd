@@ -112,7 +112,7 @@ and \eqn{y} are rows, one of which is treated and the other control.
 This function should also have a property resembling:
 \deqn{f(x, y) = 1 - f(y, x)} since there's an inherent symmetry
 in the pairs: if you knew which of the two came first, there'd
-be nothing to do. In fact, the defition of \eqn{f} would likely be
+be nothing to do. In fact, the definition of \eqn{f} would likely be
 to predict if (WLOG) \eqn{x} is the treated unit or not.
 }
 \details{

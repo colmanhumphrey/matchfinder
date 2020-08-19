@@ -62,13 +62,12 @@ Generates matched pairs either:
 }
 If you're happy to allow units to be the control multiple times,
 then the first way is fast and optimal.
-}
-\details{
 If not, you have to trade off speed vs optimality. Greedy runs
 over all units in a random order, so if you want to run greedy a bunch of
 times and take the best, it would still be (likely) much faster than
 running optimal matching.
-
+}
+\details{
 NOTE:
 with sinks -
 the optimal match gives "half" the number of sinks you might expect.
@@ -78,6 +77,8 @@ If you say sinks = 20 FOR OPTIMAL,
 you'll get 190 matches, not 180.
 We leave this behaviour in so that this algorithm
 can generate expected results if someone is used to nbpmatch
+Further, note that we don't allow equality on the tolerance vector
+if used.
 }
 \author{
 Colman Humphrey
