@@ -26,8 +26,9 @@ weight vector, but the matching won't: scaling the Mahalanobis
 matrix has no effect on distance minimising pairs etc}
 
 \item{sqrt_mahal}{logical, default TRUE; do you want regular Mahalanobis:
-d(x_i, x_j) = (x_i - x_j)' ISIG (x_i - x_j)
-or the square root? (in weighted, ISIG = W SIGMA^-1 W)}
+\eqn{d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)}
+or the square root? (in weighted, \eqn{\Sigma^{-1}} becomes
+\eqn{W \Sigma^{-1} W} in the above)}
 
 \item{match_list}{Result of any of the matching methods; provide
 exactly one of this param or `match_list_list`}

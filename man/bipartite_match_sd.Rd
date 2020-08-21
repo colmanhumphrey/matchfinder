@@ -24,7 +24,7 @@ bipartite_match_sd(
 This means it's possible that \code{cov(x_mat)} is not equal to
 \code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
-\item{y_vector}{Outcome vector (not used in match generation).x}
+\item{y_vector}{Outcome vector (not used in match generation).}
 
 \item{match_list}{A particular match result.}
 
