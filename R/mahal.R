@@ -3,23 +3,26 @@
 #' Note: def. of weighted:
 #' \eqn{d(x_i, x_j) = (x_i - x_j)' W (\Sigma)^(-1) W (x_i - x_j)}
 #' where \eqn{W = \text{diag}(weight_vec)}
-#' R chol gives U s.t. U' U = S (i.e. U = chol(S))
+#' R's cholesky gives \eqn{U s.t. U' U = S (i.e. U = chol(S))}
 #' so in general we want:
+#' \deqn{
 #'   (x_i - x_j)' W (U' U)^(-1) W (x_i - x_j)
 #' = (x_i - x_j)' W U^(-1) (U')^(-1) W (x_i - x_j)
 #' = x_i' W U^(-1) (U')^(-1) W x_i +
 #'   x_j' W U^(-1) (U')^(-1) W x_j
 #'   - 2 x_i' W U^(-1) (U')^(-1) W x_j
-#'
-#' Solving the above is easy if we have y_i = (U')^(-1) W x_i
-#' or W^(-1) U' y_i = x_i,
-#' which is simple by forwardsolve. Then we have:
-#' dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j
-#' Letting Ymat = (y_1', y_2', .... ,y_n')'
-#' [which can get in one line, Ymat' = forwardsolve(W^(-1) U', x_mat')]
-#' the first two parts are just rowSums(Ymat^2) [note that code uses Ymat', thus colSums]
-#' [add outer(.,.) to finish]
-#' and the last is Ymat Ymat'
+#' }
+#' Solving the above is easy if we have \eqn{y_i = (U')^(-1) W x_i}
+#' or \eqn{W^(-1) U' y_i = x_i},
+#' which is simple by \code{forwardsolve}. Then we have:
+#' \deqn{dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j}
+#' Letting \eqn{Ymat = (y_1', y_2', .... ,y_n')'}
+#' [which can get in one line,
+#' \eqn{Ymat' = forwardsolve(W^(-1) U', x_mat')}]
+#' the first two parts are just \code{rowSums(Ymat^2)}
+#' [note that code uses \eqn{Ymat'}, thus \code{colSums}]
+#' [add \code{outer(.,.)} to finish]
+#' and the last is \eqn{Ymat Ymat'}
 #'
 #' @param x_mat numeric matrix (adjust non-numeric columns prior),
 #'   already rank-adjusted if desired
@@ -30,19 +33,20 @@
 #'   weight vector, but the matching won't: scaling the Mahalanobis
 #'   matrix has no effect on distance minimising pairs etc
 #' @param treat_vec optionally specify which units are treated.
-#'   If NULL (default), will just return nrow(x_mat) x nrow(x_mat) distance
-#'   matrix of all pairs. Can be logicals or {0, 1}
+#'   If \code{NULL} (default), will just return
+#'   \code{nrow(x_mat) x nrow(x_mat)} distance
+#'   matrix of all pairs. Can be logicals or \eqn{{0, 1}}
 #' @param sqrt_mahal logical, default TRUE; do you want regular Mahalanobis:
-#'   d(x_i, x_j) = (x_i - x_j)' ISIG (x_i - x_j)
-#'   or the square root? (in weighted, ISIG = W SIGMA^-1 W)
+#'   \eqn{d(x_i, x_j) = (x_i - x_j)' ISIG (x_i - x_j)}
+#'   or the square root? (in weighted, \eqn{ISIG = W SIGMA^-1 W})
 #' @param partial_index In some cases, you want a subset of the full
 #'   N x N matrix, but you can't partition it like you want
 #'   with treat_vec. e.g. you want
-#'   full_dist[c(1, 2, 3), 1:10]
+#'   \code{full_dist[c(1, 2, 3), 1:10]}
 #'   then use
-#'   partial_index = list(c(1,2,3), 1:10)
+#'   \code{partial_index = list(c(1,2,3), 1:10)}
 #' @return returns a matrix of pairwise distances; the relevant indexing
-#'   depends on `treat_vec` and `partial_index`
+#'   depends on \code{treat_vec} and \code{partial_index}
 #' @export
 weighted_mahal <- function(x_mat,
                            cov_x,
