@@ -1,7 +1,7 @@
 #' Calculates the standard deviation for a match, on the outcome
 #'
 #' @inheritParams all_bipartite_matches
-#' @param y_vector Outcome vector (not used in match generation).x
+#' @param y_vector Outcome vector (not used in match generation).
 #' @param match_list A particular match result.
 #' @param use_all_controls logical; if using bipartite matches, should we
 #'   estimate the variance using all controls possible? Default \code{TRUE}.
@@ -62,7 +62,8 @@ bipartite_match_sd <- function(x_mat,
             )
             caliper_list <- gen_caliper_list(
                 caliper_vec = prop_score,
-                caliper_max = sd(prop_score) * propensity_list[["caliper_sd_mult"]],
+                caliper_max = sd(prop_score) *
+                    propensity_list[["caliper_sd_mult"]],
                 continuous_mult = propensity_list[["continuous_mult"]]
             )
         } # else caliper list is as it was
@@ -177,8 +178,10 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
                                                cov_x,
                                                y_vector,
                                                control_index,
-                                               tolerance_list = gen_tolerance_list(),
-                                               caliper_list = gen_caliper_list(),
+                                               tolerance_list =
+                                                   gen_tolerance_list(),
+                                               caliper_list =
+                                                   gen_caliper_list(),
                                                weight_vec = NULL,
                                                use_all_controls = TRUE,
                                                sqrt_mahal = TRUE) {
@@ -197,7 +200,7 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
 
     partial_index <- list(
         unique_control_index,
-        1L:nrow(x_mat)
+        seq_len(nrow(x_mat))
     )
 
     control_dist_mat <- weighted_mahal(
@@ -296,7 +299,8 @@ nonbipartite_match_sd_scaled <- function(x_mat,
 
     y_diffs <- y_vector[match_list[["treat_index"]]] -
         y_vector[match_list[["control_index"]]]
-    tol_diffs <- tolerance_list[["tolerance_vec"]][match_list[["treat_index"]]] -
+    tol_diffs <-
+        tolerance_list[["tolerance_vec"]][match_list[["treat_index"]]] -
         tolerance_list[["tolerance_vec"]][match_list[["control_index"]]]
 
     var_difference <- var(y_diffs / tol_diffs)

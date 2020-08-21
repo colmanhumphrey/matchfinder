@@ -43,7 +43,7 @@
 #'     \begin{bmatrix}
 #'     X_t& X_c \\
 #'     X_c& X_t \\
-#'     \end{bmatrix}, Y = [1 1 \hdots 1 0 0 \hdots 0]'
+#'     \end{bmatrix}, Y = [1 1 \ldots 1 0 0 \ldots 0]'
 #'   }
 #'   For the test data, we'll only (WLOG more or less) give the (treat, control)
 #'   version, for consistency in evaluation.

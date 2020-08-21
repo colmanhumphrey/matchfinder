@@ -131,7 +131,8 @@ test_that("testing errors", {
     expect_error(
         nonbipartite_matches(
             dist_mat = sym_mat(matrix(runif(100), 10, 10)),
-            tolerance_list = gen_tolerance_list(rep(c("0", "1"), times = c(5, 5)))))
+            tolerance_list = gen_tolerance_list(rep(c("0", "1"),
+                                                    times = c(5, 5)))))
     expect_error(
         nonbipartite_matches(
             dist_mat = sym_mat(matrix(runif(100), 10, 10)),
