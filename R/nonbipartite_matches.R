@@ -250,7 +250,7 @@ nonbipartite_matches <- function(dist_mat,
     }
 
     optimal_nbp_sink_wrap(dist_mat,
-        tolerance_vec = NULL,
+        tolerance_vec = tolerance_list[["tolerance_vec"]],
         n_sinks = n_sinks
     )
 }
