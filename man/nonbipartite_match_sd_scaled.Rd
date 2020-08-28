@@ -13,6 +13,7 @@ nonbipartite_match_sd_scaled(
   tolerance_list = gen_tolerance_list(),
   caliper_list = gen_caliper_list(),
   weight_vec = NULL,
+  use_regression = TRUE,
   sqrt_mahal = TRUE
 )
 }
@@ -27,15 +28,10 @@ This means it's possible that \code{cov(x_mat)} is not equal to
 
 \item{match_list}{A particular match result.}
 
+\item{tolerance_list}{See \code{gen_tolerance_list}}
+
 \item{caliper_list}{Optional, see \code{gen_caliper_list}. Provide
 this to force matches that are close on some metric.}
-
-\item{tolerance_vec}{the tolerance used to form the
-non-bipartite matches}
-
-\item{tolerance_min}{min value we must obey in tol diffs}
-
-\item{tolerance_max}{max value we must obey in tol diffs}
 }
 \value{
 a single float, the standard deviation (not standard error)
@@ -45,7 +41,11 @@ a single float, the standard deviation (not standard error)
 For when your result isn't just based
 on the differences in the y-vector, but those differences are
 weighed inversely proportional to the difference between the
-tolerance values
+tolerance values.
+To get on the standard error level, divide the result
+by \code{sqrt(length(match_list[["treat_index"]]))}
+This will be conservative in general with
+repeats.
 }
 \author{
 Colman Humphrey

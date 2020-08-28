@@ -9,7 +9,7 @@ match_estimate(match_list, y_vector, treat_vec = NULL)
 }
 \arguments{
 \item{match_list}{Typical \code{match_list} object from
-\code{{non}bipartite_matches}.}
+\code{bipartite_matches}.}
 
 \item{y_vector}{The outcome vector.}
 
@@ -19,9 +19,10 @@ match_estimate(match_list, y_vector, treat_vec = NULL)
 Returns a single number, the mean difference.
 }
 \description{
-Computes the average difference between the treated units
-and the control units for a match, given as a match list.
-Optionally confirms that all treated units are indeed treated.
+Computes the average difference between the treated units and the
+control units for a match, given as a match list.  Optionally
+confirms that all treated units are indeed treated.  Note that this
+isn't typically suitable for non-bipartite matching.
 }
 \author{
 Colman Humphrey

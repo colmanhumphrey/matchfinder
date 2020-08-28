@@ -2,7 +2,7 @@
 % Please edit documentation in R/mahal.R
 \name{weighted_mahal}
 \alias{weighted_mahal}
-\title{computes weighted Mahalanobis distance, using Choleski decomp.}
+\title{Computes weighted Mahalanobis distance, using Choleski decomp.}
 \usage{
 weighted_mahal(
   x_mat,
@@ -55,7 +55,7 @@ so in general we want:
 \deqn{
   (x_i - x_j)' W (U' U)^{-1} W (x_i - x_j) \\
 = (x_i - x_j)' W U^{-1} (U')^{-1} W (x_i - x_j) \\
-= x_i' W U^{-1} (U')^{-1} W x_i + \\
+= x_i' W U^{-1} (U')^{-1} W x_i +
   x_j' W U^{-1} (U')^{-1} W x_j \\
   - 2 x_i' W U^{-1} (U')^{-1} W x_j
 }
