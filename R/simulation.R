@@ -352,7 +352,7 @@ compute_sim_result <- function(x_generator = default_x_generator,
         silent = silent
     )
 
-    permutation_results <- permutation_bipartite_matches(
+    permutation_results <- permutation_matches(
         matches_by_sinks = sink_brier_matches[["matches_by_sinks"]],
         briers_by_sinks = sink_brier_matches[["briers_by_sinks"]],
         x_mat = x_mat,

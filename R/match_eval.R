@@ -171,6 +171,8 @@ brier_score_cv <- function(x_mat,
 #' For a given match, computes the brier score distribution
 #' if the pairing were truly random
 #'
+#' Works for bipartite and non-bipartite, since it just
+#' switches the labels within pairs.
 #' @param x_mat typical input matrix
 #' @param match_list match result
 #' @param design see \code{predict_prepare}

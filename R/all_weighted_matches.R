@@ -1,7 +1,6 @@
 #' idea is to complete a search for a given N,
 #' or vector N
 #'
-#'
 #' @param x_mat input/design matrix (already rank-adjusted etc)
 #' @param cov_x the (potentially rank-adjusted) covariance of \code{x_mat}.
 #'   This means it's possible that \code{cov(x_mat)} is not equal to
@@ -160,6 +159,8 @@ sink_brier_bipartite_matches <- function(x_mat,
 #' Takes matches and their Brier scores, and computes
 #' permutation Brier scores and the best matches
 #'
+#' Can work for bipartite or non-bipartite matches,
+#' the permutation is just over the labels.
 #' @param matches_by_sinks List by number of sinks, each a list
 #'   of match results (a match list), for each weight vector.
 #' @param briers_by_sinks List by number of sinks, each a vector
@@ -168,6 +169,10 @@ sink_brier_bipartite_matches <- function(x_mat,
 #' @param x_mat Typical input matrix
 #' @param n_sinks Vector of number of sinks - probably could get this
 #'   directly from \code{matches_by_sinks}, but nice to be explicit.
+#' @param approximate_by_best Logical, default \code{TRUE}. Only
+#'   compute one permutation distribution, using the best result by brier
+#'   score to do so. Useful because it changes little, but saves a ton of
+#'   time.
 #' @param silent Do you want to suppress message output? Default
 #'   \code{!interactive()}.
 #' @return Returns a list of two lists. The first is vectors
@@ -177,11 +182,12 @@ sink_brier_bipartite_matches <- function(x_mat,
 #' @author Colman Humphrey
 #'
 #' @export
-permutation_bipartite_matches <- function(matches_by_sinks,
-                                          briers_by_sinks,
-                                          x_mat,
-                                          n_sinks,
-                                          silent = !interactive()) {
+permutation_matches <- function(matches_by_sinks,
+                                briers_by_sinks,
+                                x_mat,
+                                n_sinks,
+                                approximate_by_best = TRUE,
+                                silent = !interactive()) {
     best_brier_inds <- lapply(briers_by_sinks, function(x) {
         which(rank(x, ties.method = "first") == length(x))
     })
@@ -190,24 +196,42 @@ permutation_bipartite_matches <- function(matches_by_sinks,
         message("running permutations, will be a little slow")
     }
 
-    ## As discussed in the corresponding paper, we only compute the permutation
-    ## scores on the best match, because each run takes so much time.
     permutation_briers <- lapply(seq_len(length(n_sinks)), function(j) {
         if (!silent) {
-            n_sinks[j]
+            message(paste0("Running permutations for ",
+                           n_sinks[j], " sinks"))
         }
-        best_brier_ind <- best_brier_inds[[j]]
-        permutation_brier(x_mat,
-            match_list = matches_by_sinks[[j]][[best_brier_ind]]
-        )
+        if (approximate_by_best) {
+            ## we'll just use the best to save time
+            best_brier_ind <- best_brier_inds[[j]]
+            return(permutation_brier(
+                x_mat,
+                match_list = matches_by_sinks[[j]][[best_brier_ind]]
+            ))
+        } else {
+            return(lapply(matches_by_sinks[[j]], function(match_list) {
+                permutation_brier(
+                    x_mat,
+                    match_list = match_list
+                )
+            }))
+        }
     })
 
     ## compute the permutation score for each match
     permutation_brier_scores <- lapply(seq_len(length(n_sinks)), function(j) {
-        permutation_vec <- permutation_briers[[j]]
-        unlist(lapply(briers_by_sinks[[j]], function(x) {
-            mean(x <= permutation_vec)
-        }))
+        if (approximate_by_best) {
+            permutation_vec <- permutation_briers[[j]]
+            return(unlist(lapply(briers_by_sinks[[j]], function(x) {
+                mean(x <= permutation_vec)
+            })))
+        } else {
+            return(unlist(lapply(
+                seq_len(length(briers_by_sinks[[j]])), function(k) {
+                    permutation_vec <- permutation_briers[[j]][[k]]
+                    mean(briers_by_sinks[[j]][[k]] <= permutation_vec)
+            })))
+        }
     })
 
     ## now that we're doing one-sided brier,
@@ -215,10 +239,20 @@ permutation_bipartite_matches <- function(matches_by_sinks,
     ## so will highest brier
 
     best_matches <- lapply(seq_len(length(n_sinks)), function(j) {
-        best_brier_ind <- best_brier_inds[[j]]
+        best_brier_ind <- if (approximate_by_best) {
+                              best_brier_inds[[j]]
+                          } else {
+                              which.min(permutation_brier_scores[[j]])
+                          }
 
-        stopifnot(permutation_brier_scores[[j]][best_brier_ind] ==
-            min(permutation_brier_scores[[j]]))
+        if (approximate_by_best) {
+            ## because they all used the same vector -
+            ## so the best must also have the best score here
+            stopifnot(
+                permutation_brier_scores[[j]][best_brier_ind] ==
+                min(permutation_brier_scores[[j]])
+            )
+        }
 
         list(
             n_sinks = n_sinks[j],
@@ -240,6 +274,7 @@ permutation_bipartite_matches <- function(matches_by_sinks,
 #' @inheritParams all_bipartite_matches
 #' @inheritParams nonbipartite_matches
 #' @param tolerance_list See \code{gen_tolerance_list}
+#'
 #' @export
 all_nonbipartite_matches <- function(x_mat,
                                      cov_x,
