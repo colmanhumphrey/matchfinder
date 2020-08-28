@@ -1,11 +1,12 @@
 #' Computes a simple mean difference in an outcome vector
 #' between treatment and control in a paired match
 #'
-#' Computes the average difference between the treated units
-#' and the control units for a match, given as a match list.
-#' Optionally confirms that all treated units are indeed treated.
+#' Computes the average difference between the treated units and the
+#' control units for a match, given as a match list.  Optionally
+#' confirms that all treated units are indeed treated.  Note that this
+#' isn't typically suitable for non-bipartite matching.
 #' @param match_list Typical \code{match_list} object from
-#'   \code{{non}bipartite_matches}.
+#'     \code{bipartite_matches}.
 #' @param y_vector The outcome vector.
 #' @param treat_vec Default NULL, provide if you want it checked.
 #' @return Returns a single number, the mean difference.
@@ -23,6 +24,66 @@ match_estimate <- function(match_list,
 
     mean(y_vector[match_list[["treat_index"]]] -
         y_vector[match_list[["control_index"]]])
+}
+
+
+##' Calculates the "match estimate" for nonbipartite matches:
+##' change per "unit" of tolerance vector
+##'
+##' This function computes either:
+##' \deqn{
+##'     \frac{1}{m} \sum_1^m \frac{y_{t_i} - y_{c_i}}{t_{t_i} - t_{c_i}}
+##' }
+##' Where \eqn{t} is the tolerance vector, and
+##' \eqn{t_i, c_i} are the \eqn{i}th treatment and control
+##' index.
+##' Or we run a regression:
+##' \deqn{
+##'     y_{t_i} - y_{c_i} ~ t_{t_i} - t_{c_i}
+##' }
+##' And return the coefficient of the tolerance difference
+##' @param match_list Typical \code{match_list} object from
+##'     \code{bipartite_matches}.
+##' @param y_vector The outcome vector.
+##' @param tolerance_list Typical tolerance list, see
+##'   \code{gen_tolerance_list}
+##' @param use_regression Boolean, use the "naive" average,
+##'   or use regression? Default \code{TRUE}
+##' @return Returns a single number, the match estimate
+##' @author Colman Humphrey
+##'
+##' @export
+match_estimate_tolerance <- function(match_list,
+                                     y_vector,
+                                     tolerance_list = gen_tolerance_list(),
+                                     use_regression = TRUE) {
+    if (is.null(tolerance_list)) {
+        stop("`tolerance_list` must be provided")
+    }
+
+    tol_vec <- tolerance_list[["tolerance_vec"]]
+    stopifnot(length(tol_vec) == length(y_vector))
+
+    tol_diffs <- tol_vec[match_list[["treat_index"]]] -
+        tol_vec[match_list[["control_index"]]]
+
+    tol_validation <- tolerance_check(match_list, tolerance_list)
+    if (tol_validation[["error"]]) {
+        stop(tol_validation[["message"]])
+    }
+
+    y_diffs <- y_vector[match_list[["treat_index"]]] -
+        y_vector[match_list[["control_index"]]]
+
+    if (use_regression) {
+        ## you can't use the standard devation from here,
+        ## you need to use `nonbipartite_match_sd_scaled`
+        reg_res <- lm(y_diffs ~ tol_diffs + 0)
+        return(unname(coef(reg_res)["tol_diffs"]))
+    } else {
+        ## "naive" measure
+        return(mean(y_diffs / tol_diffs))
+    }
 }
 
 

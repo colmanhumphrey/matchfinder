@@ -1,6 +1,5 @@
 context("testing match_eval functions")
 
-
 test_that("testing match_estimate", {
     match_list <- list(
         treat_index = 1L:200L,
@@ -32,6 +31,74 @@ test_that("testing match_estimate", {
                                 treat_vec = c(rep(1L, 200L),
                                               rep(0L, 200L))),
                  NA)
+})
+
+
+test_that("testing match_estimate_tolerance", {
+    half_rows <- 300L
+    rows <- half_rows * 2L
+    treat_effect <- 0.2
+
+    match_ests <- lapply(1L:100L, function(j) {
+        match_list <- list(
+            treat_index = 1L:half_rows,
+            control_index = (half_rows + 1L):rows,
+            distance = runif(half_rows)
+        )
+
+        pre_tol <- runif(half_rows, 0, 2)
+        tol_add <- runif(half_rows, 0.3, 3)
+        tolerance_vec <- c(pre_tol + tol_add, pre_tol)
+        tolerance_list <- gen_tolerance_list(
+            tolerance_vec = tolerance_vec
+        )
+
+        ## of course here the pairs are pre-made
+        y_vector <- rnorm(rows) + treat_effect * tolerance_vec
+
+        ##------------------------------------
+
+        match_est_naive <- match_estimate_tolerance(
+            match_list = match_list,
+            y_vector = y_vector,
+            tolerance_list = tolerance_list,
+            use_regression = FALSE
+        )
+        match_est_regression <- match_estimate_tolerance(
+            match_list = match_list,
+            y_vector = y_vector,
+            tolerance_list = tolerance_list,
+            use_regression = TRUE  # the default
+        )
+
+        return(list(
+            naive_est = match_est_naive,
+            reg_est = match_est_regression
+        ))
+    })
+
+    naive_ests <- unlist(lapply(match_ests, `[[`, "naive_est"))
+    reg_ests <- unlist(lapply(match_ests, `[[`, "reg_est"))
+
+    expect_true(abs(mean(naive_ests) - treat_effect) +
+                abs(mean(reg_ests) - treat_effect) < 0.02)
+
+    sd_naive <- sqrt(mean((naive_ests - treat_effect)^2))
+    sd_reg <- sqrt(mean((reg_ests - treat_effect)^2))
+
+    expect_true(sd_naive < 0.2)
+    expect_true(sd_reg < 0.1)
+
+    ##------------------------------------
+    ## we're using `tolerance_check` here so
+    ## we don't need to do a ton of separate tests
+    expect_error(match_estimate_tolerance(
+        match_list = match_list,
+        y_vector = y_vector,
+        tolerance_list = gen_tolerance_list(
+            tolerance_vec = -tolerance_vec
+        )
+    ))
 })
 
 
