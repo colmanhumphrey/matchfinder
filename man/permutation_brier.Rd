@@ -38,8 +38,8 @@ split.}
 vector of brier scores for random pairings
 }
 \description{
-For a given match, computes the brier score distribution
-if the pairing were truly random
+Works for bipartite and non-bipartite, since it just
+switches the labels within pairs.
 }
 \author{
 Colman Humphrey
