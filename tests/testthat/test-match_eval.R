@@ -80,8 +80,12 @@ test_that("testing match_estimate_tolerance", {
     naive_ests <- unlist(lapply(match_ests, `[[`, "naive_est"))
     reg_ests <- unlist(lapply(match_ests, `[[`, "reg_est"))
 
-    expect_true(abs(mean(naive_ests) - treat_effect) +
-                abs(mean(reg_ests) - treat_effect) < 0.02)
+    ## within 20%
+    expect_true(
+        (abs(mean(naive_ests) - treat_effect) +
+         abs(mean(reg_ests) - treat_effect)) / treat_effect
+        < 0.2
+    )
 
     sd_naive <- sqrt(mean((naive_ests - treat_effect)^2))
     sd_reg <- sqrt(mean((reg_ests - treat_effect)^2))
