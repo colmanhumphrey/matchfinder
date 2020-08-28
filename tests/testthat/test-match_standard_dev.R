@@ -226,8 +226,6 @@ test_that("testing nonbipartite_match_sd_scaled", {
     treat_vec <- rep(c(TRUE, FALSE), each = half_rows)
     y_vector <- runif(rows) + treat_vec * 0.2
 
-    y_vector <- runif(half_rows * 2L)
-
     ## won't bother with stuff we won't use
     match_list <- list(
         treat_index = 1L:half_rows,
@@ -250,7 +248,9 @@ test_that("testing nonbipartite_match_sd_scaled", {
         match_list = match_list,
         tolerance_list = gen_tolerance_list(
             tolerance_vec = tol_vec,
-            tolerance_min = 1))
+            tolerance_min = 1),
+        use_regression = FALSE
+        )
     expect_equal(match_sd, boring_sd)
 
     ## actually don't even need x
@@ -261,8 +261,23 @@ test_that("testing nonbipartite_match_sd_scaled", {
         match_list = match_list,
         tolerance_list = gen_tolerance_list(
             tolerance_vec = tol_vec,
-            tolerance_min = 1))
+            tolerance_min = 1),
+        use_regression = FALSE
+    )
     expect_equal(match_sd_no_x, boring_sd)
+
+    ## but regression is nicer
+    match_sd_with_reg <- nonbipartite_match_sd_scaled(
+        x_mat = NULL,
+        cov_x = NULL,
+        y_vector = y_vector,
+        match_list = match_list,
+        tolerance_list = gen_tolerance_list(
+            tolerance_vec = tol_vec,
+            tolerance_min = 1),
+        use_regression = TRUE
+    )
+    expect_true(match_sd_with_reg < boring_sd)
 
     ##------------------------------------
     ## now with repeats
@@ -313,16 +328,35 @@ test_that("testing nonbipartite_match_sd_scaled", {
                                      match_list = ml,
                                      tolerance_list = gen_tolerance_list(
                                          tolerance_vec = tol_vec,
-                                         tolerance_min = 1))
+                                         tolerance_min = 1),
+                                     use_regression = FALSE)
+    }))^2
+    full_variances_reg <- unlist(lapply(match_lists, function(ml) {
+        nonbipartite_match_sd_scaled(x_mat,
+                                     cov_x = cov_x,
+                                     y_vector = y_vector,
+                                     match_list = ml,
+                                     tolerance_list = gen_tolerance_list(
+                                         tolerance_vec = tol_vec,
+                                         tolerance_min = 1),
+                                     use_regression = TRUE)
     }))^2
 
     boring_avg <- colMeans(matrix(boring_variances, ncol = 2L))
     rep_avg <- colMeans(matrix(rep_variances, ncol = 2L))
     full_avg <- colMeans(matrix(full_variances, ncol = 2L))
+    full_avg_reg <- colMeans(matrix(full_variances_reg, ncol = 2L))
 
     close_to_zero <- full_avg - rep_avg - boring_avg
 
     expect_true(sum(abs(close_to_zero)) < 0.5)
+
+    ## in this case the regression doesn't change a huge amount,
+    ## since most of the work is in the repeats
+
+    abs_diffs <- abs(full_avg - full_avg_reg) /
+        (2 * abs(full_avg + full_avg_reg))
+    expect_true(sum(abs_diffs) < 0.1)
 })
 
 
@@ -704,10 +738,10 @@ test_that("testing tol_random_sample", {
     ##------------------------------------
 
     easy_pairs <- tol_random_sample(easy_tol)
-    expect_equal(dim(easy_pairs), c(rows %/% 2L, 2L))
+    expect_equal(unname(lengths(easy_pairs)), rep(rows %/% 2L, 2L))
 
-    first_greater <- tol_vec[easy_pairs[, 1]] > tol_vec[easy_pairs[, 2]]
-    expect_true(all(first_greater))
+    expect_false(tolerance_check(match_list = easy_pairs,
+                                 tolerance_list = easy_tol)[["error"]])
 
     ##------------------------------------
 
@@ -715,7 +749,9 @@ test_that("testing tol_random_sample", {
         tol_random_sample(medium_tol)
     })
 
-    num_pairs <- unlist(lapply(medium_pair_res, nrow))
+    num_pairs <- unlist(lapply(medium_pair_res, function(x) {
+        length(x[["treat_index"]])
+    }))
 
     ## ballpark low 30s
     expect_true(sum(num_pairs == (rows %/% 2L)) > 5L)
@@ -723,11 +759,8 @@ test_that("testing tol_random_sample", {
 
     any_result <- sample(medium_pair_res, 1L)[[1L]]
 
-    diffs <- tol_vec[any_result[, 1]] - tol_vec[any_result[, 2]]
-    expect_true(all(
-        medium_tol[["tolerance_min"]] < diffs &
-        diffs < medium_tol[["tolerance_max"]]
-    ))
+    expect_false(tolerance_check(match_list = any_result,
+                                 tolerance_list = medium_tol)[["error"]])
 
     ##------------------------------------
 
@@ -735,18 +768,17 @@ test_that("testing tol_random_sample", {
         tol_random_sample(hard_tol)
     })
 
-    num_pairs <- unlist(lapply(hard_pair_res, nrow))
+    num_pairs <- unlist(lapply(hard_pair_res, function(x) {
+        length(x[["treat_index"]])
+    }))
 
-    ## ballpark low 30s
+    ## ballpark none
     expect_true(!any(num_pairs == (rows %/% 2L)))
     ## but shouldn't be too bad as long as rows isn't tiny
     expect_true(min(num_pairs) > (rows %/% 2L) * 0.7)
 
     any_result <- sample(hard_pair_res, 1L)[[1L]]
 
-    diffs <- tol_vec[any_result[, 1]] - tol_vec[any_result[, 2]]
-    expect_true(all(
-        hard_tol[["tolerance_min"]] < diffs &
-        diffs < hard_tol[["tolerance_max"]]
-    ))
+    expect_false(tolerance_check(match_list = any_result,
+                                 tolerance_list = hard_tol)[["error"]])
 })
