@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computed the mahal imbalance for a given match — mahal_imbalance_list • matchfinder</title>
+<title>Generates a random pairing from a tolerance list in a naive way — tol_random_sample • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Computed the mahal imbalance for a given match — mahal_imbalance_list" />
-<meta property="og:description" content="Computed the mahal imbalance for a given match" />
+<meta property="og:title" content="Generates a random pairing from a tolerance list in a naive way — tol_random_sample" />
+<meta property="og:description" content="This function takes in a tolerance list and attempts to generate
+a &quot;simple&quot; match list by naive random sampling." />
 
 
 
@@ -103,50 +104,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computed the mahal imbalance for a given match</h1>
+    <h1>Generates a random pairing from a tolerance list in a naive way</h1>
     
-    <div class="hidden name"><code>mahal_imbalance_list.Rd</code></div>
+    <div class="hidden name"><code>tol_random_sample.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computed the mahal imbalance for a given match</p>
+    <p>This function takes in a tolerance list and attempts to generate
+a "simple" match list by naive random sampling.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance_list</span>(<span class='no'>x_mat</span>, <span class='no'>match_list</span>, <span class='no'>chol_mat</span>, <span class='no'>weight_vec</span>, <span class='no'>sqrt_mahal</span>)</pre>
+    <pre class="usage"><span class='fu'>tol_random_sample</span>(
+  <span class='no'>tolerance_list</span>,
+  <span class='kw'>prior_pairs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>NA</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2L</span>),
+  <span class='kw'>pairable_units</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>iteration</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
+  <span class='kw'>max_iterations</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
+  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <th>tolerance_list</th>
+      <td><p>Usual tol, see e.g. <code>gen_tolerance_list</code></p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`</p></td>
+      <th>prior_pairs</th>
+      <td><p>For use in recursion - what pairs are already formed
+(indeed we have none for the first iteration)</p></td>
     </tr>
     <tr>
-      <th>chol_mat</th>
-      <td></td>
+      <th>pairable_units</th>
+      <td><p>For use in recursion - what units are available
+to form pairs (<code>NULL</code> is all, hence for the first iteration)</p></td>
     </tr>
     <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
+      <th>iteration</th>
+      <td><p>What iteration number are we on</p></td>
     </tr>
     <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>max_iterations</th>
+      <td><p>Max iterations</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Boolean - spit out extra messages / warnings?</p></td>
     </tr>
     </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>"Simple" match list, list with two elements:</p><ul>
+<li><p><code>treat_index</code> Treatment units</p></li>
+<li><p><code>control_index</code> Control units</p></li>
+</ul>
 
 
   </div>

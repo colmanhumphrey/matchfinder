@@ -45,7 +45,11 @@ non-bipartite matches. — nonbipartite_match_sd_scaled" />
 <meta property="og:description" content="For when your result isn't just based
 on the differences in the y-vector, but those differences are
 weighed inversely proportional to the difference between the
-tolerance values" />
+tolerance values.
+To get on the standard error level, divide the result
+by sqrt(length(match_list[[&quot;treat_index&quot;]]))
+This will be conservative in general with
+repeats." />
 
 
 
@@ -118,7 +122,11 @@ non-bipartite matches.</h1>
     <p>For when your result isn't just based
 on the differences in the y-vector, but those differences are
 weighed inversely proportional to the difference between the
-tolerance values</p>
+tolerance values.
+To get on the standard error level, divide the result
+by <code><a href='https://rdrr.io/r/base/MathFun.html'>sqrt(length(match_list[["treat_index"]]))</a></code>
+This will be conservative in general with
+repeats.</p>
     </div>
 
     <pre class="usage"><span class='fu'>nonbipartite_match_sd_scaled</span>(
@@ -129,6 +137,7 @@ tolerance values</p>
   <span class='kw'>tolerance_list</span> <span class='kw'>=</span> <span class='fu'><a href='gen_tolerance_list.html'>gen_tolerance_list</a></span>(),
   <span class='kw'>caliper_list</span> <span class='kw'>=</span> <span class='fu'><a href='gen_caliper_list.html'>gen_caliper_list</a></span>(),
   <span class='kw'>weight_vec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>use_regression</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>sqrt_mahal</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
 )</pre>
 
@@ -147,29 +156,20 @@ This means it's possible that <code><a href='https://rdrr.io/r/stats/cor.html'>c
     </tr>
     <tr>
       <th>y_vector</th>
-      <td><p>Outcome vector (not used in match generation).x</p></td>
+      <td><p>Outcome vector (not used in match generation).</p></td>
     </tr>
     <tr>
       <th>match_list</th>
       <td><p>A particular match result.</p></td>
     </tr>
     <tr>
+      <th>tolerance_list</th>
+      <td><p>See <code>gen_tolerance_list</code></p></td>
+    </tr>
+    <tr>
       <th>caliper_list</th>
       <td><p>Optional, see <code>gen_caliper_list</code>. Provide
 this to force matches that are close on some metric.</p></td>
-    </tr>
-    <tr>
-      <th>tolerance_vec</th>
-      <td><p>the tolerance used to form the
-non-bipartite matches</p></td>
-    </tr>
-    <tr>
-      <th>tolerance_min</th>
-      <td><p>min value we must obey in tol diffs</p></td>
-    </tr>
-    <tr>
-      <th>tolerance_max</th>
-      <td><p>max value we must obey in tol diffs</p></td>
     </tr>
     </table>
 

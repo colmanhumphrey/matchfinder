@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computed the mahal imbalance for a given match — mahal_imbalance_list • matchfinder</title>
+<title>Validates a match on a tolerance list — tolerance_check • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,10 @@
 
 
 
-<meta property="og:title" content="Computed the mahal imbalance for a given match — mahal_imbalance_list" />
-<meta property="og:description" content="Computed the mahal imbalance for a given match" />
+<meta property="og:title" content="Validates a match on a tolerance list — tolerance_check" />
+<meta property="og:description" content="Checks that the differences are all at least
+at the min, and if a max is given, checks that too.
+Gives reasonable error messages on errors" />
 
 
 
@@ -103,50 +105,40 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computed the mahal imbalance for a given match</h1>
+    <h1>Validates a match on a tolerance list</h1>
     
-    <div class="hidden name"><code>mahal_imbalance_list.Rd</code></div>
+    <div class="hidden name"><code>tolerance_check.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computed the mahal imbalance for a given match</p>
+    <p>Checks that the differences are all at least
+at the min, and if a max is given, checks that too.
+Gives reasonable error messages on errors</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance_list</span>(<span class='no'>x_mat</span>, <span class='no'>match_list</span>, <span class='no'>chol_mat</span>, <span class='no'>weight_vec</span>, <span class='no'>sqrt_mahal</span>)</pre>
+    <pre class="usage"><span class='fu'>tolerance_check</span>(<span class='no'>match_list</span>, <span class='no'>tolerance_list</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
-    </tr>
-    <tr>
       <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`</p></td>
+      <td><p>Typical <code>match_list</code> object from
+<code>bipartite_matches</code>.</p></td>
     </tr>
     <tr>
-      <th>chol_mat</th>
-      <td></td>
-    </tr>
-    <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
-    </tr>
-    <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>tolerance_list</th>
+      <td><p>Typical tolerance list, see
+<code>gen_tolerance_list</code></p></td>
     </tr>
     </table>
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>List with two elements:</p><ul>
+<li><p><code>error</code>Boolean - is all good?</p></li>
+<li><p><code>message</code>If error, then gives error string</p></li>
+</ul>
 
 
   </div>

@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computed the mahal imbalance for a given match — mahal_imbalance_list • matchfinder</title>
+<title>Simple function for <code>tol_random_sample</code> to convert matrices
+of pairs into list — matrix_to_simple_match • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,10 @@
 
 
 
-<meta property="og:title" content="Computed the mahal imbalance for a given match — mahal_imbalance_list" />
-<meta property="og:description" content="Computed the mahal imbalance for a given match" />
+<meta property="og:title" content="Simple function for <code>tol_random_sample</code> to convert matrices
+of pairs into list — matrix_to_simple_match" />
+<meta property="og:description" content="Simple function for tol_random_sample to convert matrices
+of pairs into list" />
 
 
 
@@ -103,51 +106,36 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computed the mahal imbalance for a given match</h1>
+    <h1>Simple function for <code>tol_random_sample</code> to convert matrices
+of pairs into list</h1>
     
-    <div class="hidden name"><code>mahal_imbalance_list.Rd</code></div>
+    <div class="hidden name"><code>matrix_to_simple_match.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computed the mahal imbalance for a given match</p>
+    <p>Simple function for <code>tol_random_sample</code> to convert matrices
+of pairs into list</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance_list</span>(<span class='no'>x_mat</span>, <span class='no'>match_list</span>, <span class='no'>chol_mat</span>, <span class='no'>weight_vec</span>, <span class='no'>sqrt_mahal</span>)</pre>
+    <pre class="usage"><span class='fu'>matrix_to_simple_match</span>(<span class='no'>pairs_matrix</span>, <span class='kw'>treat_first</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <th>pairs_matrix</th>
+      <td><p>Matrix with two columns, one for the treatment
+indices, one for the control</p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`</p></td>
-    </tr>
-    <tr>
-      <th>chol_mat</th>
-      <td></td>
-    </tr>
-    <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
-    </tr>
-    <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>treat_first</th>
+      <td><p>Boolean; is the first column the treatment column?</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>See <code>tol_random_sample</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

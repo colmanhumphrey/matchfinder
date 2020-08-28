@@ -42,9 +42,10 @@ between treatment and control in a paired match — match_estimate • matchfind
 
 <meta property="og:title" content="Computes a simple mean difference in an outcome vector
 between treatment and control in a paired match — match_estimate" />
-<meta property="og:description" content="Computes the average difference between the treated units
-and the control units for a match, given as a match list.
-Optionally confirms that all treated units are indeed treated." />
+<meta property="og:description" content="Computes the average difference between the treated units and the
+control units for a match, given as a match list.  Optionally
+confirms that all treated units are indeed treated.  Note that this
+isn't typically suitable for non-bipartite matching." />
 
 
 
@@ -114,9 +115,10 @@ between treatment and control in a paired match</h1>
     </div>
 
     <div class="ref-description">
-    <p>Computes the average difference between the treated units
-and the control units for a match, given as a match list.
-Optionally confirms that all treated units are indeed treated.</p>
+    <p>Computes the average difference between the treated units and the
+control units for a match, given as a match list.  Optionally
+confirms that all treated units are indeed treated.  Note that this
+isn't typically suitable for non-bipartite matching.</p>
     </div>
 
     <pre class="usage"><span class='fu'>match_estimate</span>(<span class='no'>match_list</span>, <span class='no'>y_vector</span>, <span class='kw'>treat_vec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
@@ -127,7 +129,7 @@ Optionally confirms that all treated units are indeed treated.</p>
     <tr>
       <th>match_list</th>
       <td><p>Typical <code>match_list</code> object from
-<code>{non}bipartite_matches</code>.</p></td>
+<code>bipartite_matches</code>.</p></td>
     </tr>
     <tr>
       <th>y_vector</th>

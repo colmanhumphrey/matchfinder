@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computed the mahal imbalance for a given match — mahal_imbalance_list • matchfinder</title>
+<title>Quick and dirty method to approximate the sd and mean
+of the ratio of the differences — y_tolerance_diff_ratio • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +40,21 @@
 
 
 
-<meta property="og:title" content="Computed the mahal imbalance for a given match — mahal_imbalance_list" />
-<meta property="og:description" content="Computed the mahal imbalance for a given match" />
+<meta property="og:title" content="Quick and dirty method to approximate the sd and mean
+of the ratio of the differences — y_tolerance_diff_ratio" />
+<meta property="og:description" content="For non-bipartite work, we work with something like:
+$$
+    \frac{y_{\text{treat}} - y_{\text{control}}}
+         {tol_{\text{treat}} - tol_{\text{control}}}
+$$
+And not just \(y_{\text{treat}} - y_{\text{control}}\) as
+our &quot;difference&quot;: here we say we're caring about the change
+in \(y\) per unit tol.
+This function estimates the standard deviation of this
+if you just did random pairings **that obeyed the tolerance
+rules** with min and max.
+This function computes approx sd for the **optimal** case.
+Also yes this is a terrible function name." />
 
 
 
@@ -103,51 +117,62 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computed the mahal imbalance for a given match</h1>
+    <h1>Quick and dirty method to approximate the sd and mean
+of the ratio of the differences</h1>
     
-    <div class="hidden name"><code>mahal_imbalance_list.Rd</code></div>
+    <div class="hidden name"><code>y_tolerance_diff_ratio.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computed the mahal imbalance for a given match</p>
+    <p>For non-bipartite work, we work with something like:
+$$
+    \frac{y_{\text{treat}} - y_{\text{control}}}
+         {tol_{\text{treat}} - tol_{\text{control}}}
+$$
+And not just \(y_{\text{treat}} - y_{\text{control}}\) as
+our "difference": here we say we're caring about the change
+in \(y\) per unit tol.
+This function estimates the standard deviation of this
+if you just did random pairings **that obeyed the tolerance
+rules** with min and max.
+This function computes approx sd for the **optimal** case.
+Also yes this is a terrible function name.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance_list</span>(<span class='no'>x_mat</span>, <span class='no'>match_list</span>, <span class='no'>chol_mat</span>, <span class='no'>weight_vec</span>, <span class='no'>sqrt_mahal</span>)</pre>
+    <pre class="usage"><span class='fu'>y_tolerance_diff_ratio</span>(
+  <span class='no'>y_vector</span>,
+  <span class='no'>tolerance_list</span>,
+  <span class='kw'>use_regression</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
+  <span class='kw'>samples</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <th>y_vector</th>
+      <td><p>Vector of outcomes we care about</p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`</p></td>
+      <th>tolerance_list</th>
+      <td><p>Usual tolerance list (see <code>gen_tolerance_list</code>)</p></td>
     </tr>
     <tr>
-      <th>chol_mat</th>
-      <td></td>
+      <th>use_regression</th>
+      <td><p><code>TRUE</code> to use regression, <code>FALSE</code> to use
+the ratios directly. Default <code>TRUE</code>.</p></td>
     </tr>
     <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
-    </tr>
-    <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>samples</th>
+      <td><p>How many samples to use. Defaults to a number between 50
+and 200, depending on the length of the various vectors</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a single number: the average of the sds of <code>samples</code>
+  random runs</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

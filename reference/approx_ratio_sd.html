@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computed the mahal imbalance for a given match — mahal_imbalance_list • matchfinder</title>
+<title>Approximate the standard deviation of the ratio of two vectors — approx_ratio_sd • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,17 @@
 
 
 
-<meta property="og:title" content="Computed the mahal imbalance for a given match — mahal_imbalance_list" />
-<meta property="og:description" content="Computed the mahal imbalance for a given match" />
+<meta property="og:title" content="Approximate the standard deviation of the ratio of two vectors — approx_ratio_sd" />
+<meta property="og:description" content="The delta method gives us:
+$$
+   Var(N/D) \approx \frac{\mu_N^2}{\mu_D^2}
+                    \bigg[ \frac{\sigma^2_N}{\mu_N^2} +
+                           \frac{\sigma^2_D}{\mu_D^2} -
+                           2 \frac{Cov(N, D)}{\mu_N \mu_D}]
+$$
+Of course it's not necessarily clear we'd have the covariance
+and not the vectors, but there are indeed some interesting
+cases." />
 
 
 
@@ -103,51 +112,64 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computed the mahal imbalance for a given match</h1>
+    <h1>Approximate the standard deviation of the ratio of two vectors</h1>
     
-    <div class="hidden name"><code>mahal_imbalance_list.Rd</code></div>
+    <div class="hidden name"><code>approx_ratio_sd.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computed the mahal imbalance for a given match</p>
+    <p>The delta method gives us:
+$$
+   Var(N/D) \approx \frac{\mu_N^2}{\mu_D^2}
+                    \bigg[ \frac{\sigma^2_N}{\mu_N^2} +
+                           \frac{\sigma^2_D}{\mu_D^2} -
+                           2 \frac{Cov(N, D)}{\mu_N \mu_D}]
+$$
+Of course it's not necessarily clear we'd have the covariance
+and not the vectors, but there are indeed some interesting
+cases.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance_list</span>(<span class='no'>x_mat</span>, <span class='no'>match_list</span>, <span class='no'>chol_mat</span>, <span class='no'>weight_vec</span>, <span class='no'>sqrt_mahal</span>)</pre>
+    <pre class="usage"><span class='fu'>approx_ratio_sd</span>(
+  <span class='no'>numerator_mean</span>,
+  <span class='no'>numerator_sd</span>,
+  <span class='no'>denominator_mean</span>,
+  <span class='no'>denominator_sd</span>,
+  <span class='no'>covariance</span>
+)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <th>numerator_mean</th>
+      <td><p>mean of the numerator</p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`</p></td>
+      <th>numerator_sd</th>
+      <td><p>standard dev of the numerator</p></td>
     </tr>
     <tr>
-      <th>chol_mat</th>
-      <td></td>
+      <th>denominator_mean</th>
+      <td><p>mean of the denominator</p></td>
     </tr>
     <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
+      <th>denominator_sd</th>
+      <td><p>standard dev of the denominator</p></td>
     </tr>
     <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>covariance</th>
+      <td><p>covariance of the numerator and denominator</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Returns a single float: the sd estimate</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>From e.g. Kendall’s Advanced Theory of Statistics or other
+places with delta method / Taylor expansion</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
