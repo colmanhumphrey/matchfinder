@@ -46,9 +46,9 @@ test_that("testing covariance_with_ranks", {
 
     expect_true(sum(abs(x_cov_rank - sigma)) < 100)
 
-    ## a 50x (usually much bigger) improvement over the raw version:
+    ## a 20x (usually much bigger) improvement over the raw version:
     expect_true(sum(abs(x_cov_rank - sigma)) <
-                (sum(abs(x_cov_raw - sigma)) / 50))
+                (sum(abs(x_cov_raw - sigma)) / 20))
 
     ##------------------------------------
     ## error modes
@@ -61,14 +61,16 @@ test_that("testing covariance_with_ranks", {
     expect_error(covariance_with_ranks(x_mat = matrix(1:4, 2, 2),
                                        rank_cols = "some_col"))
     ## if x_mat has colnames, rank_cols must be a subset
-    expect_error(covariance_with_ranks(x_mat = matrix(1:4, 2, 2,
-                                                      dimnames = list(c(), c("a", "b"))),
-                                       rank_cols = "some_col"))
+    expect_error(covariance_with_ranks(
+        x_mat = matrix(1:4, 2, 2,
+                       dimnames = list(c(), c("a", "b"))),
+        rank_cols = "some_col"))
     ## no error here
-    expect_error(covariance_with_ranks(x_mat = matrix(1:4, 2, 2,
-                                                      dimnames = list(c(), c("a", "b"))),
-                                       rank_cols = "b"),
-                 NA)
+    expect_error(covariance_with_ranks(
+        x_mat = matrix(1:4, 2, 2,
+                       dimnames = list(c(), c("a", "b"))),
+        rank_cols = "b"),
+        NA)
 
     ##------------------------------------
 })

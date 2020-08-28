@@ -354,9 +354,9 @@ test_that("testing nonbipartite_match_sd_scaled", {
     ## in this case the regression doesn't change a huge amount,
     ## since most of the work is in the repeats
 
-    abs_diffs <- abs(full_avg - full_avg_reg) /
-        (2 * abs(full_avg + full_avg_reg))
-    expect_true(sum(abs_diffs) < 0.1)
+    abs_diffs <- 2 * abs(full_avg - full_avg_reg) /
+        abs(full_avg + full_avg_reg)
+    expect_true(mean(abs_diffs) < 0.2)
 })
 
 

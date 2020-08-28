@@ -530,7 +530,7 @@ test_that("testing sink_brier_bipartite_matches", {
 })
 
 
-test_that("testing permutation_bipartite_matches", {
+test_that("testing permutation_matches", {
     rows <- 40L
     num_weight_vecs <- 3L
     x_mat <- cbind(rnorm(rows),
@@ -558,7 +558,7 @@ test_that("testing permutation_bipartite_matches", {
         n_sinks = c(0L, 4L),
         silent = TRUE)
 
-    permutation_result <- permutation_bipartite_matches(
+    permutation_result <- permutation_matches(
         matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
         briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
         x_mat = x_mat,
@@ -573,4 +573,25 @@ test_that("testing permutation_bipartite_matches", {
                  c("n_sinks", "raw_brier", "permutation_brier", "match_list"))
 
     expect_true(all(0 <= unlist(perm_briers) & unlist(perm_briers) <= 1))
+
+    ## ------------------------------------
+    ## and if we don't want to approximate (very slow!):
+
+    long_permutation_result <- permutation_matches(
+        matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        x_mat = x_mat,
+        n_sinks = c(0L, 4L),
+        approximate_by_best = FALSE
+    )
+    long_perm_briers <- long_permutation_result[["permutation_brier_scores"]]
+
+    ## overall should be relatively similar
+    approx_scores <- unlist(perm_briers)
+    full_scores <- unlist(long_perm_briers)
+
+    abs_perc_diff <- 2 * abs(approx_scores - full_scores) /
+        abs(approx_scores + full_scores)
+
+    expect_true(mean(abs_perc_diff) < 0.1)
 })
