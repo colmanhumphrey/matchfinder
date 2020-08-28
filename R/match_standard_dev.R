@@ -272,12 +272,13 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
 #' For when your result isn't just based
 #' on the differences in the y-vector, but those differences are
 #' weighed inversely proportional to the difference between the
-#' tolerance values
+#' tolerance values.
+#' To get on the standard error level, divide the result
+#' by \code{sqrt(length(match_list[["treat_index"]]))}
+#' This will be conservative in general with
+#' repeats.
 #' @inheritParams bipartite_match_sd
-#' @param tolerance_vec the tolerance used to form the
-#'   non-bipartite matches
-#' @param tolerance_min min value we must obey in tol diffs
-#' @param tolerance_max max value we must obey in tol diffs
+#' @inheritParams nonbipartite_matches
 #' @return a single float, the standard deviation (not standard error)
 #'   for the match
 #' @author Colman Humphrey
@@ -290,6 +291,7 @@ nonbipartite_match_sd_scaled <- function(x_mat,
                                          tolerance_list = gen_tolerance_list(),
                                          caliper_list = gen_caliper_list(),
                                          weight_vec = NULL,
+                                         use_regression = TRUE,
                                          sqrt_mahal = TRUE) {
     ## two variance components
 
@@ -303,7 +305,13 @@ nonbipartite_match_sd_scaled <- function(x_mat,
         tolerance_list[["tolerance_vec"]][match_list[["treat_index"]]] -
         tolerance_list[["tolerance_vec"]][match_list[["control_index"]]]
 
-    var_difference <- var(y_diffs / tol_diffs)
+
+    var_difference <- if (use_regression) {
+                          reg_res <- lm(y_diffs ~ tol_diffs + 0)
+                          vcov(reg_res)[1, 1] * length(y_diffs)
+                      } else {
+                          var(y_diffs / tol_diffs)
+                      }
 
     ## ----------------
     ## V2 harder: the added variance from using repeats
@@ -331,4 +339,289 @@ nonbipartite_match_sd_scaled <- function(x_mat,
     var_total <- var_difference + var_repeated
 
     sqrt(var_total)
+}
+
+
+##' Approximate the standard deviation of the ratio of two vectors
+##'
+##' The delta method gives us:
+##' \deqn{
+##'    Var(N/D) \approx \frac{\mu_N^2}{\mu_D^2}
+##'                     \bigg[ \frac{\sigma^2_N}{\mu_N^2} +
+##'                            \frac{\sigma^2_D}{\mu_D^2} -
+##'                            2 \frac{Cov(N, D)}{\mu_N \mu_D}]
+##' }
+##' Of course it's not necessarily clear we'd have the covariance
+##' and not the vectors, but there are indeed some interesting
+##' cases.
+##'
+##' From e.g. Kendall’s Advanced Theory of Statistics or other
+##' places with delta method / Taylor expansion
+##' @param numerator_mean mean of the numerator
+##' @param numerator_sd standard dev of the numerator
+##' @param denominator_mean mean of the denominator
+##' @param denominator_sd standard dev of the denominator
+##' @param covariance covariance of the numerator and denominator
+##' @return Returns a single float: the sd estimate
+##' @author Colman Humphrey
+##'
+##' @export
+approx_ratio_sd <- function(numerator_mean,
+                            numerator_sd,
+                            denominator_mean,
+                            denominator_sd,
+                            covariance) {
+    if (numerator_sd <= 0 || denominator_sd <= 0) {
+        stop("sd inputs must be positive")
+    }
+
+    if (denominator_mean <= 0) {
+        stop("denominator should have positive mean")
+    }
+
+    if (denominator_mean * 5 < denominator_sd) {
+        warning(
+            "denominator sd very large compared to mean;",
+            "could have negative values?"
+        )
+    }
+
+    if (abs(covariance) > numerator_sd * denominator_sd) {
+        stop(
+            "covariance is bigger in absolute value than is possible ",
+            "given the two standard deviations"
+        )
+    }
+
+    mean_ratio <- (numerator_mean / denominator_mean)^2
+    n_ratio <- (numerator_sd / numerator_mean)^2
+    d_ratio <- (denominator_sd / denominator_mean)^2
+    cov_scaled <- covariance / (numerator_mean * denominator_mean)
+
+    sqrt(mean_ratio * (n_ratio + d_ratio - 2 * cov_scaled))
+}
+
+##' Quick and dirty method to approximate the sd and mean
+##' of the ratio of the differences
+##'
+##' For non-bipartite work, we work with something like:
+##' \deqn{
+##'     \frac{y_{\text{treat}} - y_{\text{control}}}
+##'          {tol_{\text{treat}} - tol_{\text{control}}}
+##' }
+##' And not just \eqn{y_{\text{treat}} - y_{\text{control}}} as
+##' our "difference": here we say we're caring about the change
+##' in \eqn{y} per unit tol.
+##' This function estimates the standard deviation of this
+##' if you just did random pairings **that obeyed the tolerance
+##' rules** with min and max.
+##' This function computes approx sd for the **optimal** case.
+##' Also yes this is a terrible function name.
+##' @param y_vector Vector of outcomes we care about
+##' @param tolerance_list Usual tolerance list (see \code{gen_tolerance_list})
+##' @param use_regression \code{TRUE} to use regression, \code{FALSE} to use
+##'   the ratios directly. Default \code{TRUE}.
+##' @param samples How many samples to use. Defaults to a number between 50
+##'   and 200, depending on the length of the various vectors
+##' @return Returns a single number: the average of the sds of \code{samples}
+##'   random runs
+##' @author Colman Humphrey
+##'
+##' @export
+y_tolerance_diff_ratio <- function(y_vector,
+                                   tolerance_list,
+                                   use_regression = TRUE,
+                                   samples = NULL) {
+    tol_vector <- tolerance_list[["tolerance_vec"]]
+    if (length(y_vector) != length(tol_vector)) {
+        stop("y_vector and the tolerance vector should have same length")
+    }
+
+    if (is.null(samples)) {
+        samples <- min(max(50L, ceiling(20000L / length(y_vector))), 200L)
+    }
+
+    tol_matches <- lapply(1L:(samples * 2L), function(j) {
+        tol_random_sample(tolerance_list)
+    })
+    pair_count <- unlist(lapply(tol_matches, function(x) {
+        length(x[["treat_index"]])
+    }))
+    keep_pairs <- rank(pair_count, ties.method = "random") > samples
+    tol_matches <- tol_matches[keep_pairs]
+
+    ##------------------------------------
+
+    random_ratio_res <- lapply(tol_matches, function(match_list) {
+        return(list(
+            match_mean = match_estimate_tolerance(
+                match_list = match_list,
+                y_vector = y_vector,
+                tolerance_list = tolerance_list,
+                use_regression = use_regression
+            ),
+            match_sd = nonbipartite_match_sd_scaled(
+                x_mat = matrix(NA, 1L, 1L),  # won't use it
+                cov_x = matrix(NA, 1L, 1L),  # won't use it
+                y_vector = y_vector,
+                match_list = match_list,
+                tolerance_list = tolerance_list,
+                use_regression = use_regression
+            )
+        ))
+    })
+
+    list(
+        mean = mean(unlist(
+            lapply(random_ratio_res, `[[`, "match_mean")
+        )),
+        sd = mean(unlist(
+            lapply(random_ratio_res, `[[`, "match_sd")
+        ))
+    )
+}
+
+
+##' Generates a random pairing from a tolerance list in a naive way
+##'
+##' This function takes in a tolerance list and attempts to generate
+##' a "simple" match list by naive random sampling.
+##' @param tolerance_list Usual tol, see e.g. \code{gen_tolerance_list}
+##' @param prior_pairs For use in recursion - what pairs are already formed
+##'   (indeed we have none for the first iteration)
+##' @param pairable_units For use in recursion - what units are available
+##'   to form pairs (\code{NULL} is all, hence for the first iteration)
+##' @param iteration What iteration number are we on
+##' @param max_iterations Max iterations
+##' @param verbose Boolean - spit out extra messages / warnings?
+##' @return "Simple" match list, list with two elements:
+##' \itemize{
+##'    \item{\code{treat_index}} Treatment units
+##'    \item{\code{control_index}} Control units
+##' }
+##' @author Colman Humphrey
+##'
+##' @keywords internal
+tol_random_sample <- function(tolerance_list,
+                              prior_pairs = matrix(NA, nrow = 0L, ncol = 2L),
+                              pairable_units = NULL,
+                              iteration = 0L,
+                              max_iterations = 10L,
+                              verbose = FALSE) {
+    len_tol <- length(tolerance_list[["tolerance_vec"]])
+
+    pairable_units <- if (is.null(pairable_units)) {
+                          seq_len(len_tol)
+                      } else {
+                          pairable_units
+                      }
+
+    if (length(pairable_units) == 0L) {
+        return(matrix_to_simple_match(matrix(NA, 0L, 2L)))
+    }
+
+    rand_sample <- fixed_sample(pairable_units)
+
+    mid <- length(pairable_units) %/% 2
+    pairs <- cbind(
+        rand_sample[1L:mid],
+        rand_sample[(mid + 1L):(2L * mid)]
+    )
+    extra_el <- if (length(pairable_units) %% 2 == 1L) {
+                    pairable_units[length(pairable_units)]
+                } else {
+                    NULL
+                }
+    right_order <- tolerance_list[["tolerance_vec"]][pairs[, 1]] -
+        tolerance_list[["tolerance_vec"]][pairs[, 2]] > 0
+
+    if (!all(right_order)) {
+        temp <- pairs[!right_order, 1]
+        pairs[!right_order, 1] <- pairs[!right_order, 2]
+        pairs[!right_order, 2] <- temp
+    }
+
+    diffs <- tolerance_list[["tolerance_vec"]][pairs[, 1]] -
+        tolerance_list[["tolerance_vec"]][pairs[, 2]]
+
+    ##-------------------------------------
+
+    tol_min <- tolerance_list[["tolerance_min"]]
+    tol_max <- if (is.null(tolerance_list[["tolerance_max"]])) {
+                   max(diffs) + 1
+               } else {
+                   tolerance_list[["tolerance_max"]]
+               }
+
+    valid_diff <- tol_min < diffs & diffs < tol_max
+
+    if (all(valid_diff)) {
+        return(matrix_to_simple_match(rbind(prior_pairs, pairs)))
+    }
+
+    good_so_far <- rbind(prior_pairs, pairs[valid_diff, ])
+
+    if (sum(!valid_diff) == 1L) {
+        ## can't switch on one
+        if (verbose) {
+            warning("one unmatchable pair, will be dropped")
+        }
+        return(matrix_to_simple_match(good_so_far))
+    }
+
+    if (iteration == max_iterations) {
+        ## best is 0.5, 0.25 is "half" available pairs
+        if (nrow(good_so_far) < 0.3 * len_tol || verbose) {
+            warning(
+                "reached max iterations, but only ",
+                nrow(good_so_far),
+                " out of a possible ",
+                len_tol %/% 2L
+            )
+        }
+
+        return(matrix_to_simple_match(good_so_far))
+    }
+
+    ## -------------------------------------
+
+    if (verbose) {
+        message(
+            "starting iteration ", iteration + 1L,
+            " with ", nrow(good_so_far), " pairs so far",
+            " (max: ", len_tol %/% 2, ")"
+            )
+    }
+
+    return(tol_random_sample(
+        tolerance_list,
+        prior_pairs = good_so_far,
+        pairable_units = c(pairs[!valid_diff, , drop = FALSE]),
+        iteration = iteration + 1L,
+        max_iterations = max_iterations,
+        verbose = verbose
+    ))
+}
+
+##' Simple function for \code{tol_random_sample} to convert matrices
+##' of pairs into list
+##'
+##' @param pairs_matrix Matrix with two columns, one for the treatment
+##'   indices, one for the control
+##' @param treat_first Boolean; is the first column the treatment column?
+##' @return See \code{tol_random_sample}
+##' @author Colman Humphrey
+##'
+##' @keywords internal
+matrix_to_simple_match <- function(pairs_matrix,
+                                   treat_first = TRUE) {
+    if (ncol(pairs_matrix) != 2L) {
+        stop("`pairs_matrix` must have exactly two columns")
+    }
+    treat_ind <- ifelse(treat_first, 1L, 2L)
+    control_ind <- 3L - treat_ind
+    return(list(
+        treat_index = pairs_matrix[, treat_ind],
+        control_index = pairs_matrix[, control_ind]
+    ))
 }
