@@ -388,3 +388,94 @@ binary_search <- function(target_value,
 
     input_val
 }
+
+
+##' Validates a match on a tolerance list
+##'
+##' Checks that the differences are all at least
+##' at the min, and if a max is given, checks that too.
+##' Gives reasonable error messages on errors
+##' @inheritParams match_estimate_tolerance
+##' @return List with two elements:
+##' \itemize{
+##'  \item{\code{error}}{Boolean - is all good?}
+##'  \item{\code{message}}{If error, then gives error string}
+##' }
+##' @author Colman Humphrey
+##'
+##' @keywords internal
+tolerance_check <- function(match_list,
+                            tolerance_list) {
+    tol_vec <- tolerance_list[["tolerance_vec"]]
+
+    tol_diffs <- tol_vec[match_list[["treat_index"]]] -
+        tol_vec[match_list[["control_index"]]]
+
+    ## equality isn't allowed
+    min_violations <- sum(tol_diffs <= tolerance_list[["tolerance_min"]])
+    if (min_violations > 0L) {
+        neg_violations <- sum(tol_diffs < 0)
+        if (neg_violations > 0L) {
+            error_message <-
+                if (neg_violations == length(tol_diffs)) {
+                    ## all wrong direction
+                    paste0(
+                        "tolerance direction violated by match: ",
+                        "all pairs have treatment tolerance ",
+                        "with lower value than control tolerance, ",
+                        "did the treatment and control get switched?"
+                    )
+                } else {
+                    paste0(
+                        "tolerance direction violated by match: ",
+                        neg_violations, " pairs have treatment tolerance ",
+                        "with lower value than control tolerance"
+                    )
+                }
+            if (neg_violations < min_violations) {
+                error_message <- paste0(
+                    error_message,
+                    "; a further ", min_violations - neg_violations,
+                    " pairs have min constraint violated by match ",
+                    "(differences below or at `tolerance_min`)"
+                )
+            }
+
+            return(list(
+                error = TRUE,
+                message = error_message
+            ))
+        }
+
+        return(list(
+            error = TRUE,
+            message = paste0(
+                "",
+                min_violations, " pairs have difference below or at ",
+                "`tolerance_min`"
+            )
+        ))
+    }
+
+
+    if (!is.null(tolerance_list[["tolerance_max"]])) {
+        ## equality is allowed
+        max_violations <- sum(tol_diffs > tolerance_list[["tolerance_max"]])
+
+        if (max_violations > 0L) {
+            return(list(
+                error = TRUE,
+                message = paste0(
+                    "max constraint violated by match: ",
+                    max_violations, " pairs have difference above ",
+                    "`tolerance_max`"
+                )
+            ))
+        }
+    }
+
+    return(list(
+        error = FALSE,
+        message = ""
+    ))
+}

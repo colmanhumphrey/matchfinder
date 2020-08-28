@@ -194,11 +194,14 @@ test_that("testing ranked_x", {
                  NA)
 
     ## need all ten cols to use logical
-    expect_error(ranked_x(x_mat, rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 6L))))
-    expect_error(ranked_x(x_mat, rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 7L))),
+    expect_error(ranked_x(x_mat,
+                          rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 6L))))
+    expect_error(ranked_x(x_mat,
+                          rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 7L))),
                  NA)
 
-    expect_equal(ranked_x(x_mat, rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 7L))),
+    expect_equal(ranked_x(x_mat,
+                          rank_cols = c(TRUE, FALSE, TRUE, rep(FALSE, 7L))),
                  ranked_x(x_mat, rank_cols = c(1, 3)))
 
     colnames(x_mat) <- paste0("col", 1L:10L)
@@ -253,14 +256,15 @@ test_that("testing near_given_match", {
     dist_mat <- abs(outer(random_vec[random_given_lgl],
                           random_vec,
                           "-"))
-    dist_mat[cbind(1L:length(random_given),
+    dist_mat[cbind(seq_len(length(random_given)),
                    random_given)] <- Inf
 
-    min_dist_ind <- apply(dist_mat, 1, function(x){
+    min_dist_ind <- apply(dist_mat, 1, function(x) {
         which(rank(x, ties.method = "random") == 1)
     })
 
-    ## this is must faster because we just have one vector, here about 50 times so
+    ## this is must faster because we just have one vector,
+    ## here about 50 times so
     closest_ind <- near_given_match(random_vec, random_given)
 
     expect_equal(min_dist_ind, closest_ind)
@@ -324,7 +328,7 @@ test_that("testing binary_search", {
     ##------------------------------------
 
     mono_func <- function(x) {
-        - x/3 + 50
+        - x / 3 + 50
     }
 
     mono_sol <- binary_search(target_value = -600,
@@ -340,4 +344,77 @@ test_that("testing binary_search", {
 
     expect_true(abs(mono_func(mono_sol) - 1200) < 1e-6)
     expect_false(abs(mono_func(mono_sol) - 1200) < 1e-9)
+})
+
+
+test_that("testing tolerance_check", {
+    control_tol <- runif(1000L)
+    treat_tol <- control_tol + runif(1000L, 1, 3)
+    tol_vec <- c(control_tol, treat_tol)
+
+    match_list <- list(
+        treat_index = 1001L:2000L,
+        control_index = 1L:1000L,
+        distance = runif(1000L)
+    )
+
+    nothing_wrong <- tolerance_check(
+        match_list,
+        gen_tolerance_list(
+            tolerance_vec = tol_vec
+        )
+    )
+    expect_false(nothing_wrong[["error"]])
+
+    ## ------------------------------------
+
+    min_violations <- tolerance_check(
+        match_list,
+        gen_tolerance_list(
+            tolerance_vec = tol_vec,
+            tolerance_min = 2
+        )
+    )
+
+    expect_true(min_violations[["error"]])
+    expect_true(grepl("have difference below or at",
+                      min_violations[["message"]]))
+
+    wrong_dir <- tolerance_check(
+        match_list,
+        gen_tolerance_list(
+            tolerance_vec = -tol_vec
+        )
+    )
+
+    expect_true(wrong_dir[["error"]])
+    expect_true(grepl("all pairs have treatment tolerance",
+                      wrong_dir[["message"]]))
+    expect_true(grepl("did the treatment and control get switched?",
+                      wrong_dir[["message"]]))
+
+    max_violations <- tolerance_check(
+        match_list,
+        gen_tolerance_list(
+            tolerance_vec = tol_vec,
+            tolerance_max = 2
+        )
+    )
+
+    expect_true(max_violations[["error"]])
+    expect_true(grepl("have difference above",
+                      max_violations[["message"]]))
+
+    random_tol <- tolerance_check(
+        match_list,
+        gen_tolerance_list(
+            tolerance_vec = sample(tol_vec),
+            tolerance_min = 2
+        )
+    )
+    expect_true(random_tol[["error"]])
+    expect_true(grepl("treatment tolerance with lower value than",
+                      random_tol[["message"]]))
+    expect_true(grepl("a further \\d{1,3} pairs have min constraint violated",
+                      random_tol[["message"]]))
 })
