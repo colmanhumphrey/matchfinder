@@ -70,13 +70,13 @@ all_bipartite_matches <- function(x_mat,
         )
     }
 
-    lapply(weight_list, function(weight_vec) {
+    by_weight_list <- lapply(weight_list, function(weight_vec) {
         w_dist_mat <- weighted_mahal(x_mat,
-            cov_x = cov_x,
-            weight_vec = weight_vec,
-            treat_vec = treat_vec,
-            sqrt_mahal = sqrt_mahal
-        )
+                                     cov_x = cov_x,
+                                     weight_vec = weight_vec,
+                                     treat_vec = treat_vec,
+                                     sqrt_mahal = sqrt_mahal
+                                     )
 
         if (!is.null(caliper_list)) {
             w_dist_mat <- w_dist_mat + caliper_dist_mat
@@ -90,6 +90,13 @@ all_bipartite_matches <- function(x_mat,
             tol_val = tol_val
         )
     })
+
+    ## more natural to group by sink value
+    setNames(lapply(n_sinks, function(x) {
+        lapply(by_weight_list, function(y) {
+            y[[as.character(x)]]
+        })
+    }), n_sinks)
 }
 
 
@@ -132,19 +139,12 @@ sink_brier_bipartite_matches <- function(x_mat,
         n_sinks = n_sinks
     )
 
-    ## reorder: by sink instead of by weight vector
-    all_by_sinks <- setNames(lapply(n_sinks, function(x) {
-        lapply(all_matches, function(y) {
-            y[[as.character(x)]]
-        })
-    }), n_sinks)
-
     if (!silent) {
         message("getting briers")
     }
 
     ## get all brier scores for all results
-    briers_by_sinks <- lapply(all_by_sinks, function(x) {
+    briers_by_sinks <- lapply(all_matches, function(x) {
         if (!silent) {
             print(x[[1]]["num_sinks"])
         }
@@ -157,7 +157,7 @@ sink_brier_bipartite_matches <- function(x_mat,
     })
 
     list(
-        matches_by_sinks = all_by_sinks,
+        matches_by_sinks = all_matches,
         briers_by_sinks = briers_by_sinks
     )
 }
@@ -341,7 +341,7 @@ all_nonbipartite_matches <- function(x_mat,
                 )
     }
 
-    lapply(weight_list, function(weight_vec) {
+    by_weight_list <- lapply(weight_list, function(weight_vec) {
         w_dist_mat <- weighted_mahal(x_mat,
             cov_x = cov_x,
             weight_vec = weight_vec,
@@ -360,4 +360,11 @@ all_nonbipartite_matches <- function(x_mat,
             keep_all_with_replacement = keep_all_with_replacement
         )
     })
+
+    ## more natural to group by sink value
+    setNames(lapply(n_sinks, function(x) {
+        lapply(by_weight_list, function(y) {
+            y[[as.character(x)]]
+        })
+    }), n_sinks)
 }
