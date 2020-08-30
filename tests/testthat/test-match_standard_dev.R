@@ -709,7 +709,7 @@ test_that("testing y_tolerance_diff_ratio_sd", {
 
     ## NOT same results for "bias"
     ## random is totally unbiased!
-    expect_true(perc_bias[["match"]][["reg"]] < 0.001)
+    expect_true(perc_bias[["match"]][["reg"]] < 0.003)
     ## in this simple example, the naive versions of
     ## both also perform very well
 
