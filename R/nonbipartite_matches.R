@@ -153,8 +153,10 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #'     \item{\code{control_index}}{index of control units}
 #'     \item{\code{distance}}{distances between the pairs}
 #'   }
-#'   If \code{n_sinks} is not NULL, you'll get a list of such objects, each
+#'   You'll get a list of such objects, each
 #'   with an extra element: the number of sinks used.
+#'   If \code{n_sinks} is NULL, it'll default to using a
+#'   single value: zero.
 #' @author Colman Humphrey
 #' @export
 nonbipartite_matches <- function(dist_mat,
@@ -399,13 +401,13 @@ add_nbp_sinks <- function(dist_mat,
             ncol(dist_mat) + n_sinks
         )
         distmat_add_zeros[
-            1:nrow(dist_mat),
-            1:ncol(dist_mat)
+            seq_len(nrow(dist_mat)),
+            seq_len(ncol(dist_mat))
         ] <- dist_mat
         ## they can't match each other:
         distmat_add_zeros[
-            1:n_sinks + nrow(dist_mat),
-            1:n_sinks + ncol(dist_mat)
+            seq_len(n_sinks) + nrow(dist_mat),
+            seq_len(n_sinks) + ncol(dist_mat)
         ] <- Inf
     } else {
         distmat_add_zeros <- dist_mat
