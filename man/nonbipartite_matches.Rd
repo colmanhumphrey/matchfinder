@@ -48,8 +48,10 @@ basic return value is a list with three elements:
     \item{\code{control_index}}{index of control units}
     \item{\code{distance}}{distances between the pairs}
   }
-  If \code{n_sinks} is not NULL, you'll get a list of such objects, each
+  You'll get a list of such objects, each
   with an extra element: the number of sinks used.
+  If \code{n_sinks} is NULL, it'll default to using a
+  single value: zero.
 }
 \description{
 Generates matched pairs either:

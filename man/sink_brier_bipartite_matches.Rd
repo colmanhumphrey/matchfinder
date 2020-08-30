@@ -11,7 +11,7 @@ sink_brier_bipartite_matches(
   weight_list,
   treat_vec,
   match_method = c("with_replacement", "optimal", "greedy"),
-  n_sinks = 0,
+  n_sinks = 0L,
   caliper_list = gen_caliper_list(),
   propensity_list = match_propensity_list(NULL),
   sqrt_mahal = TRUE,

@@ -42,13 +42,17 @@ Default 1e-4 is reasonable in many cases.}
 basic return value is a list with five elements:
   \describe{
     \item{\code{treat_index}}{index of treated units, from all units}
-    \item{\code{treat_index_within}}{index of treated units, from the set of treated}
+    \item{\code{treat_index_within}}{index of treated units,
+          from the set of treated}
     \item{\code{control_index}}{index of control units, from all units}
-    \item{\code{control_index_within}}{index of control units, from the set of control}
+    \item{\code{control_index_within}}{index of control units,
+          from the set of control}
     \item{\code{distance}}{distances between the pairs}
   }
-  If \code{n_sinks} is not NULL, you'll get a list of such objects, each
-  with an extra element: the number of sinks used.
+  You'll get a list of such objects, each
+  with an extra element: the number of sinks used. If you
+  have \code{n_sinks} as \code{NULL}, then it'll default to
+  a single sink value: zero.
 }
 \description{
 Generates matched pairs either:
