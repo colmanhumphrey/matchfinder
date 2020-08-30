@@ -16,7 +16,7 @@
 simple_sink_wrap <- function(simple_match_list,
                              n_sinks = NULL) {
     if (is.null(n_sinks)) {
-        n_sinks <- 0
+        n_sinks <- 0L
     }
 
     ## ------------------------------------
@@ -50,7 +50,7 @@ optimal_sink_wrap <- function(dist_mat,
                               n_sinks,
                               tol_val) {
     if (is.null(n_sinks)) {
-        n_sinks <- 0
+        n_sinks <- 0L
     }
 
     ## ------------------------------------
@@ -78,7 +78,7 @@ optimal_nbp_sink_wrap <- function(dist_mat,
                                   tolerance_vec,
                                   n_sinks = NULL) {
     if (is.null(n_sinks)) {
-        n_sinks <- 0
+        n_sinks <- 0L
     }
 
     ## ------------------------------------

@@ -26,11 +26,15 @@ all_bipartite_matches <- function(x_mat,
                                       "optimal",
                                       "greedy"
                                   ),
-                                  n_sinks = 0,
+                                  n_sinks = 0L,
                                   caliper_list = gen_caliper_list(),
                                   propensity_list = match_propensity_list(NULL),
                                   sqrt_mahal = TRUE,
                                   tol_val = NULL) {
+    if (is.null(n_sinks)) {
+        n_sinks <- 0L
+    }
+
     if (!is.null(propensity_list)) {
         if (!is.null(caliper_list)) {
             stop(
@@ -107,13 +111,16 @@ sink_brier_bipartite_matches <- function(x_mat,
                                              "optimal",
                                              "greedy"
                                          ),
-                                         n_sinks = 0,
+                                         n_sinks = 0L,
                                          caliper_list = gen_caliper_list(),
                                          propensity_list =
                                              match_propensity_list(NULL),
                                          sqrt_mahal = TRUE,
                                          silent = !interactive(),
                                          tol_val = NULL) {
+    if (is.null(n_sinks)) {
+        n_sinks <- 0L
+    }
 
     ## generate all matches: one per weight vector per n_sink value
     all_matches <- all_bipartite_matches(
@@ -291,6 +298,10 @@ all_nonbipartite_matches <- function(x_mat,
                                          match_propensity_list(NULL),
                                      sqrt_mahal = TRUE,
                                      keep_all_with_replacement = FALSE) {
+    if (is.null(n_sinks)) {
+        n_sinks <- 0L
+    }
+
     if (!is.null(propensity_list)) {
         if (!is.null(caliper_list)) {
             stop(
