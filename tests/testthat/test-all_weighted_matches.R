@@ -456,7 +456,7 @@ test_that("testing all_nonbipartite_matches", {
 })
 
 
-test_that("testing sink_brier_bipartite_matches", {
+test_that("testing brier_bipartite_matches", {
     rows <- 100L
     num_weight_vecs <- 5L
     x_mat <- cbind(rnorm(rows),
@@ -465,11 +465,6 @@ test_that("testing sink_brier_bipartite_matches", {
                                              45L)
     y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
     cov_x <- covariance_with_ranks(x_mat)
-
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,
@@ -482,7 +477,7 @@ test_that("testing sink_brier_bipartite_matches", {
                                             match_method = "with_replacement",
                                             n_sinks = c(0L, 4L))
 
-    sink_brier_wr_matches <- sink_brier_bipartite_matches(
+    brier_wr_matches <- brier_bipartite_matches(
         x_mat = x_mat,
         cov_x = cov_x,
         weight_list = weight_vecs,
@@ -491,75 +486,131 @@ test_that("testing sink_brier_bipartite_matches", {
         n_sinks = c(0L, 4L),
         silent = TRUE)
 
-    expect_true(all(lengths(sink_brier_wr_matches) == 2L))
+    expect_true(all(lengths(brier_wr_matches) == 2L))
     expect_true(all(lengths(
-        sink_brier_wr_matches[["matches_by_sinks"]]) == 5L))
+        brier_wr_matches[["matches_by_sinks"]]) == 5L))
     expect_true(all(lengths(
-        sink_brier_wr_matches[["briers_by_sinks"]]) == 5L))
+        brier_wr_matches[["briers_by_sinks"]]) == 5L))
 
     expect_equal(all_wr_matches[["0"]][[3]],
-                 sink_brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
+                 brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
     expect_equal(all_wr_matches[["1"]][[5]],
-                 sink_brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
+                 brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
 
-    brier_scores <- unlist(sink_brier_wr_matches[["briers_by_sinks"]])
+    brier_scores <- unlist(brier_wr_matches[["briers_by_sinks"]])
+    expect_true(all(0 < brier_scores & brier_scores < 1))
+    expect_true(all(abs(brier_scores - 0.25) < 0.15))
+})
+
+
+test_that("testing brier_nonbipartite_matches", {
+    treat_effect <- 0.3
+    rows <- 200L
+    num_weight_vecs <- 5L
+    x_mat <- cbind(rnorm(rows),
+                   runif(rows))
+    tol_vec <- runif(rows) + x_mat[, 1L]
+    y_vector <- x_mat[, 1L] + x_mat[, 2L] + tol_vec * treat_effect + rnorm(rows)
+    cov_x <- covariance_with_ranks(x_mat)
+
+    tol_list <- gen_tolerance_list(
+        tolerance_vec = tol_vec
+    )
+
+    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
+                                           number_vectors = num_weight_vecs,
+                                           minimum_weights = c(0.1, 0.1))
+
+    all_wr_matches <- all_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = c(0L, 4L)
+    )
+
+    brier_wr_matches <- brier_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = c(0L, 4L),
+        silent = TRUE
+    )
+
+    expect_true(all(lengths(brier_wr_matches) == 2L))
+    expect_true(all(lengths(
+        brier_wr_matches[["matches_by_sinks"]]) == 5L))
+    expect_true(all(lengths(
+        brier_wr_matches[["briers_by_sinks"]]) == 5L))
+
+    expect_equal(all_wr_matches[["0"]][[3]],
+                 brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
+    expect_equal(all_wr_matches[["1"]][[5]],
+                 brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
+
+    brier_scores <- unlist(brier_wr_matches[["briers_by_sinks"]])
     expect_true(all(0 < brier_scores & brier_scores < 1))
     expect_true(all(abs(brier_scores - 0.25) < 0.15))
 })
 
 
 test_that("testing permutation_matches", {
+    ## ------------------------------------
+    ## bipartite
     rows <- 40L
     num_weight_vecs <- 3L
+    n_sinks_vec <- c(0L, 4L)
+    treat_effect <- 0.3
+
     x_mat <- cbind(rnorm(rows),
                    runif(rows))
     treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
                                              15L)
-    y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
+    ## don't need it here
+    ## y_vector <- tol_vec * treat_effect + <x stuff> + <noise>
     cov_x <- covariance_with_ranks(x_mat)
-
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,
                                            minimum_weights = c(0.1, 0.1))
 
-    sink_brier_wr_matches <- sink_brier_bipartite_matches(
+    brier_wr_matches <- brier_bipartite_matches(
         x_mat = x_mat,
         cov_x = cov_x,
         weight_list = weight_vecs,
         treat_vec = treat_vec,
         match_method = "with_replacement",
-        n_sinks = c(0L, 4L),
+        n_sinks = n_sinks_vec,
         silent = TRUE)
 
     permutation_result <- permutation_matches(
-        matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
-        briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
         x_mat = x_mat,
-        n_sinks = c(0L, 4L))
+        n_sinks = n_sinks_vec)
 
     perm_briers <- permutation_result[["permutation_brier_scores"]]
     best_matches <- permutation_result[["best_matches"]]
 
-    expect_equal(lengths(perm_briers), c(3L, 3L))
-    expect_equal(lengths(best_matches), c(4L, 4L))
+    expect_equal(lengths(perm_briers),
+                 rep(num_weight_vecs, times = length(n_sinks_vec)))
+    expect_equal(length(best_matches), length(n_sinks_vec))
     expect_equal(names(best_matches[[1]]),
                  c("n_sinks", "raw_brier", "permutation_brier", "match_list"))
 
     expect_true(all(0 <= unlist(perm_briers) & unlist(perm_briers) <= 1))
 
-    ## ------------------------------------
+    ## ----------------
     ## and if we don't want to approximate (very slow!):
 
     long_permutation_result <- permutation_matches(
-        matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
-        briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
         x_mat = x_mat,
-        n_sinks = c(0L, 4L),
+        n_sinks = n_sinks_vec,
         approximate_by_best = FALSE
     )
     long_perm_briers <- long_permutation_result[["permutation_brier_scores"]]
@@ -572,4 +623,54 @@ test_that("testing permutation_matches", {
         abs(approx_scores + full_scores)
 
     expect_true(mean(abs_perc_diff) < 0.2)
+
+    ## ------------------------------------
+    ## nonbipartite
+
+    treat_effect <- 0.3
+    rows <- 200L
+    num_weight_vecs <- 5L
+    n_sinks_vec <- c(0L, 4L)
+
+    x_mat <- cbind(rnorm(rows),
+                   runif(rows))
+    tol_vec <- runif(rows) + x_mat[, 1L]
+    ## don't need it here
+    ## y_vector <- tol_vec * treat_effect + <x stuff> + <noise>
+    cov_x <- covariance_with_ranks(x_mat)
+
+    tol_list <- gen_tolerance_list(
+        tolerance_vec = tol_vec
+    )
+
+    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
+                                           number_vectors = num_weight_vecs,
+                                           minimum_weights = c(0.1, 0.1))
+
+    brier_wr_matches <- brier_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = n_sinks_vec,
+        silent = TRUE
+    )
+
+    permutation_result <- permutation_matches(
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
+        x_mat = x_mat,
+        n_sinks = n_sinks_vec)
+
+    perm_briers <- permutation_result[["permutation_brier_scores"]]
+    best_matches <- permutation_result[["best_matches"]]
+
+    expect_equal(lengths(perm_briers),
+                 rep(num_weight_vecs, times = length(n_sinks_vec)))
+    expect_equal(length(best_matches), length(n_sinks_vec))
+    expect_equal(names(best_matches[[1]]),
+                 c("n_sinks", "raw_brier", "permutation_brier", "match_list"))
+
+    expect_true(all(0 <= unlist(perm_briers) & unlist(perm_briers) <= 1))
 })

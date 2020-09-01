@@ -109,22 +109,22 @@ all_bipartite_matches <- function(x_mat,
 #' @author Colman Humphrey
 #'
 #' @export
-sink_brier_bipartite_matches <- function(x_mat,
-                                         cov_x,
-                                         weight_list,
-                                         treat_vec,
-                                         match_method = c(
-                                             "with_replacement",
-                                             "optimal",
-                                             "greedy"
-                                         ),
-                                         n_sinks = 0L,
-                                         caliper_list = gen_caliper_list(),
-                                         propensity_list =
-                                             match_propensity_list(NULL),
-                                         sqrt_mahal = TRUE,
-                                         silent = !interactive(),
-                                         tol_val = NULL) {
+brier_bipartite_matches <- function(x_mat,
+                                    cov_x,
+                                    weight_list,
+                                    treat_vec,
+                                    match_method = c(
+                                        "with_replacement",
+                                        "optimal",
+                                        "greedy"
+                                    ),
+                                    n_sinks = 0L,
+                                    caliper_list = gen_caliper_list(),
+                                    propensity_list =
+                                        match_propensity_list(NULL),
+                                    sqrt_mahal = TRUE,
+                                    tol_val = NULL,
+                                    silent = !interactive()) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
     }
@@ -132,11 +132,15 @@ sink_brier_bipartite_matches <- function(x_mat,
     ## generate all matches: one per weight vector per n_sink value
     all_matches <- all_bipartite_matches(
         x_mat = x_mat,
-        cov_x = covariance_with_ranks(x_mat),
+        cov_x = cov_x,
         weight_list = weight_list,
         treat_vec = treat_vec,
         match_method = match_method,
-        n_sinks = n_sinks
+        n_sinks = n_sinks,
+        caliper_list = caliper_list,
+        propensity_list = propensity_list,
+        sqrt_mahal = sqrt_mahal,
+        tol_val = tol_val
     )
 
     if (!silent) {
@@ -144,14 +148,14 @@ sink_brier_bipartite_matches <- function(x_mat,
     }
 
     ## get all brier scores for all results
-    briers_by_sinks <- lapply(all_matches, function(x) {
+    briers_by_sinks <- lapply(all_matches, function(all_by_sink) {
         if (!silent) {
-            print(x[[1]]["num_sinks"])
+            print(all_by_sink[[1]]["num_sinks"])
         }
-        unlist(lapply(x, function(y) {
+        unlist(lapply(all_by_sink, function(indiv_match_list) {
             brier_score_cv(
-                x_mat,
-                y
+                x_mat = x_mat,
+                match_list = indiv_match_list
             )
         }))
     })
@@ -367,4 +371,71 @@ all_nonbipartite_matches <- function(x_mat,
             y[[as.character(x)]]
         })
     }), n_sinks)
+}
+
+
+#' Computes all matches, then gets the brier scores for each. Reorder by
+#' number of sinks.
+#'
+#' @inheritParams all_nonbipartite_matches
+#' @return List of matches within sink values,
+#'  and brier scores for each.
+#' @author Colman Humphrey
+#'
+#' @export
+brier_nonbipartite_matches <- function(x_mat,
+                                       cov_x,
+                                       weight_list,
+                                       tolerance_list = gen_tolerance_list(),
+                                       match_method = c(
+                                           "with_replacement",
+                                           "optimal",
+                                           "greedy"
+                                       ),
+                                       n_sinks = 0L,
+                                       caliper_list = gen_caliper_list(),
+                                       propensity_list =
+                                           match_propensity_list(NULL),
+                                       sqrt_mahal = TRUE,
+                                       keep_all_with_replacement = FALSE,
+                                       silent = !interactive()) {
+    if (is.null(n_sinks)) {
+        n_sinks <- 0L
+    }
+
+    ## generate all matches: one per weight vector per n_sink value
+    all_matches <- all_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_list,
+        tolerance_list = tolerance_list,
+        match_method = match_method,
+        n_sinks = n_sinks,
+        caliper_list = caliper_list,
+        propensity_list = propensity_list,
+        sqrt_mahal = sqrt_mahal,
+        keep_all_with_replacement = keep_all_with_replacement
+    )
+
+    if (!silent) {
+        message("getting briers")
+    }
+
+    ## get all brier scores for all results
+    briers_by_sinks <- lapply(all_matches, function(all_by_sink) {
+        if (!silent) {
+            print(all_by_sink[[1]]["num_sinks"])
+        }
+        unlist(lapply(all_by_sink, function(indiv_match_list) {
+            brier_score_cv(
+                x_mat = x_mat,
+                match_list = indiv_match_list
+            )
+        }))
+    })
+
+    list(
+        matches_by_sinks = all_matches,
+        briers_by_sinks = briers_by_sinks
+    )
 }
