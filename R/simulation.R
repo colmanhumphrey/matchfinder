@@ -342,7 +342,7 @@ compute_sim_result <- function(x_generator = default_x_generator,
         minimum_weights = rep(1 / (3 * n_cols), times = n_cols)
     )
 
-    sink_brier_matches <- sink_brier_bipartite_matches(
+    brier_matches <- brier_bipartite_matches(
         x_mat = x_mat,
         cov_x = covariance_with_ranks(x_mat),
         weight_list = weight_list,
@@ -353,8 +353,8 @@ compute_sim_result <- function(x_generator = default_x_generator,
     )
 
     permutation_results <- permutation_matches(
-        matches_by_sinks = sink_brier_matches[["matches_by_sinks"]],
-        briers_by_sinks = sink_brier_matches[["briers_by_sinks"]],
+        matches_by_sinks = brier_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_matches[["briers_by_sinks"]],
         x_mat = x_mat,
         n_sinks = n_sinks,
         silent = silent
