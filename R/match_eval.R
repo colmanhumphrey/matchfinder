@@ -91,7 +91,9 @@ match_estimate_tolerance <- function(match_list,
 #' function to use, generates brier score
 #'
 #' @param train_test_list output from \code{predict_prepare}
-#' @param match_predict_function function to predict treated unit
+#' @param match_predict_function function to predict treated unit,
+#'   see e.g. \code{match_predict_xgb} (the default) or
+#'   \code{match_predict_linear}
 #' @param avg logical, default TRUE: should we average (or sum) the briers?
 #' @return result from \code{calc_brier}, length-one double
 #' @author Colman Humphrey

@@ -57,6 +57,8 @@ match_predict_xgb <- function(train_test_list,
 #' @param use_lm_approx logical, default FALSE; if
 #' @return returns a vector of predictions for the test data
 #' @author Colman Humphrey
+#'
+#' @export
 match_predict_linear <- function(train_test_list,
                                  use_lm_approx = FALSE) {
     train_frame <- as.data.frame(train_test_list[["x_train"]])

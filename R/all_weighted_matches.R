@@ -104,6 +104,7 @@ all_bipartite_matches <- function(x_mat,
 #' number of sinks.
 #'
 #' @inheritParams all_bipartite_matches
+#' @inheritParams brier_score_cv
 #' @return List of matches within sink values,
 #'  and brier scores for each.
 #' @author Colman Humphrey
@@ -124,6 +125,9 @@ brier_bipartite_matches <- function(x_mat,
                                         match_propensity_list(NULL),
                                     sqrt_mahal = TRUE,
                                     tol_val = NULL,
+                                    design = "cross_all",
+                                    num_folds = 5,
+                                    match_predict_function = match_predict_xgb,
                                     silent = !interactive()) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
@@ -155,7 +159,10 @@ brier_bipartite_matches <- function(x_mat,
         unlist(lapply(all_by_sink, function(indiv_match_list) {
             brier_score_cv(
                 x_mat = x_mat,
-                match_list = indiv_match_list
+                match_list = indiv_match_list,
+                design = design,
+                num_folds = num_folds,
+                match_predict_function = match_predict_function
             )
         }))
     })
@@ -378,6 +385,7 @@ all_nonbipartite_matches <- function(x_mat,
 #' number of sinks.
 #'
 #' @inheritParams all_nonbipartite_matches
+#' @inheritParams brier_score_cv
 #' @return List of matches within sink values,
 #'  and brier scores for each.
 #' @author Colman Humphrey
@@ -398,6 +406,9 @@ brier_nonbipartite_matches <- function(x_mat,
                                            match_propensity_list(NULL),
                                        sqrt_mahal = TRUE,
                                        keep_all_with_replacement = FALSE,
+                                       design = "cross_all",
+                                       num_folds = 5,
+                                       match_predict_function = match_predict_xgb,
                                        silent = !interactive()) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
@@ -429,7 +440,10 @@ brier_nonbipartite_matches <- function(x_mat,
         unlist(lapply(all_by_sink, function(indiv_match_list) {
             brier_score_cv(
                 x_mat = x_mat,
-                match_list = indiv_match_list
+                match_list = indiv_match_list,
+                design = design,
+                num_folds = num_folds,
+                match_predict_function = match_predict_function
             )
         }))
     })
