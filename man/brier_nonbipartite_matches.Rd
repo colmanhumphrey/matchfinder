@@ -16,6 +16,9 @@ brier_nonbipartite_matches(
   propensity_list = match_propensity_list(NULL),
   sqrt_mahal = TRUE,
   keep_all_with_replacement = FALSE,
+  design = "cross_all",
+  num_folds = 5,
+  match_predict_function = match_predict_xgb,
   silent = !interactive()
 )
 }
@@ -53,6 +56,12 @@ as many pairs as there are units (if using a tolerance vec, then maybe not
 the lowest value pairs, since they'll have no control unit).
 But this would form a contrast with all other methods, so we will cut
 down to using half by default.}
+
+\item{design}{see \code{predict_prepare}}
+
+\item{num_folds}{how many CV folds to use}
+
+\item{match_predict_function}{function to predict treated units}
 }
 \value{
 List of matches within sink values,

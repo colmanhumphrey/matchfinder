@@ -16,6 +16,9 @@ brier_bipartite_matches(
   propensity_list = match_propensity_list(NULL),
   sqrt_mahal = TRUE,
   tol_val = NULL,
+  design = "cross_all",
+  num_folds = 5,
+  match_predict_function = match_predict_xgb,
   silent = !interactive()
 )
 }
@@ -40,6 +43,12 @@ this to force matches that are close on some metric.}
 \item{tol_val}{For optimal matches, you can set a tolerance
 to be within optimality of, which can be zero for perfect optimality.
 Default 1e-4 is reasonable in many cases.}
+
+\item{design}{see \code{predict_prepare}}
+
+\item{num_folds}{how many CV folds to use}
+
+\item{match_predict_function}{function to predict treated units}
 }
 \value{
 List of matches within sink values,

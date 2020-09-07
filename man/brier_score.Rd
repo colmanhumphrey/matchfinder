@@ -14,7 +14,9 @@ brier_score(
 \arguments{
 \item{train_test_list}{output from \code{predict_prepare}}
 
-\item{match_predict_function}{function to predict treated unit}
+\item{match_predict_function}{function to predict treated unit,
+see e.g. \code{match_predict_xgb} (the default) or
+\code{match_predict_linear}}
 
 \item{avg}{logical, default TRUE: should we average (or sum) the briers?}
 }
