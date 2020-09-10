@@ -2,11 +2,10 @@
 % Please edit documentation in R/match_predict.R
 \name{match_predict_xgb}
 \alias{match_predict_xgb}
-\title{Function to predict treatment / control pairs using
+\title{Function factory to predict treatment / control pairs using
 xgboost}
 \usage{
 match_predict_xgb(
-  train_test_list,
   nrounds = 50,
   nthread = 1,
   params = list(eta = 0.1, max.depth = 4),
@@ -14,8 +13,6 @@ match_predict_xgb(
 )
 }
 \arguments{
-\item{train_test_list}{output from \code{predict_prepare}}
-
 \item{nrounds}{training rounds for the xgb algorithm}
 
 \item{nthread}{threads to use for fitting, default 1...}
@@ -24,10 +21,13 @@ match_predict_xgb(
 most likely something like \code{eta} and \code{max.depth}}
 }
 \value{
-returns a vector of predictions for the test data
+returns a function that takes in a \code{train_test_list}
+  from \code{predict_prepare}; this function returns a
+  vector of predictions for the test data
 }
 \description{
-This function takes in training and test data, trains an
+The returned function takes in training and test data
+(output from \code{predict_prepare}), trains an
 xgboost model on the training, predicts on the test, and
 returns the test vector
 }

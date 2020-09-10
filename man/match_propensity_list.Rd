@@ -5,7 +5,7 @@
 \title{Generates the propensity parameters used for using propensity-based calipers}
 \usage{
 match_propensity_list(
-  propensity_function = propensity_score_xgb,
+  propensity_function = propensity_score_xgb(),
   oos_propensity = FALSE,
   n_folds = NULL,
   caliper_sd_mult = 0.6,

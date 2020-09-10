@@ -130,7 +130,7 @@ test_that("testing brier_score", {
                                        "cross_all")
 
     brier_res <- brier_score(train_test_list,
-                             match_predict_xgb,
+                             match_predict_xgb(),
                              avg = TRUE)
     expect_true(brier_res < 0.25 && brier_res > 0.01)
 
@@ -159,7 +159,7 @@ test_that("testing brier_score", {
                                        "cross_all")
 
     brier_res <- brier_score(train_test_list,
-                             match_predict_xgb,
+                             match_predict_xgb(),
                              avg = FALSE)
 
     ## on average will be larger than 0.25, and we have 80
@@ -185,7 +185,7 @@ test_that("testing brier_score_split", {
                                    match_list,
                                    design = "cross_all",
                                    train_fraction = 0.7,
-                                   match_predict_xgb)
+                                   match_predict_xgb())
     expect_true(abs(brier_res - 0.25) < 0.125)
 })
 
@@ -208,7 +208,7 @@ test_that("testing brier_score_cv", {
                                 match_list,
                                 design = "cross_all",
                                 num_folds = 5,
-                                match_predict_xgb)
+                                match_predict_xgb())
 
     ## little tighter than with split
     expect_true(abs(brier_res - 0.28) < 0.1)
@@ -235,14 +235,14 @@ test_that("testing permutation_brier", {
                                    design = "cross_all",
                                    use_cv = TRUE,
                                    num_permutations = 20L,
-                                   match_predict_function = match_predict_xgb,
+                                   match_predict_function = match_predict_xgb(),
                                    train_fraction = 0.7))
     expect_error(permutation_brier(x_mat,
                                    match_list,
                                    design = "cross_all",
                                    use_cv = FALSE,
                                    num_permutations = 20L,
-                                   match_predict_function = match_predict_xgb,
+                                   match_predict_function = match_predict_xgb(),
                                    num_folds = 5))
     ## see below for non-error versions
 
@@ -254,7 +254,7 @@ test_that("testing permutation_brier", {
                                 match_list,
                                 design = "cross_all",
                                 num_folds = 5,
-                                match_predict_xgb)
+                                match_predict_xgb())
     expect_true(brier_res < 0.15)
 
     ## now get the dist:
@@ -263,7 +263,7 @@ test_that("testing permutation_brier", {
                                   design = "cross_all",
                                   use_cv = TRUE,
                                   num_permutations = 8L,
-                                  match_predict_function = match_predict_xgb,
+                                  match_predict_function = match_predict_xgb(),
                                   num_folds = 3L)
     expect_true(abs(mean(perm_res) - 0.28) < 0.04)
 
@@ -275,7 +275,7 @@ test_that("testing permutation_brier", {
                                    match_list,
                                    design = "cross_all",
                                    train_fraction = 0.7,
-                                   match_predict_xgb)
+                                   match_predict_xgb())
     expect_true(brier_res < 0.2)
 
     ## now get the dist:
@@ -284,7 +284,7 @@ test_that("testing permutation_brier", {
                                   design = "cross_all",
                                   use_cv = FALSE,
                                   num_permutations = 8L,
-                                  match_predict_function = match_predict_xgb,
+                                  match_predict_function = match_predict_xgb(),
                                   train_fraction = 0.7)
 
     expect_true(abs(mean(perm_res) - 0.28) < 0.05)

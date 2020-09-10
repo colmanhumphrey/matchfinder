@@ -173,8 +173,9 @@ test_that("testing all_bipartite_matches", {
     expect_true(mean(four_opt_sd) < 0.85 * expected_random_sd)
 
     ## wr not as good on this metric, as expected, since we repeat controls
-    expect_true(mean(zero_wr_sd) < 0.95 * expected_random_sd)
-    expect_true(mean(four_wr_sd) < 0.95 * expected_random_sd)
+    ## should beat expected though
+    expect_true(mean(zero_wr_sd) < expected_random_sd)
+    expect_true(mean(four_wr_sd) < expected_random_sd)
 })
 
 

@@ -20,10 +20,10 @@ test_that("testing match_predict functions", {
     train_test_list <- predict_prepare(x_mat,
                                        index_list,
                                        "cross_all")
-    test_pred <- match_predict_xgb(train_test_list,
-                                   nrounds = 10,
-                                   nthread = 1,
-                                   params = list(eta = 0.3, max.depth = 5))
+    test_pred_func <- match_predict_xgb(nrounds = 10,
+                                        nthread = 1,
+                                        params = list(eta = 0.3, max.depth = 5))
+    test_pred <- test_pred_func(train_test_list)
 
     expect_equal(length(test_pred), length(train_test_list[["y_test"]]))
     ## should get most correct!
@@ -37,8 +37,8 @@ test_that("testing match_predict functions", {
     train_test_list <- predict_prepare(x_mat,
                                        index_list,
                                        "differences_random")
-    test_pred <- match_predict_linear(train_test_list,
-                                      use_lm_approx = FALSE)
+    test_pred_func <- match_predict_linear(use_linear_lm = FALSE)
+    test_pred <- test_pred_func(train_test_list)
 
     expect_equal(length(test_pred), length(train_test_list[["y_test"]]))
 

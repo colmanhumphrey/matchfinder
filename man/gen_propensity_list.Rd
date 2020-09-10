@@ -6,7 +6,7 @@
 builds a named list.}
 \usage{
 gen_propensity_list(
-  propensity_function = propensity_score_xgb,
+  propensity_function = propensity_score_xgb(),
   oos_propensity = FALSE,
   n_folds = NULL
 )

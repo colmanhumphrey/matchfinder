@@ -18,7 +18,7 @@ brier_bipartite_matches(
   tol_val = NULL,
   design = "cross_all",
   num_folds = 5,
-  match_predict_function = match_predict_xgb,
+  match_predict_function = match_predict_xgb(),
   silent = !interactive()
 )
 }

@@ -93,10 +93,11 @@ test_that("propensity_score_linear", {
         y_test = rbinom(n_rows, 1, prob = 0.5)
     )
 
-    glm_pred <- propensity_score_linear(train_test_list,
-                                        use_lm_approx = FALSE)
-    lm_pred <- propensity_score_linear(train_test_list,
-                                       use_lm_approx = FALSE)
+    glm_pred <- propensity_score_linear(use_linear_lm = FALSE)(
+        train_test_list)
+
+    lm_pred <- propensity_score_linear(use_linear_lm = FALSE)(
+        train_test_list)
 
     expect_equal(length(glm_pred), n_rows)
     expect_equal(length(lm_pred), n_rows)
@@ -128,13 +129,13 @@ test_that("propensity_score_linear", {
         y_test = treat_vec[!train_ind]
     )
 
-    glm_pred <- propensity_score_linear(train_test_list,
-                                        use_lm_approx = FALSE)
-    lm_pred <- propensity_score_linear(train_test_list,
-                                       use_lm_approx = TRUE)
+    glm_pred <- propensity_score_linear(use_linear_lm = FALSE)(
+        train_test_list)
+    lm_pred <- propensity_score_linear(use_linear_lm = TRUE)(
+        train_test_list)
 
-    expect_true(calc_brier(glm_pred, train_test_list[["y_test"]]) < 0.2)
-    expect_true(calc_brier(lm_pred, train_test_list[["y_test"]]) < 0.2)
+    expect_true(calc_brier(glm_pred, train_test_list[["y_test"]]) < 0.24)
+    expect_true(calc_brier(lm_pred, train_test_list[["y_test"]]) < 0.24)
 
     ##------
 
@@ -150,10 +151,11 @@ test_that("propensity_score_linear", {
         y_test = treat_vec[!train_ind]
     )
 
-    glm_pred <- propensity_score_linear(train_test_list,
-                                        use_lm_approx = FALSE)
-    lm_pred <- propensity_score_linear(train_test_list,
-                                       use_lm_approx = TRUE)
+    glm_pred <- propensity_score_linear(use_linear_lm = FALSE)(
+        train_test_list)
+
+    lm_pred <- propensity_score_linear(use_linear_lm = TRUE)(
+        train_test_list)
 
     expect_true(calc_brier(glm_pred, train_test_list[["y_test"]]) < 0.3)
     expect_true(calc_brier(lm_pred, train_test_list[["y_test"]]) < 0.3)
@@ -172,7 +174,7 @@ test_that("propensity_score_xgb", {
         y_test = rbinom(n_rows, 1, prob = 0.5)
     )
 
-    xgb_pred <- propensity_score_xgb(train_test_list)
+    xgb_pred <- propensity_score_xgb()(train_test_list)
 
     expect_equal(length(xgb_pred), n_rows)
 
@@ -200,7 +202,7 @@ test_that("propensity_score_xgb", {
         y_test = treat_vec[!train_ind]
     )
 
-    xgb_pred <- propensity_score_xgb(train_test_list)
+    xgb_pred <- propensity_score_xgb()(train_test_list)
 
     expect_true(calc_brier(xgb_pred, train_test_list[["y_test"]]) < 0.25)
 
@@ -218,7 +220,7 @@ test_that("propensity_score_xgb", {
         y_test = treat_vec[!train_ind]
     )
 
-    xgb_pred <- propensity_score_xgb(train_test_list)
+    xgb_pred <- propensity_score_xgb()(train_test_list)
 
     expect_true(calc_brier(xgb_pred, train_test_list[["y_test"]]) < 0.2)
 })
