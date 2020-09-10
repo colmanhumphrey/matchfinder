@@ -127,7 +127,8 @@ brier_bipartite_matches <- function(x_mat,
                                     tol_val = NULL,
                                     design = "cross_all",
                                     num_folds = 5,
-                                    match_predict_function = match_predict_xgb,
+                                    match_predict_function =
+                                        match_predict_xgb(),
                                     silent = !interactive()) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
@@ -408,7 +409,8 @@ brier_nonbipartite_matches <- function(x_mat,
                                        keep_all_with_replacement = FALSE,
                                        design = "cross_all",
                                        num_folds = 5,
-                                       match_predict_function = match_predict_xgb,
+                                       match_predict_function =
+                                           match_predict_xgb(),
                                        silent = !interactive()) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L

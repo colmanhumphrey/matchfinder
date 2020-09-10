@@ -305,7 +305,7 @@ compute_sim_result <- function(x_generator = default_x_generator,
         treat_vec = treat_vec,
         match_method = match_method,
         propensity_list = gen_propensity_list(
-            propensity_function = propensity_score_linear,
+            propensity_function = propensity_score_linear(),
             oos_propensity = FALSE
         ),
         n_sinks = n_sinks
