@@ -204,9 +204,23 @@ brier_bipartite_matches <- function(x_mat,
 permutation_matches <- function(matches_by_sinks,
                                 briers_by_sinks,
                                 x_mat,
-                                n_sinks,
+                                n_sinks = 0L,
                                 approximate_by_best = TRUE,
                                 silent = !interactive()) {
+    if (is.null(n_sinks)) {
+        n_sinks <- 0L
+    }
+
+    if (length(n_sinks) != length(matches_by_sinks)) {
+        stop("`n_sinks` is length ", length(n_sinks),
+             " but `matches_by_sinks` is length ", length(matches_by_sinks))
+    }
+
+    if (length(n_sinks) != length(briers_by_sinks)) {
+        stop("`n_sinks` is length ", length(n_sinks),
+             " but `briers_by_sinks` is length ", length(briers_by_sinks))
+    }
+
     best_brier_inds <- lapply(briers_by_sinks, function(x) {
         which(rank(x, ties.method = "first") == length(x))
     })
@@ -238,7 +252,7 @@ permutation_matches <- function(matches_by_sinks,
     })
 
     ## compute the permutation score for each match
-    permutation_brier_scores <- lapply(seq_len(length(n_sinks)), function(j) {
+    permutation_brier_scores <- setNames(lapply(seq_len(length(n_sinks)), function(j) {
         if (approximate_by_best) {
             permutation_vec <- permutation_briers[[j]]
             return(unlist(lapply(briers_by_sinks[[j]], function(x) {
@@ -251,13 +265,13 @@ permutation_matches <- function(matches_by_sinks,
                     mean(briers_by_sinks[[j]][[k]] <= permutation_vec)
             })))
         }
-    })
+    }), n_sinks)
 
     ## now that we're doing one-sided brier,
     ## the lowest value will just be the best
     ## so will highest brier
 
-    best_matches <- lapply(seq_len(length(n_sinks)), function(j) {
+    best_matches <- setNames(lapply(seq_len(length(n_sinks)), function(j) {
         best_brier_ind <- if (approximate_by_best) {
                               best_brier_inds[[j]]
                           } else {
@@ -279,7 +293,7 @@ permutation_matches <- function(matches_by_sinks,
             permutation_brier = permutation_brier_scores[[j]][best_brier_ind],
             match_list = matches_by_sinks[[j]][[best_brier_ind]]
         )
-    })
+    }), n_sinks)
 
     list(
         permutation_brier_scores = permutation_brier_scores,
