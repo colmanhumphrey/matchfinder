@@ -154,7 +154,7 @@ test_that("testing compute_sim_result and reshape funcs", {
     expect_equal(lengths(sim_results[["mahal_results"]]),
                  c(2L, 2L))
 
-    expect_equal(lengths(sim_results[["weighted_results"]]),
+    expect_equal(lengths(unname(sim_results[["weighted_results"]])),
                  c(4L, 4L))
 
     n_sink_vec <- unlist(lapply(
@@ -162,7 +162,7 @@ test_that("testing compute_sim_result and reshape funcs", {
         function(x){
             x[["n_sinks"]]
         }))
-    expect_equal(n_sink_vec[1L], 0L)
+    expect_equal(unname(n_sink_vec[1L]), 0L)
     expect_true(abs(n_sink_vec[1L] < 19L) < 2L)
 
     flat_sims <- reshape_list_of_sims(

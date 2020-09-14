@@ -596,7 +596,7 @@ test_that("testing permutation_matches", {
     perm_briers <- permutation_result[["permutation_brier_scores"]]
     best_matches <- permutation_result[["best_matches"]]
 
-    expect_equal(lengths(perm_briers),
+    expect_equal(lengths(unname(perm_briers)),
                  rep(num_weight_vecs, times = length(n_sinks_vec)))
     expect_equal(length(best_matches), length(n_sinks_vec))
     expect_equal(names(best_matches[[1]]),
@@ -658,6 +658,16 @@ test_that("testing permutation_matches", {
         silent = TRUE
     )
 
+    ## wrong number of sinks
+    expect_error(
+        permutation_matches(
+            matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+            briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
+            x_mat = x_mat,
+            n_sinks = n_sinks_vec[1]
+        )
+    )
+
     permutation_result <- permutation_matches(
         matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
         briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
@@ -667,7 +677,7 @@ test_that("testing permutation_matches", {
     perm_briers <- permutation_result[["permutation_brier_scores"]]
     best_matches <- permutation_result[["best_matches"]]
 
-    expect_equal(lengths(perm_briers),
+    expect_equal(lengths(unname(perm_briers)),
                  rep(num_weight_vecs, times = length(n_sinks_vec)))
     expect_equal(length(best_matches), length(n_sinks_vec))
     expect_equal(names(best_matches[[1]]),

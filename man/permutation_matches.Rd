@@ -9,7 +9,7 @@ permutation_matches(
   matches_by_sinks,
   briers_by_sinks,
   x_mat,
-  n_sinks,
+  n_sinks = 0L,
   approximate_by_best = TRUE,
   silent = !interactive()
 )
