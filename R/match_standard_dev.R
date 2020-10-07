@@ -89,6 +89,12 @@ bipartite_match_sd <- function(x_mat,
 }
 
 
+#' Abadie, Alberto and Guido W Imbens (2006).
+#' “Large sample properties of matching estimators
+#' for average treatment effects”.
+#' Econometrica 74.1, pp. 235–267. - see page 251.
+#' More info at “Matching on the estimated propensity score”.
+#' Econometrica 84.2, pp. 781–807.
 #' @inheritParams bipartite_match_sd
 #' @keywords internal
 gen_bipartite_repeated_variance <- function(x_mat,
@@ -107,6 +113,7 @@ gen_bipartite_repeated_variance <- function(x_mat,
 
     ## the second term should actually be K_{sq,i},
     ## but when using just one control, we have K_i = K_{sq,i}
+    ## 2020-10-05: I don't really understand the above comment
     k_sq_minus_k <- count_frame[["count"]]^2 - count_frame[["count"]]
 
     unique_control_index <- as.numeric(as.character(
@@ -220,7 +227,8 @@ gen_nonbipartite_repeated_variance <- function(x_mat,
             )]
     }
 
-    min_control_match <- min_blocked_rank(control_dist_mat,
+    min_control_match <- min_blocked_rank(
+        control_dist_mat,
         blocked_ind = unique_control_index
     )
 
