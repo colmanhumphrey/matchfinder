@@ -8,7 +8,7 @@
 min_different_rank <- function(dist_mat) {
     min_blocked_rank(
         dist_mat,
-        1L:nrow(dist_mat)
+        seq_len(nrow(dist_mat))
     )
 }
 
@@ -24,7 +24,7 @@ min_different_rank <- function(dist_mat) {
 min_blocked_rank <- function(dist_mat,
                              blocked_ind = NULL) {
     if (is.null(blocked_ind)) {
-        return(unlist(lapply(1:nrow(dist_mat), function(j) {
+        return(unlist(lapply(seq_len(nrow(dist_mat)), function(j) {
             ranks <- rank(dist_mat[j, ], ties.method = "random")
             which(ranks == min(ranks))
         })))
@@ -32,7 +32,7 @@ min_blocked_rank <- function(dist_mat,
 
     stopifnot(length(blocked_ind) == nrow(dist_mat))
 
-    unlist(lapply(1:nrow(dist_mat), function(j) {
+    unlist(lapply(seq_len(nrow(dist_mat)), function(j) {
         ranks <- rank(dist_mat[j, ], ties.method = "random")
         ranks[blocked_ind[j]] <- max(ranks) + 1L
         which(ranks == min(ranks))

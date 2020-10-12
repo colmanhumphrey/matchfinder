@@ -72,7 +72,8 @@ weighted_mahal <- function(x_mat,
         }
     }
 
-    weighted_ymat <- forwardsolve(diag(1 / weight_vec) %*% t(chol_cov), t(x_mat))
+    weighted_ymat <- forwardsolve(diag(1 / weight_vec) %*%
+                                  t(chol_cov), t(x_mat))
 
     ymat_sumsq <- colSums(weighted_ymat^2)
 
