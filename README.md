@@ -64,11 +64,13 @@ library(matchfinder)
 
 treat_effect <- 0.3
 
-rows <- 500L
-num_weight_vecs <- 5L
+rows <- 600L
+num_weight_vecs <- 25L
 x_mat <- cbind(rnorm(rows),
                runif(rows))
-treat_vec <- (1L:rows) %in% fixed_sample(1L:rows, floor(rows * 0.45))
+treat_vec <- (1L:rows) %in%
+    sample(1L:rows, size = floor(rows * 0.45),
+           prob = (x_mat[, 2] + 2) / 5)
 y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * treat_effect + rnorm(rows)
 ```
 
@@ -95,6 +97,9 @@ You don't have to use this function, it just
 has some reasonble features for generating random
 vectors, including setting minimum weights, prior
 weights etc.
+
+We're only generating 25 here, but for a serious go
+of things, we'd probably want closer to 1,000.
 ```r
 weight_vecs <- generate_random_weights(
     prior_weights = c(2, 1),
@@ -120,7 +125,7 @@ all_wr_matches <- all_bipartite_matches(
     weight_list = weight_vecs,
     treat_vec = treat_vec,
     match_method = "with_replacement",
-    n_sinks = c(0L, 30L)
+    n_sinks = c(0L, 30L, 100L, 200L)
 )
 
 ## 2. get all brier scores for all results
@@ -128,7 +133,7 @@ wr_briers <- lapply(all_wr_matches, function(by_sinks) {
     unlist(lapply(by_sinks, function(indiv_match_list) {
         brier_score_cv(
             x_mat = x_mat,
-            match_list = indiv_match_list
+            match_list = indiv_match_list,
         )
     }))
 })
