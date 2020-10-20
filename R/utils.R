@@ -479,3 +479,77 @@ tolerance_check <- function(match_list,
         message = ""
     ))
 }
+
+
+##' Takes a vector, returns a named list of repeated elements
+##' along with indices.
+##'
+##' We have a vector of potentially repeating elements.
+##' We want all elements with repeats, along with
+##' the index of all locations of that value.
+##' So e.g. if \code{vec = c("a", "d", "f", "d", "f")},
+##' we'll get a list with element \code{"d"}
+##' being a vector with values \code{c(2, 4)}
+##' and \code{"f"} having \code{c(3, 5)}.
+##' @param vec Vector of potentially repeating elements that we
+##'   want the index locations of
+##' @return List with named elements, names from the input \code{vec},
+##'   each element is a list of indices
+##' @author Colman Humphrey
+##'
+##' @export
+build_index_vector <- function(vec) {
+    if (is.list(vec)) {
+        stop("`vec` is a list, can't build index")
+    }
+    if (!is.vector(vec)) {
+        stop("`vec` is not a vector, can't build index")
+    }
+    group_frame <- aggregate(seq_len(length(vec)),
+                             list(vec),
+                             FUN = identity,
+                             simplify = FALSE)
+    group_list <- group_frame[["x"]]
+    above_one <- lengths(group_list) > 1L
+    setNames(group_list[above_one],
+             group_frame[["Group.1"]][above_one])
+}
+
+
+##' Builds symmetric pairs of indices for vectors
+##'
+##' For a given vector interpreted as indices, e.g.
+##' \code{c(5, 10, 13)}, we want all possible pairs that
+##' aren't the same element, e.g. we want \code{c(5, 10)},
+##' \code{c(5, 13)} and \code{c(10, 13)}. Further, we want
+##' them in both orders, and then combined into a matrix. Finally,
+##' we want to do this for multiple vectors from a list, and have a
+##' single final matrix output.
+##' @param index_list List of vectors, interpreted as index locations
+##' @return Matrix of pairs
+##' @author Colman Humphrey
+##'
+##' @keywords internal
+pair_indexing <- function(index_list) {
+    if (!is.list(index_list)) {
+        stop("`index_list` needs to be a list")
+    }
+
+    pair_list <- lapply(seq_len(length(index_list)), function(j) {
+        vec <- index_list[[j]]
+        if (any(duplicated(vec))) {
+            err_message <- paste0(
+                "`index_list` element ",
+                names(index_list)[j],
+                " contains duplicates"
+            )
+            stop(err_message)
+        }
+
+        full_mat <- cbind(rep(vec, each = length(vec)),
+                          rep(vec, times = length(vec)))
+        full_mat[full_mat[, 1] != full_mat[, 2], , drop = FALSE]
+    })
+
+    do.call(rbind, pair_list)
+}
