@@ -159,83 +159,6 @@ test_that("testing nonbipartite_match_sd_scaled", {
     expect_true(match_sd_with_reg < boring_sd)
 
     ##------------------------------------
-    ## now with repeats
-
-    sub_lengths <- c(rep(50L, 4L),
-                     rep(quarter_rows, 4L))
-
-    control_lists <- lapply(sub_lengths, function(x) {
-        unique_size_sub(1L:rows, x)
-    })
-    control_lists <- lapply(control_lists, function(cl) {
-        bad_ind <- cl == match_list[["treat_index"]] |
-            tol_vec[cl] == tol_vec[match_list[["treat_index"]]]
-        while (any(bad_ind)) {
-            cl[bad_ind] <- fixed_sample(1L:rows, sum(bad_ind))
-            bad_ind <- cl == match_list[["treat_index"]] |
-                tol_vec[cl] == tol_vec[match_list[["treat_index"]]]
-        }
-        return(cl)
-    })
-    match_lists <- lapply(control_lists, function(cl) {
-        list(
-            treat_index = 1L:half_rows,
-            control_index = cl
-        )
-    })
-
-    boring_variances <- unlist(lapply(control_lists, function(cl) {
-        var((y_vector[1L:half_rows] - y_vector[cl]) /
-            (tol_vec[1L:half_rows] - tol_vec[cl]))
-    }))
-
-    rep_variances <- unlist(lapply(control_lists, function(cl) {
-        gen_nonbipartite_repeated_variance(
-            x_mat = x_mat,
-            cov_x = cov_x,
-            y_vector = y_vector,
-            control_index = cl,
-            tolerance_list = gen_tolerance_list(
-                tolerance_vec = tol_vec,
-                tolerance_min = 1))
-    }))
-
-    full_variances <- unlist(lapply(match_lists, function(ml) {
-        nonbipartite_match_sd_scaled(x_mat,
-                                     cov_x = cov_x,
-                                     y_vector = y_vector,
-                                     match_list = ml,
-                                     tolerance_list = gen_tolerance_list(
-                                         tolerance_vec = tol_vec,
-                                         tolerance_min = 1),
-                                     use_regression = FALSE)
-    }))^2
-    full_variances_reg <- unlist(lapply(match_lists, function(ml) {
-        nonbipartite_match_sd_scaled(x_mat,
-                                     cov_x = cov_x,
-                                     y_vector = y_vector,
-                                     match_list = ml,
-                                     tolerance_list = gen_tolerance_list(
-                                         tolerance_vec = tol_vec,
-                                         tolerance_min = 1),
-                                     use_regression = TRUE)
-    }))^2
-
-    boring_avg <- colMeans(matrix(boring_variances, ncol = 2L))
-    rep_avg <- colMeans(matrix(rep_variances, ncol = 2L))
-    full_avg <- colMeans(matrix(full_variances, ncol = 2L))
-    full_avg_reg <- colMeans(matrix(full_variances_reg, ncol = 2L))
-
-    close_to_zero <- full_avg - rep_avg - boring_avg
-
-    expect_true(sum(abs(close_to_zero)) < 0.5)
-
-    ## in this case the regression doesn't change a huge amount,
-    ## since most of the work is in the repeats
-
-    abs_diffs <- 2 * abs(full_avg - full_avg_reg) /
-        abs(full_avg + full_avg_reg)
-    expect_true(mean(abs_diffs) < 0.2)
 })
 
 
@@ -385,13 +308,11 @@ test_that("testing y_tolerance_diff_ratio_sd", {
         )
         random_match_res <- y_tolerance_diff_ratio(
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = TRUE
+            tolerance_list = tol_list
         )
         random_match_res_naive <- y_tolerance_diff_ratio(
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = FALSE
+            tolerance_list = tol_list
         )
         return(list(
             match_sd_reg = nonbi_sd,
@@ -443,8 +364,6 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     ## beats the random
     expect_true(perc_errors[["match"]][["reg"]] <
                 perc_errors[["random"]][["reg"]])
-    ## expect_true(perc_errors[["match"]][["naive"]] <
-    ##             perc_errors[["random"]][["naive"]])
     ## beats regression!
     expect_true(perc_errors[["match"]][["reg"]] <
                 perc_errors[["actual_reg"]])
@@ -454,8 +373,6 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     ## beats the random
     expect_true(perc_bias[["match"]][["reg"]] <
                 perc_bias[["random"]][["reg"]])
-    ## expect_true(perc_bias[["match"]][["naive"]] <
-    ##             perc_bias[["random"]][["naive"]])
     ## beats regression!
     expect_true(perc_bias[["match"]][["reg"]] <
                 perc_bias[["actual_reg"]])
@@ -463,9 +380,6 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     ## now comparing the standard deviations
     expect_true(res_means["match_sd_reg"] <
                 0.6 * res_means["random_sd_reg"])
-    ## not as fun
-    expect_true(res_means["match_sd_naive"] <
-                2 * res_means["random_sd_naive"])
 
     ## ------------------------------------
     ## simpler overall test, more tricky tolerance
@@ -528,13 +442,11 @@ test_that("testing y_tolerance_diff_ratio_sd", {
         )
         random_match_res <- y_tolerance_diff_ratio(
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = TRUE
+            tolerance_list = tol_list
         )
         random_match_res_naive <- y_tolerance_diff_ratio(
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = FALSE
+            tolerance_list = tol_list
         )
         return(list(
             match_sd_reg = nonbi_sd,
