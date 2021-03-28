@@ -109,7 +109,7 @@ test_that("regression_eval with repeated controls", {
     throw_results <- lapply(seq_len(10L), function(toss) {
         throw_some <- lapply(seq_len(20L), function(j) {
             match_list_throw <- match_list
-            ## toss four of the ones, two of the neg ones
+            ## toss four of the ones, two of the neg ones (if j = 2 say)
             match_list_throw[["treat_index"]] <- c(
                 sample(seq_len(num_neg * 2L), size = num_neg * 2L - toss * 2L),
                 num_neg * 2L + sample(seq_len(num_neg), size = num_neg - toss)
@@ -199,7 +199,7 @@ test_that("regression_eval with repeated controls", {
         mean(abs(diffs)) / length(values)
     }
     expect_true(rank_diffs(throw_se_diff) < 0.1)
-    expect_equal(rank_diffs(repeat_se_diff) < 0.1)
+    expect_true(rank_diffs(repeat_se_diff) < 0.1)
 
     ## probably all true
     expect_true(mean(repeat_agg$mean_se <
