@@ -25,7 +25,7 @@ all_bipartite_matches(
 This means it's possible that \code{cov(x_mat)} is not equal to
 \code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
-\item{weight_list}{list of weight vectors. See `generate_random_weights` to
+\item{weight_list}{list of weight vectors. See \code{generate_random_weights} to
 automatically generate a reasonable set of vectors.}
 
 \item{treat_vec}{Logical (or 1/0) vector, indicating treatment (or control).}

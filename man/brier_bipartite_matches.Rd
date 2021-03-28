@@ -29,7 +29,7 @@ brier_bipartite_matches(
 This means it's possible that \code{cov(x_mat)} is not equal to
 \code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
-\item{weight_list}{list of weight vectors. See `generate_random_weights` to
+\item{weight_list}{list of weight vectors. See \code{generate_random_weights} to
 automatically generate a reasonable set of vectors.}
 
 \item{treat_vec}{Logical (or 1/0) vector, indicating treatment (or control).}
@@ -52,7 +52,7 @@ Default 1e-4 is reasonable in many cases.}
 }
 \value{
 List of matches within sink values,
- and brier scores for each.
+and brier scores for each.
 }
 \description{
 Computes all matches, then gets the brier scores for each. Reorder by

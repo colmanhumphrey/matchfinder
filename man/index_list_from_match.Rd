@@ -16,7 +16,7 @@ index_list_from_match(match_list, train_index)
 }
 \value{
 returns an \code{index_list} object, see
-  \code{predict_prepare}
+\code{predict_prepare}
 }
 \description{
 Constructs an \code{index_list} from a \code{match_list} and a logical

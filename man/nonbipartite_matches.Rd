@@ -9,7 +9,8 @@ nonbipartite_matches(
   tolerance_list = gen_tolerance_list(),
   match_method = c("with_replacement", "optimal", "greedy"),
   n_sinks = NULL,
-  keep_all_with_replacement = FALSE
+  keep_all_with_replacement = FALSE,
+  weight_vec = NULL
 )
 }
 \arguments{
@@ -20,11 +21,11 @@ nonbipartite_matches(
 \item{match_method}{This enum corresponds to the three matching methods
 discussed above:
 \describe{
-  \item{"with_replacement"}{Finds smallest control for each treatment}
-  \item{"greedy"}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{"optimal"}{Minimum total distance}
+\item{"with_replacement"}{Finds smallest control for each treatment}
+\item{"greedy"}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{"optimal"}{Minimum total distance}
 }}
 
 \item{n_sinks}{Vector of sinks per match. Note that this is NOT the same
@@ -40,27 +41,31 @@ as many pairs as there are units (if using a tolerance vec, then maybe not
 the lowest value pairs, since they'll have no control unit).
 But this would form a contrast with all other methods, so we will cut
 down to using half by default.}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \value{
 basic return value is a list with three elements:
-  \describe{
-    \item{\code{treat_index}}{index of treated units}
-    \item{\code{control_index}}{index of control units}
-    \item{\code{distance}}{distances between the pairs}
-  }
-  You'll get a list of such objects, each
-  with an extra element: the number of sinks used.
-  If \code{n_sinks} is NULL, it'll default to using a
-  single value: zero.
+\describe{
+\item{\code{treat_index}}{index of treated units}
+\item{\code{control_index}}{index of control units}
+\item{\code{distance}}{distances between the pairs}
+}
+You'll get a list of such objects, each
+with an extra element: the number of sinks used.
+If \code{n_sinks} is NULL, it'll default to using a
+single value: zero.
 }
 \description{
 Generates matched pairs either:
 \describe{
-  \item{With Replacement}{Finds smallest control for each treatment}
-  \item{Without Replacement, Greedy}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{Without Replacement, Optimally}{Minimum total distance}
+\item{With Replacement}{Finds smallest control for each treatment}
+\item{Without Replacement, Greedy}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{Without Replacement, Optimally}{Minimum total distance}
 }
 If you're happy to allow units to be the control multiple times,
 then the first way is fast and optimal.

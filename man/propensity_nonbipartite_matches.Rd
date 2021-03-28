@@ -25,11 +25,11 @@ propensity_nonbipartite_matches(
 \item{match_method}{This enum corresponds to the three matching methods
 discussed above:
 \describe{
-  \item{"with_replacement"}{Finds smallest control for each treatment}
-  \item{"greedy"}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{"optimal"}{Minimum total distance}
+\item{"with_replacement"}{Finds smallest control for each treatment}
+\item{"greedy"}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{"optimal"}{Minimum total distance}
 }}
 
 \item{n_sinks}{how many potential matches to not bother with

@@ -34,9 +34,9 @@ generate zero-mean data.}
 \value{
 List:
 \describe{
-  \item{\code{x_mat}}{Data Matrix}
-  \item{\code{treat_vec}}{Treatment Vector}
-  \item{\code{y_vec}}{Output Vector}
+\item{\code{x_mat}}{Data Matrix}
+\item{\code{treat_vec}}{Treatment Vector}
+\item{\code{y_vec}}{Output Vector}
 }
 }
 \description{

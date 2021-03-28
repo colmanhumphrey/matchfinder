@@ -8,9 +8,9 @@
 ##' against the tolerance differences.
 ##' In both cases, if controls are repeated, we build up the appropriate
 ##' correlation matrix and use Generalised Linear Regression to solve.
-##' @param match_list
-##' @param y_vector
-##' @param tolerance_list
+##' @param match_list Usual match list
+##' @param y_vector Usual outcome vector
+##' @param tolerance_list Usual tolerance list
 ##' @return Returns a list:
 ##' * \code{estimate}: the estimated treatment effect. If we're in bipartite
 ##'     land, then this is the usual difference in means, else

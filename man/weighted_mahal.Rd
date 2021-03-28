@@ -44,7 +44,7 @@ then use
 }
 \value{
 returns a matrix of pairwise distances; the relevant indexing
-  depends on \code{treat_vec} and \code{partial_index}
+depends on \code{treat_vec} and \code{partial_index}
 }
 \description{
 Note: def. of weighted:
@@ -64,10 +64,10 @@ or \eqn{W^{-1} U' y_i = x_i},
 which is simple by \code{forwardsolve}. Then we have:
 \deqn{dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j}
 Letting \eqn{Y = (y_1', y_2', .... ,y_n')'}
-[which can get in one line,
-\eqn{Y' = } \code{forwardsolve} \eqn{(W^{-1} U', x_mat')}]
+\link[=which can get in one line,
+\eqn{Y' = } \code{forwardsolve} \eqn{(W^{-1} U', x_mat')}]{which can get in one line, 1PITiKRJGQR3VqDbIIrGi5e7BswQei5j-13- 1PITiKRJGQR3VqDbIIrGi5e7BswQei5j-14- 1PITiKRJGQR3VqDbIIrGi5e7BswQei5j-15-}
 the first two parts are just \code{rowSums}\eqn{(Y^2)}
-[note that code uses \eqn{Y'}, thus \code{colSums}]
-[add \code{outer(.,.)} to finish]
+\link{note that code uses \eqn{Y'}, thus \code{colSums}}
+\link{add \code{outer(.,.)} to finish}
 and the last is \eqn{Y Y'}
 }

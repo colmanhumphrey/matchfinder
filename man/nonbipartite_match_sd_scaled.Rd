@@ -32,10 +32,14 @@ This means it's possible that \code{cov(x_mat)} is not equal to
 
 \item{caliper_list}{Optional, see \code{gen_caliper_list}. Provide
 this to force matches that are close on some metric.}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \value{
 a single float, the standard deviation (not standard error)
-  for the match
+for the match
 }
 \description{
 For when your result isn't just based

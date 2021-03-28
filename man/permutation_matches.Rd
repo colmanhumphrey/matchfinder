@@ -37,9 +37,9 @@ time.}
 }
 \value{
 Returns a list of two lists. The first is vectors
-  of permutation Brier scores (one per match). The second is the
-  best match at each sink value, along with some extra info about that
-  match.
+of permutation Brier scores (one per match). The second is the
+best match at each sink value, along with some extra info about that
+match.
 }
 \description{
 Can work for bipartite or non-bipartite matches,

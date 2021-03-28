@@ -24,7 +24,7 @@ all_nonbipartite_matches(
 This means it's possible that \code{cov(x_mat)} is not equal to
 \code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
-\item{weight_list}{list of weight vectors. See `generate_random_weights` to
+\item{weight_list}{list of weight vectors. See \code{generate_random_weights} to
 automatically generate a reasonable set of vectors.}
 
 \item{tolerance_list}{See \code{gen_tolerance_list}}
@@ -32,11 +32,11 @@ automatically generate a reasonable set of vectors.}
 \item{match_method}{This enum corresponds to the three matching methods
 discussed above:
 \describe{
-  \item{"with_replacement"}{Finds smallest control for each treatment}
-  \item{"greedy"}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{"optimal"}{Minimum total distance}
+\item{"with_replacement"}{Finds smallest control for each treatment}
+\item{"greedy"}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{"optimal"}{Minimum total distance}
 }}
 
 \item{n_sinks}{how many potential matches to not bother with

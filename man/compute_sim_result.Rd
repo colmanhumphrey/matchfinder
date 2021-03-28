@@ -48,14 +48,14 @@ suppress messages.}
 \value{
 Returns a named list:
 \describe{
-    \item{\code{naive_est}}{Just a number: mean difference between all
-  treated units and all control}
-    \item{\code{propensity_results}}{List of lists: each with
-  \code{n_sinks} and the \code{est}}
-    \item{\code{mahal_results}}{Same as above}
-    \item{\code{weighted_results}}{List of lists: each with
-  \code{n_sinks}, the raw brier score, the permutation brier score,
-  and the \code{est}}
+\item{\code{naive_est}}{Just a number: mean difference between all
+treated units and all control}
+\item{\code{propensity_results}}{List of lists: each with
+\code{n_sinks} and the \code{est}}
+\item{\code{mahal_results}}{Same as above}
+\item{\code{weighted_results}}{List of lists: each with
+\code{n_sinks}, the raw brier score, the permutation brier score,
+and the \code{est}}
 }
 }
 \description{

@@ -13,15 +13,15 @@ should be in (0, 1).}
 }
 \value{
 List of four functions that take in a matrix and
-  output a vector of probabilities:
+output a vector of probabilities:
 \describe{
-  \item{\code{constant_treat_prob}}{Just repeats \code{target_mean}}
-  \item{\code{logistic_treat_prob}}{Computes a logistic style relationship
-  between the data matrix and the output vector}
-  \item{\code{sparse_treat_prob}}{Based on the sign of the first data matrix
-  column; gives a number a bit above the mean and a bit below.}
-  \item{\code{sparse_nonlin_treat_prob}}{Cubic logit function of the
-  first vector}
+\item{\code{constant_treat_prob}}{Just repeats \code{target_mean}}
+\item{\code{logistic_treat_prob}}{Computes a logistic style relationship
+between the data matrix and the output vector}
+\item{\code{sparse_treat_prob}}{Based on the sign of the first data matrix
+column; gives a number a bit above the mean and a bit below.}
+\item{\code{sparse_nonlin_treat_prob}}{Cubic logit function of the
+first vector}
 }
 }
 \description{

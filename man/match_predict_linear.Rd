@@ -13,8 +13,8 @@ to use regular \code{lm} instead of \code{glm}.}
 }
 \value{
 returns a function that takes in a \code{train_test_list}
-  from \code{predict_prepare}; this function returns a
-  vector of predictions for the test data
+from \code{predict_prepare}; this function returns a
+vector of predictions for the test data
 }
 \description{
 The returned function takes in training and test data

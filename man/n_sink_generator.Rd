@@ -15,7 +15,7 @@ n_sink_generator(start_frac = 0, end_frac = 0.8, length_out = 9)
 }
 \value{
 Function that accepts a \code{treat_vec}
-  and returns a vector of numbers.
+and returns a vector of numbers.
 }
 \description{
 This function returns a function that accepts a treatment vector

@@ -13,7 +13,7 @@ create_caliper(caliper_list, treat_vec = NULL)
 }
 \value{
 A matrix, either square (\code{|caliper_vec| x |caliper_vec|})
-  or else \code{sum(treat_vec == 1) x sum(treat_vec == 0)}.
+or else \code{sum(treat_vec == 1) x sum(treat_vec == 0)}.
 }
 \description{
 Given a vector, \code{caliper_vec}, this function sets penalties

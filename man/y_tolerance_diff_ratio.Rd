@@ -5,27 +5,19 @@
 \title{Quick and dirty method to approximate the sd and mean
 of the ratio of the differences}
 \usage{
-y_tolerance_diff_ratio(
-  y_vector,
-  tolerance_list,
-  use_regression = TRUE,
-  samples = NULL
-)
+y_tolerance_diff_ratio(y_vector, tolerance_list, samples = NULL)
 }
 \arguments{
 \item{y_vector}{Vector of outcomes we care about}
 
 \item{tolerance_list}{Usual tolerance list (see \code{gen_tolerance_list})}
 
-\item{use_regression}{\code{TRUE} to use regression, \code{FALSE} to use
-the ratios directly. Default \code{TRUE}.}
-
 \item{samples}{How many samples to use. Defaults to a number between 50
 and 200, depending on the length of the various vectors}
 }
 \value{
 Returns a single number: the average of the sds of \code{samples}
-  random runs
+random runs
 }
 \description{
 For non-bipartite work, we work with something like:
@@ -35,11 +27,13 @@ For non-bipartite work, we work with something like:
 }
 And not just \eqn{y_{\text{treat}} - y_{\text{control}}} as
 our "difference": here we say we're caring about the change
-in \eqn{y} per unit tol.
+in \eqn{y} per unit tol. Note that we use regression
+to estimate, but that is really just a statment about error
+assumptions.
 This function estimates the standard deviation of this
-if you just did random pairings **that obeyed the tolerance
-rules** with min and max.
-This function computes approx sd for the **optimal** case.
+if you just did random pairings \strong{that obeyed the tolerance
+rules} with min and max.
+This function computes approx sd for the \strong{optimal} case.
 Also yes this is a terrible function name.
 }
 \author{

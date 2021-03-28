@@ -31,8 +31,8 @@ to form pairs (\code{NULL} is all, hence for the first iteration)}
 \value{
 "Simple" match list, list with two elements:
 \itemize{
-   \item{\code{treat_index}} Treatment units
-   \item{\code{control_index}} Control units
+\item{\code{treat_index}} Treatment units
+\item{\code{control_index}} Control units
 }
 }
 \description{

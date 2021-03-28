@@ -39,7 +39,7 @@ If \code{FALSE}, will only use controls from the match given}
 }
 \value{
 a single float, the standard deviation (not standard error)
-  for the match
+for the match
 }
 \description{
 Calculates the standard deviation for a match, on the outcome

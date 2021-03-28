@@ -14,7 +14,7 @@ x_from_cov(cov_mat, n_rows)
 }
 \value{
 A matrix such that the covariance would tend to
-  \code{cov_mat} as \code{n_rows} grows.
+\code{cov_mat} as \code{n_rows} grows.
 }
 \description{
 Generates a matrix where each row is generated

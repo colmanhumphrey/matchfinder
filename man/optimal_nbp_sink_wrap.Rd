@@ -4,7 +4,12 @@
 \alias{optimal_nbp_sink_wrap}
 \title{Given a vector of sink values, produces optimal NBP matches for each}
 \usage{
-optimal_nbp_sink_wrap(dist_mat, tolerance_vec, n_sinks = NULL)
+optimal_nbp_sink_wrap(
+  dist_mat,
+  tolerance_vec,
+  n_sinks = NULL,
+  weight_vec = NULL
+)
 }
 \arguments{
 \item{dist_mat}{Matrix of pairwise distances.}
@@ -15,6 +20,10 @@ and \code{"greedy"}, it subtracts one pair. But for optimal matching,
 it removes one full unit. \code{"greedy"} is the weird one here, but it
 wouldn't truly make sense given the code to try and replicate the optimal
 implementation. Be safe and don't use greedy...}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \description{
 Given a vector of sink values, produces optimal NBP matches for each

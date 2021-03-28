@@ -12,7 +12,7 @@ unique_size_sub(primary, unique)
 \item{unique}{how many unique elements you want}
 }
 \value{
-vector equal in length to primary, with `unique` unique elements
+vector equal in length to primary, with \code{unique} unique elements
 }
 \description{
 Takes a subsample with a given number of unique elements
