@@ -406,6 +406,13 @@ binary_search <- function(target_value,
 ##' @keywords internal
 tolerance_check <- function(match_list,
                             tolerance_list) {
+    if (is.null(tolerance_list)) {
+        return(list(
+            error = FALSE,
+            message = ""
+        ))
+    }
+
     tol_vec <- tolerance_list[["tolerance_vec"]]
 
     tol_diffs <- tol_vec[match_list[["treat_index"]]] -

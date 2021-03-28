@@ -87,7 +87,8 @@ all_bipartite_matches <- function(x_mat,
             treat_vec = treat_vec,
             match_method = match_method,
             n_sinks = n_sinks,
-            tol_val = tol_val
+            tol_val = tol_val,
+            weight_vec = weight_vec
         )
     })
 
@@ -252,7 +253,8 @@ permutation_matches <- function(matches_by_sinks,
     })
 
     ## compute the permutation score for each match
-    permutation_brier_scores <- setNames(lapply(seq_len(length(n_sinks)), function(j) {
+    permutation_brier_scores <- setNames(lapply(seq_len(length(n_sinks)),
+                                                function(j) {
         if (approximate_by_best) {
             permutation_vec <- permutation_briers[[j]]
             return(unlist(lapply(briers_by_sinks[[j]], function(x) {
@@ -383,7 +385,8 @@ all_nonbipartite_matches <- function(x_mat,
             tolerance_list = tolerance_list,
             match_method = match_method,
             n_sinks = n_sinks,
-            keep_all_with_replacement = keep_all_with_replacement
+            keep_all_with_replacement = keep_all_with_replacement,
+            weight_vec = weight_vec
         )
     })
 

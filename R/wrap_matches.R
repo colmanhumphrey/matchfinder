@@ -9,12 +9,16 @@
 #'   \code{greedy_match}, \code{with_replacement_nbp_match} or
 #'   \code{greedy_nbp_match}.
 #' @param n_sinks default NULL, vector of sink values to use.
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
 #' @return list of lists; see parent function
 #' @author Colman Humphrey
 #'
 #' @keywords internal
 simple_sink_wrap <- function(simple_match_list,
-                             n_sinks = NULL) {
+                             n_sinks = NULL,
+                             weight_vec = NULL) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
     }
@@ -30,6 +34,9 @@ simple_sink_wrap <- function(simple_match_list,
             x[keep_ind]
         })
         match_list[["num_sinks"]] <- sink_val
+        if (!is.null(weight_vec)) {
+            match_list[["weight_vec"]] <- weight_vec
+        }
         match_list
     }), n_sinks)
 }
@@ -41,6 +48,9 @@ simple_sink_wrap <- function(simple_match_list,
 #' Will be slow; you can't just generate one match and subset from it.
 #' @inheritParams bipartite_matches
 #' @param n_sinks default NULL, vector of sink values to use.
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
 #' @return list of lists; see parent function
 #' @author Colman Humphrey
 #'
@@ -48,7 +58,8 @@ simple_sink_wrap <- function(simple_match_list,
 optimal_sink_wrap <- function(dist_mat,
                               treat_vec,
                               n_sinks,
-                              tol_val) {
+                              tol_val,
+                              weight_vec = NULL) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
     }
@@ -62,7 +73,10 @@ optimal_sink_wrap <- function(dist_mat,
             sink_val,
             tol_val
         )
-        match_list$num_sinks <- sink_val
+        match_list[["num_sinks"]] <- sink_val
+        if (!is.null(weight_vec)) {
+            match_list[["weight_vec"]] <- weight_vec
+        }
         match_list
     }), n_sinks)
 }
@@ -71,12 +85,16 @@ optimal_sink_wrap <- function(dist_mat,
 #' Given a vector of sink values, produces optimal NBP matches for each
 #'
 #' @inheritParams nonbipartite_matches
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
 #' @author Colman Humphrey
 #'
 #' @keywords internal
 optimal_nbp_sink_wrap <- function(dist_mat,
                                   tolerance_vec,
-                                  n_sinks = NULL) {
+                                  n_sinks = NULL,
+                                  weight_vec = NULL) {
     if (is.null(n_sinks)) {
         n_sinks <- 0L
     }
@@ -89,6 +107,9 @@ optimal_nbp_sink_wrap <- function(dist_mat,
             n_sinks = sink_val
         )
         match_list[["num_sinks"]] <- sink_val
+        if (!is.null(weight_vec)) {
+            match_list[["weight_vec"]] <- weight_vec
+        }
         match_list
     }), n_sinks)
 }

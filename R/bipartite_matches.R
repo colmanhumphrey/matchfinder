@@ -36,7 +36,10 @@
 #'   is acceptable to be from the true optimal value? Speed with large value,
 #'   accuracy with small. Only relevant for \code{!with_replacement && !greedy}.
 #'   Default 1e-4 is reasonable in many cases.
-#' @return basic return value is a list with five elements:
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
+#' @return basic return value is a list with five elements and an optional sixth:
 #'   \describe{
 #'     \item{\code{treat_index}}{index of treated units, from all units}
 #'     \item{\code{treat_index_within}}{index of treated units,
@@ -45,6 +48,8 @@
 #'     \item{\code{control_index_within}}{index of control units,
 #'           from the set of control}
 #'     \item{\code{distance}}{distances between the pairs}
+#'     \item{\code{weight_vec}}{weight vector used to generate
+#'           \code{dist_mat} if supplied}
 #'   }
 #'   You'll get a list of such objects, each
 #'   with an extra element: the number of sinks used. If you
@@ -60,7 +65,8 @@ bipartite_matches <- function(dist_mat,
                                   "greedy"
                               ),
                               n_sinks = NULL,
-                              tol_val = NULL) {
+                              tol_val = NULL,
+                              weight_vec = NULL) {
     stopifnot(is.matrix(dist_mat))
     stopifnot(min(dist_mat) >= 0)
 
@@ -101,7 +107,8 @@ bipartite_matches <- function(dist_mat,
                 dist_mat,
                 treat_vec
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -111,7 +118,8 @@ bipartite_matches <- function(dist_mat,
                 dist_mat,
                 treat_vec
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -119,7 +127,8 @@ bipartite_matches <- function(dist_mat,
         dist_mat,
         treat_vec,
         n_sinks,
-        tol_val
+        tol_val,
+        weight_vec
     )
 }
 

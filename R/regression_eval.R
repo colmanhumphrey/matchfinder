@@ -1,8 +1,8 @@
 ##' Evaluate match using regression
 ##'
 ##' Generates a list with the estimated treatment effect,
-##' and the standard error for that effect. If bipartite,
-##' that is no tolerance used, just regresses differences in
+##' and the standard error for that effect. If bipartite
+##' (i.e. no tolerance used) just regresses differences in
 ##' \code{y_vector} against the intercept, basically difference in means.
 ##' If a tolerance vector is used, the differences are regressed
 ##' against the tolerance differences.

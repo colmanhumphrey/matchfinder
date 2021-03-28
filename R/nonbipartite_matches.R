@@ -147,6 +147,9 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #'   the lowest value pairs, since they'll have no control unit).
 #'   But this would form a contrast with all other methods, so we will cut
 #'   down to using half by default.
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
 #' @return basic return value is a list with three elements:
 #'   \describe{
 #'     \item{\code{treat_index}}{index of treated units}
@@ -167,7 +170,8 @@ nonbipartite_matches <- function(dist_mat,
                                      "greedy"
                                  ),
                                  n_sinks = NULL,
-                                 keep_all_with_replacement = FALSE) {
+                                 keep_all_with_replacement = FALSE,
+                                 weight_vec = NULL) {
     stopifnot(is.matrix(dist_mat))
     stopifnot(min(dist_mat) >= 0)
 
@@ -237,7 +241,8 @@ nonbipartite_matches <- function(dist_mat,
                 tolerance_list[["tolerance_vec"]],
                 keep_all = keep_all_with_replacement
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -247,13 +252,15 @@ nonbipartite_matches <- function(dist_mat,
                 dist_mat,
                 tolerance_list[["tolerance_vec"]]
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
     optimal_nbp_sink_wrap(dist_mat,
         tolerance_vec = tolerance_list[["tolerance_vec"]],
-        n_sinks = n_sinks
+        n_sinks = n_sinks,
+        weight_vec
     )
 }
 
