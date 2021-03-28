@@ -27,6 +27,7 @@ bipartite_match_sd <- function(x_mat,
             " If you do want both, create the combined caliper separately"
         )
     }
+
     ## ------------------------------------
     ## two variance components
 
@@ -325,7 +326,9 @@ approx_ratio_sd <- function(numerator_mean,
 ##' }
 ##' And not just \eqn{y_{\text{treat}} - y_{\text{control}}} as
 ##' our "difference": here we say we're caring about the change
-##' in \eqn{y} per unit tol.
+##' in \eqn{y} per unit tol. Note that we use regression
+##' to estimate, but that is really just a statment about error
+##' assumptions.
 ##' This function estimates the standard deviation of this
 ##' if you just did random pairings **that obeyed the tolerance
 ##' rules** with min and max.
@@ -333,8 +336,6 @@ approx_ratio_sd <- function(numerator_mean,
 ##' Also yes this is a terrible function name.
 ##' @param y_vector Vector of outcomes we care about
 ##' @param tolerance_list Usual tolerance list (see \code{gen_tolerance_list})
-##' @param use_regression \code{TRUE} to use regression, \code{FALSE} to use
-##'   the ratios directly. Default \code{TRUE}.
 ##' @param samples How many samples to use. Defaults to a number between 50
 ##'   and 200, depending on the length of the various vectors
 ##' @return Returns a single number: the average of the sds of \code{samples}
@@ -344,7 +345,6 @@ approx_ratio_sd <- function(numerator_mean,
 ##' @export
 y_tolerance_diff_ratio <- function(y_vector,
                                    tolerance_list,
-                                   use_regression = TRUE,
                                    samples = NULL) {
     tol_vector <- tolerance_list[["tolerance_vec"]]
     if (length(y_vector) != length(tol_vector)) {
@@ -367,31 +367,28 @@ y_tolerance_diff_ratio <- function(y_vector,
     ##------------------------------------
 
     random_ratio_res <- lapply(tol_matches, function(match_list) {
-        return(list(
-            match_mean = match_estimate_tolerance(
-                match_list = match_list,
-                y_vector = y_vector,
-                tolerance_list = tolerance_list,
-                use_regression = use_regression
-            ),
-            match_sd = nonbipartite_match_sd_scaled(
-                x_mat = matrix(NA, 1L, 1L),  # won't use it
-                cov_x = matrix(NA, 1L, 1L),  # won't use it
-                y_vector = y_vector,
-                match_list = match_list,
-                tolerance_list = tolerance_list,
-                use_regression = use_regression
-            )
-        ))
+        regression_eval(
+            match_list = match_list,
+            y_vector = y_vector,
+            tolerance_list = tolerance_list
+        )
     })
+
+    ## even with the selection process above in good cases
+    ## we may not get all units used
+    match_lengths <- unlist(lapply(tol_matches, function(tol_match) {
+        length(tol_match$treat_index)
+    }))
+
+    se_vector <- unlist(lapply(random_ratio_res, `[[`, "standard_error"))
+    sd_vector <- se_vector * sqrt(match_lengths)
 
     list(
         mean = mean(unlist(
-            lapply(random_ratio_res, `[[`, "match_mean")
+            lapply(random_ratio_res, `[[`, "estimate")
         )),
-        sd = mean(unlist(
-            lapply(random_ratio_res, `[[`, "match_sd")
-        ))
+        se = mean(se_vector),
+        sd = mean(sd_vector)
     )
 }
 
