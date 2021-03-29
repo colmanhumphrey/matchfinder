@@ -16,8 +16,8 @@ tolerance_check(match_list, tolerance_list)
 \value{
 List with two elements:
 \itemize{
- \item{\code{error}}{Boolean - is all good?}
- \item{\code{message}}{If error, then gives error string}
+\item{\code{error}}{Boolean - is all good?}
+\item{\code{message}}{If error, then gives error string}
 }
 }
 \description{

@@ -7,182 +7,179 @@ test_that("testing all_bipartite_matches", {
 
     rows <- 200L
     num_weight_vecs <- 5L
-    x_mat <- cbind(rnorm(rows),
-                   runif(rows))
-    treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
-                                             45L)
-    y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3 + rnorm(rows)
-    cov_x <- covariance_with_ranks(x_mat)
 
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
+    ## run it three times
+    ## some tests are within each run,
+    ## others on aggregate
+    se_results <- lapply(seq_len(3L), function(j_iter) {
 
-    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
-                                           number_vectors = num_weight_vecs,
-                                           minimum_weights = c(0.1, 0.1))
+        x_mat <- cbind(rnorm(rows),
+                       runif(rows))
+        treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
+                                                 45L)
+        y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3 + rnorm(rows)
+        cov_x <- covariance_with_ranks(x_mat)
 
-    all_wr_matches <- all_bipartite_matches(x_mat = x_mat,
-                                            cov_x = cov(x_mat),
-                                            weight_list = weight_vecs,
-                                            treat_vec = treat_vec,
-                                            match_method = "with_replacement",
-                                            n_sinks = c(0L, 4L))
+        some_dist_mat <- weighted_mahal(x_mat,
+                                        cov_x = cov_x,
+                                        weight_vec = c(0.66, 0.33),
+                                        treat_vec = treat_vec)
 
-    zero_wr_matches <- lapply(all_wr_matches, function(x) {
-        x[["0"]]
+        weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
+                                               number_vectors = num_weight_vecs,
+                                               minimum_weights = c(0.1, 0.1))
+
+        all_wr_matches <- all_bipartite_matches(x_mat = x_mat,
+                                                cov_x = cov(x_mat),
+                                                weight_list = weight_vecs,
+                                                treat_vec = treat_vec,
+                                                match_method = "with_replacement",
+                                                n_sinks = c(0L, 4L))
+
+        zero_wr_matches <- all_wr_matches[["0"]]
+        four_wr_matches <- all_wr_matches[["4"]]
+
+        zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x) {
+            !any(duplicated(x[["treat_index"]]))
+        }))
+        zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x) {
+            sum(x[["distance"]])
+        }))
+        zero_wr_length <- unlist(lapply(zero_wr_matches, function(x) {
+            length(x[["treat_index"]])
+        }))
+
+        expect_true(all(zero_wr_unique))
+        expect_true(all(zero_wr_length == sum(treat_vec)))
+
+        some_match <- bipartite_matches(
+            dist_mat = some_dist_mat,
+            treat_vec = treat_vec,
+            match_method = "with_replacement",
+            n_sinks = 0
+        )[["0"]]
+
+        expect_true(abs(mean(zero_wr_dist /
+                             sum(some_match[["distance"]])) - 1) < 0.25)
+
+        random_dist <- mean(some_dist_mat[
+            cbind(seq_len(nrow(some_dist_mat)),
+                  fixed_sample(seq_len(ncol(some_dist_mat)),
+                               nrow(some_dist_mat)))
+        ])
+        expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
+
+        all_optimal_matches <- all_bipartite_matches(x_mat = x_mat,
+                                                     cov_x = cov(x_mat),
+                                                     weight_list = weight_vecs,
+                                                     treat_vec = treat_vec,
+                                                     match_method = "optimal",
+                                                     n_sinks = c(0L, 4L))
+
+        zero_optimal_matches <- all_optimal_matches[["0"]]
+        four_optimal_matches <- all_optimal_matches[["4"]]
+
+        zero_opt_unique <- unlist(lapply(zero_optimal_matches, function(x) {
+            !any(duplicated(x[["treat_index"]]))
+        }))
+        zero_opt_dist <- unlist(lapply(zero_optimal_matches, function(x) {
+            sum(x[["distance"]])
+        }))
+        zero_opt_length <- unlist(lapply(zero_optimal_matches, function(x) {
+            length(x[["treat_index"]])
+        }))
+
+        expect_true(all(zero_opt_unique))
+        expect_true(all(zero_opt_length == sum(treat_vec)))
+
+        some_match <- bipartite_matches(
+            dist_mat = some_dist_mat,
+            treat_vec = treat_vec,
+            match_method = "optimal",
+            n_sinks = 0L
+        )[["0"]]
+
+        expect_true(abs(mean(zero_opt_dist /
+                             sum(some_match[["distance"]])) - 1) < 0.3)
+
+        random_dist <- mean(some_dist_mat[
+            cbind(seq_len(nrow(some_dist_mat)),
+                  fixed_sample(seq_len(ncol(some_dist_mat)),
+                               nrow(some_dist_mat)))
+        ])
+        expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
+
+        ##----------------
+
+        expect_true(all(zero_opt_dist > zero_wr_dist))
+
+        ##------------------------------------
+
+        zero_wr_briers <- unlist(lapply(zero_wr_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        zero_opt_briers <- unlist(lapply(zero_optimal_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        four_wr_briers <- unlist(lapply(four_wr_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        four_opt_briers <- unlist(lapply(four_optimal_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+
+        expect_true(mean(zero_wr_briers) > 0.1 && mean(zero_wr_briers) < 0.5)
+        expect_true(mean(four_wr_briers) > 0.1 && mean(four_wr_briers) < 0.5)
+        expect_true(mean(zero_opt_briers) > 0.1 && mean(zero_opt_briers) < 0.5)
+        expect_true(mean(four_opt_briers) > 0.1 && mean(four_opt_briers) < 0.5)
+
+        zero_wr_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(match_list = zero_wr_matches[[j]],
+                            y_vector = y_vector)$standard_error
+        }))
+        zero_opt_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(match_list = zero_optimal_matches[[j]],
+                            y_vector = y_vector)$standard_error
+        }))
+        four_wr_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(match_list = four_wr_matches[[j]],
+                            y_vector = y_vector)$standard_error
+        }))
+        four_opt_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(match_list = four_optimal_matches[[j]],
+                            y_vector = y_vector)$standard_error
+        }))
+
+        ## random differences give sqrt(2), so we're below that
+        expected_random_sd <- sd(y_vector) * sqrt(2)
+        expected_zero_se <- expected_random_sd /
+            sqrt(length(zero_wr_matches[[1]]$treat_index))
+        expected_four_se <- expected_random_sd /
+            sqrt(length(four_wr_matches[[1]]$treat_index))
+
+        c(
+            zero_opt_ratio = mean(zero_opt_se) / expected_zero_se,
+            four_opt_ratio = mean(four_opt_se) / expected_four_se,
+            zero_wr_ratio = mean(zero_wr_se) / expected_zero_se,
+            four_wr_ratio = mean(four_wr_se) / expected_four_se
+        )
     })
-    four_wr_matches <- lapply(all_wr_matches, function(x) {
-        x[["4"]]
-    })
 
-    zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x) {
-        !any(duplicated(x[["treat_index"]]))
-    }))
-    zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x) {
-        sum(x[["distance"]])
-    }))
-    zero_wr_length <- unlist(lapply(zero_wr_matches, function(x) {
-        length(x[["treat_index"]])
-    }))
-
-    expect_true(all(zero_wr_unique))
-    expect_true(all(zero_wr_length == sum(treat_vec)))
-
-
-    some_match <- bipartite_matches(
-        dist_mat = some_dist_mat,
-        treat_vec = treat_vec,
-        match_method = "with_replacement",
-        n_sinks = 0
-    )[["0"]]
-
-    expect_true(abs(mean(zero_wr_dist /
-                         sum(some_match[["distance"]])) - 1) < 0.2)
-
-    random_dist <- mean(some_dist_mat[
-        cbind(seq_len(nrow(some_dist_mat)),
-              fixed_sample(seq_len(ncol(some_dist_mat)),
-                           nrow(some_dist_mat)))
-    ])
-    expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
-
-    all_optimal_matches <- all_bipartite_matches(x_mat = x_mat,
-                                                 cov_x = cov(x_mat),
-                                                 weight_list = weight_vecs,
-                                                 treat_vec = treat_vec,
-                                                 match_method = "optimal",
-                                                 n_sinks = c(0L, 4L))
-
-    zero_optimal_matches <- lapply(all_optimal_matches, function(x) {
-        x[["0"]]
-    })
-    four_optimal_matches <- lapply(all_optimal_matches, function(x) {
-        x[["4"]]
-    })
-
-    zero_opt_unique <- unlist(lapply(zero_optimal_matches, function(x) {
-        !any(duplicated(x[["treat_index"]]))
-    }))
-    zero_opt_dist <- unlist(lapply(zero_optimal_matches, function(x) {
-        sum(x[["distance"]])
-    }))
-    zero_opt_length <- unlist(lapply(zero_optimal_matches, function(x) {
-        length(x[["treat_index"]])
-    }))
-
-    expect_true(all(zero_opt_unique))
-    expect_true(all(zero_opt_length == sum(treat_vec)))
-
-    some_match <- bipartite_matches(
-        dist_mat = some_dist_mat,
-        treat_vec = treat_vec,
-        match_method = "optimal",
-        n_sinks = 0
-    )[["0"]]
-
-    expect_true(abs(mean(zero_opt_dist /
-                         sum(some_match[["distance"]])) - 1) < 0.3)
-
-    random_dist <- mean(some_dist_mat[
-        cbind(seq_len(nrow(some_dist_mat)),
-              fixed_sample(seq_len(ncol(some_dist_mat)),
-                           nrow(some_dist_mat)))
-    ])
-    expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
-
-    ##----------------
-
-    expect_true(all(zero_opt_dist > zero_wr_dist))
-
-    ##------------------------------------
-
-    zero_wr_briers <- unlist(lapply(zero_wr_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    zero_opt_briers <- unlist(lapply(zero_optimal_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    four_wr_briers <- unlist(lapply(four_wr_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    four_opt_briers <- unlist(lapply(four_optimal_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-
-    expect_true(mean(zero_wr_briers) > 0.1 && mean(zero_wr_briers) < 0.5)
-    expect_true(mean(four_wr_briers) > 0.1 && mean(four_wr_briers) < 0.5)
-    expect_true(mean(zero_opt_briers) > 0.1 && mean(zero_opt_briers) < 0.5)
-    expect_true(mean(four_opt_briers) > 0.1 && mean(four_opt_briers) < 0.5)
-
-    zero_wr_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        bipartite_match_sd(x_mat,
-                           cov_x = cov_x,
-                           y_vector = y_vector,
-                           match_list = zero_wr_matches[[j]],
-                           treat_vec = treat_vec,
-                           weight_vec = weight_vecs[[j]])
-    }))
-    zero_opt_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        bipartite_match_sd(x_mat,
-                           cov_x = cov_x,
-                           y_vector = y_vector,
-                           match_list = zero_optimal_matches[[j]],
-                           treat_vec = treat_vec,
-                           weight_vec = weight_vecs[[j]])
-    }))
-    four_wr_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        bipartite_match_sd(x_mat,
-                           cov_x = cov_x,
-                           y_vector = y_vector,
-                           match_list = four_wr_matches[[j]],
-                           treat_vec = treat_vec,
-                           weight_vec = weight_vecs[[j]])
-    }))
-    four_opt_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        bipartite_match_sd(x_mat,
-                           cov_x = cov_x,
-                           y_vector = y_vector,
-                           match_list = four_optimal_matches[[j]],
-                           treat_vec = treat_vec,
-                           weight_vec = weight_vecs[[j]])
-    }))
-
-    ## random differences give sqrt(2), so we're below that
-    expected_random_sd <- sd(y_vector) * sqrt(2)
+    se_results_mat <- do.call(rbind, se_results)
+    se_results_avg <- apply(se_results_mat, 2L, mean)
 
     ## opt does great here
-    expect_true(mean(zero_opt_sd) < 0.85 * expected_random_sd)
-    expect_true(mean(four_opt_sd) < 0.85 * expected_random_sd)
+    expect_true(se_results_avg["zero_opt_ratio"] < 0.85)
+    expect_true(se_results_avg["four_opt_ratio"] < 0.85)
 
     ## wr not as good on this metric, as expected, since we repeat controls
-    expect_true(mean(zero_wr_sd) < 0.95 * expected_random_sd)
-    expect_true(mean(four_wr_sd) < 0.95 * expected_random_sd)
+    ## should beat expected though
+    expect_true(se_results_avg["zero_wr_ratio"] < 0.9)
+    expect_true(se_results_avg["four_wr_ratio"] < 0.9)
 })
 
 
@@ -246,239 +243,236 @@ test_that("testing all_nonbipartite_matches", {
         NA
     )
 
+    tol_list <- gen_tolerance_list(
+            tolerance_vec = tolerance_vec
+    )
+
     all_wr_matches <- all_nonbipartite_matches(
         x_mat = x_mat,
         cov_x = cov_x,
         weight_list = weight_vecs,
-        tolerance_list = gen_tolerance_list(
-            tolerance_vec = tolerance_vec
-        ),
+        tolerance_list = tol_list,
         match_method = "with_replacement",
         n_sinks = c(0L, 1L, 2L)
     )
 
     ## verify that the treated units are larger in tol
-    treat_larger_in_tol <- unlist(
-        lapply(
-            all_wr_matches,
-            function(matches_by_sink) {
-                all_pos <- lapply(
-                    matches_by_sink,
-                    function(match_list) {
-                        diffs <- tolerance_vec[match_list[["treat_index"]]] -
-                            tolerance_vec[match_list[["control_index"]]]
-                        all(diffs > 0)
-                    }
-                )
-                all(unlist(all_pos))
-            }
-        )
-    )
+    treat_larger_in_tol <- unlist(lapply(
+        all_wr_matches, function(matches_by_sink) {
+            !any(unlist(lapply(matches_by_sink, function(match_list) {
+                tolerance_check(match_list, tol_list)[["error"]]
+            })))
+        }
+    ))
+
     expect_true(all(treat_larger_in_tol))
 
     ##------------------------------------
     ## no caliper/propens
 
-    rows <- 400L
-    num_weight_vecs <- 5L
-    x_mat <- cbind(rnorm(rows),
-                   runif(rows))
-    tol_vec <- runif(rows) * 2 + x_mat[, 1] * 0.3
-    tol_list <- gen_tolerance_list(
-        tolerance_vec = tol_vec,
-        tolerance_min = 0.1
-    )
-    y_vector <- x_mat[, 1] + x_mat[, 2] + tol_vec * 0.3 + rnorm(rows)
-    cov_x <- covariance_with_ranks(x_mat)
-
-    some_dist_mat <- weighted_mahal(x_mat,
-        cov_x = cov_x,
-        weight_vec = c(0.4, 0.6)
-    )
-
-    weight_vecs <- generate_random_weights(prior_weights = c(2, 3),
-                                           number_vectors = num_weight_vecs,
-                                           minimum_weights = c(0.1, 0.1))
-
-    all_wr_matches <- all_nonbipartite_matches(
-        x_mat = x_mat,
-        cov_x = cov(x_mat),
-        weight_list = weight_vecs,
-        tolerance_list = tol_list,
-        match_method = "with_replacement",
-        n_sinks = c(0L, 4L)
-    )
-
-    zero_wr_matches <- lapply(all_wr_matches, function(x) {
-        x[["0"]]
-    })
-    four_wr_matches <- lapply(all_wr_matches, function(x) {
-        x[["4"]]
-    })
-
-    zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x) {
-        !any(duplicated(x[["treat_index"]]))
-    }))
-    zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x) {
-        sum(x[["distance"]])
-    }))
-    zero_wr_length <- unlist(lapply(zero_wr_matches, function(x) {
-        length(x[["treat_index"]])
-    }))
-
-    expect_true(all(zero_wr_unique))
-    ## should be able to use all
-    expect_true(all(zero_wr_length == rows %/% 2L))
-
-    some_match <- nonbipartite_matches(
-        dist_mat = some_dist_mat,
-        tolerance_list = tol_list,
-        match_method = "with_replacement",
-        n_sinks = 0L
-    )[["0"]]
-
-    expect_true(abs(mean(zero_wr_dist /
-                         sum(some_match[["distance"]])) - 1) < 0.2)
-
-    random_dist <- mean(some_dist_mat[
-        cbind(seq_len(nrow(some_dist_mat)),
-              fixed_sample(seq_len(ncol(some_dist_mat)),
-                           nrow(some_dist_mat)))
-    ])
-    expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
-
-    all_optimal_matches <- all_nonbipartite_matches(
-        x_mat = x_mat,
-        cov_x = cov(x_mat),
-        weight_list = weight_vecs,
-        tolerance_list = tol_list,
-        match_method = "optimal",
-        n_sinks = c(0L, 4L)
-    )
-
-    zero_optimal_matches <- lapply(all_optimal_matches, function(x) {
-        x[["0"]]
-    })
-    four_optimal_matches <- lapply(all_optimal_matches, function(x) {
-        x[["4"]]
-    })
-
-    zero_opt_unique <- unlist(lapply(zero_optimal_matches, function(x) {
-        !any(duplicated(x[["treat_index"]]))
-    }))
-    zero_opt_dist <- unlist(lapply(zero_optimal_matches, function(x) {
-        sum(x[["distance"]])
-    }))
-    zero_opt_length <- unlist(lapply(zero_optimal_matches, function(x) {
-        length(x[["treat_index"]])
-    }))
-
-    expect_true(all(zero_opt_unique))
-    ## should still be able to use all
-    expect_true(all(zero_opt_length == rows %/% 2L))
-
-    some_match <- nonbipartite_matches(
-        dist_mat = some_dist_mat,
-        tolerance_list = tol_list,
-        match_method = "optimal",
-        n_sinks = 0
-    )[["0"]]
-
-    expect_true(abs(mean(zero_opt_dist /
-                         sum(some_match[["distance"]])) - 1) < 0.3)
-
-    random_dist <- mean(some_dist_mat[
-        cbind(seq_len(nrow(some_dist_mat)),
-              fixed_sample(seq_len(ncol(some_dist_mat)),
-                           nrow(some_dist_mat)))
-    ])
-    expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
-
-    ##----------------
-
-    expect_true(all(zero_opt_dist > zero_wr_dist))
-
-    ##------------------------------------
-
-    zero_wr_briers <- unlist(lapply(zero_wr_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    zero_opt_briers <- unlist(lapply(zero_optimal_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    four_wr_briers <- unlist(lapply(four_wr_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-    four_opt_briers <- unlist(lapply(four_optimal_matches, function(ml) {
-        brier_score_cv(x_mat,
-                       match_list = ml)
-    }))
-
-    expect_true(mean(zero_wr_briers) > 0.1 && mean(zero_wr_briers) < 0.5)
-    expect_true(mean(four_wr_briers) > 0.1 && mean(four_wr_briers) < 0.5)
-    expect_true(mean(zero_opt_briers) > 0.1 && mean(zero_opt_briers) < 0.5)
-    expect_true(mean(four_opt_briers) > 0.1 && mean(four_opt_briers) < 0.5)
-
-    zero_wr_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        nonbipartite_match_sd_scaled(
-            x_mat,
-            cov_x = cov_x,
-            y_vector = y_vector,
-            match_list = zero_wr_matches[[j]],
-            tolerance_list = tol_list,
-            weight_vec = weight_vecs[[j]]
+    ## run it four times
+    ## some tests are within each run,
+    ## others on aggregate
+    se_results <- lapply(seq_len(4L), function(j_iter) {
+        rows <- 400L
+        num_weight_vecs <- 5L
+        x_mat <- cbind(rnorm(rows),
+                       runif(rows))
+        tol_vec <- runif(rows) * 2 + x_mat[, 1] * 0.3
+        tol_list <- gen_tolerance_list(
+            tolerance_vec = tol_vec,
+            tolerance_min = 0.1
         )
-    }))
-    zero_opt_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        nonbipartite_match_sd_scaled(
-            x_mat,
-            cov_x = cov_x,
-            y_vector = y_vector,
-            match_list = zero_optimal_matches[[j]],
-            tolerance_list = tol_list,
-            weight_vec = weight_vecs[[j]]
-        )
-    }))
-    four_wr_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        nonbipartite_match_sd_scaled(
-            x_mat,
-            cov_x = cov_x,
-            y_vector = y_vector,
-            match_list = four_wr_matches[[j]],
-            tolerance_list = tol_list,
-            weight_vec = weight_vecs[[j]]
-        )
-    }))
-    four_opt_sd <- unlist(lapply(1L:num_weight_vecs, function(j) {
-        nonbipartite_match_sd_scaled(
-            x_mat,
-            cov_x = cov_x,
-            y_vector = y_vector,
-            match_list = four_optimal_matches[[j]],
-            tolerance_list = tol_list,
-            weight_vec = weight_vecs[[j]]
-        )
-    }))
+        y_vector <- x_mat[, 1] + x_mat[, 2] + tol_vec * 0.3 + rnorm(rows)
+        cov_x <- covariance_with_ranks(x_mat)
 
-    expected_random <- y_tolerance_diff_ratio(
-        y_vector = y_vector,
-        tolerance_list = tol_list
-    )
-    expected_random_sd <- expected_random[["sd"]]
+        some_dist_mat <- weighted_mahal(x_mat,
+                                        cov_x = cov_x,
+                                        weight_vec = c(0.4, 0.6)
+                                        )
+
+        weight_vecs <- generate_random_weights(prior_weights = c(2, 3),
+                                               number_vectors = num_weight_vecs,
+                                               minimum_weights = c(0.1, 0.1))
+
+        all_wr_matches <- all_nonbipartite_matches(
+            x_mat = x_mat,
+            cov_x = cov(x_mat),
+            weight_list = weight_vecs,
+            tolerance_list = tol_list,
+            match_method = "with_replacement",
+            n_sinks = c(0L, 4L)
+        )
+
+        zero_wr_matches <- all_wr_matches[["0"]]
+        four_wr_matches <- all_wr_matches[["4"]]
+
+        zero_wr_unique <- unlist(lapply(zero_wr_matches, function(x) {
+            !any(duplicated(x[["treat_index"]]))
+        }))
+        zero_wr_dist <- unlist(lapply(zero_wr_matches, function(x) {
+            sum(x[["distance"]])
+        }))
+        zero_wr_length <- unlist(lapply(zero_wr_matches, function(x) {
+            length(x[["treat_index"]])
+        }))
+
+        expect_true(all(zero_wr_unique))
+        ## should be able to use all
+        expect_true(all(zero_wr_length == rows %/% 2L))
+
+        some_match <- nonbipartite_matches(
+            dist_mat = some_dist_mat,
+            tolerance_list = tol_list,
+            match_method = "with_replacement",
+            n_sinks = 0L
+        )[["0"]]
+
+        expect_true(abs(mean(zero_wr_dist /
+                             sum(some_match[["distance"]])) - 1) < 0.2)
+
+        random_dist <- mean(some_dist_mat[
+            cbind(seq_len(nrow(some_dist_mat)),
+                  fixed_sample(seq_len(ncol(some_dist_mat)),
+                               nrow(some_dist_mat)))
+        ])
+        expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
+
+        all_optimal_matches <- all_nonbipartite_matches(
+            x_mat = x_mat,
+            cov_x = cov(x_mat),
+            weight_list = weight_vecs,
+            tolerance_list = tol_list,
+            match_method = "optimal",
+            n_sinks = c(0L, 4L)
+        )
+
+        zero_optimal_matches <- all_optimal_matches[["0"]]
+        four_optimal_matches <- all_optimal_matches[["4"]]
+
+        zero_opt_unique <- unlist(lapply(zero_optimal_matches, function(x) {
+            !any(duplicated(x[["treat_index"]]))
+        }))
+        zero_opt_dist <- unlist(lapply(zero_optimal_matches, function(x) {
+            sum(x[["distance"]])
+        }))
+        zero_opt_length <- unlist(lapply(zero_optimal_matches, function(x) {
+            length(x[["treat_index"]])
+        }))
+
+        expect_true(all(zero_opt_unique))
+        ## should still be able to use all
+        expect_true(all(zero_opt_length == rows %/% 2L))
+
+        some_match <- nonbipartite_matches(
+            dist_mat = some_dist_mat,
+            tolerance_list = tol_list,
+            match_method = "optimal",
+            n_sinks = 0
+        )[["0"]]
+
+        expect_true(abs(mean(zero_opt_dist /
+                             sum(some_match[["distance"]])) - 1) < 0.3)
+
+        random_dist <- mean(some_dist_mat[
+            cbind(seq_len(nrow(some_dist_mat)),
+                  fixed_sample(seq_len(ncol(some_dist_mat)),
+                               nrow(some_dist_mat)))
+        ])
+        expect_true((mean(some_match[["distance"]]) / random_dist) < 0.5)
+
+        ##----------------
+
+        expect_true(all(zero_opt_dist > zero_wr_dist))
+
+        ##------------------------------------
+
+        zero_wr_briers <- unlist(lapply(zero_wr_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        zero_opt_briers <- unlist(lapply(zero_optimal_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        four_wr_briers <- unlist(lapply(four_wr_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+        four_opt_briers <- unlist(lapply(four_optimal_matches, function(ml) {
+            brier_score_cv(x_mat,
+                           match_list = ml)
+        }))
+
+        expect_true(mean(zero_wr_briers) > 0.1 && mean(zero_wr_briers) < 0.5)
+        expect_true(mean(four_wr_briers) > 0.1 && mean(four_wr_briers) < 0.5)
+        expect_true(mean(zero_opt_briers) > 0.1 && mean(zero_opt_briers) < 0.5)
+        expect_true(mean(four_opt_briers) > 0.1 && mean(four_opt_briers) < 0.5)
+
+        zero_wr_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(
+                match_list = zero_wr_matches[[j]],
+                y_vector = y_vector,
+                tolerance_list = tol_list
+            )$standard_error
+        }))
+        zero_opt_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(
+                match_list = zero_optimal_matches[[j]],
+                y_vector = y_vector,
+                tolerance_list = tol_list
+            )$standard_error
+        }))
+        four_wr_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(
+                match_list = four_wr_matches[[j]],
+                y_vector = y_vector,
+                tolerance_list = tol_list
+            )$standard_error
+        }))
+        four_opt_se <- unlist(lapply(1L:num_weight_vecs, function(j) {
+            regression_eval(
+                match_list = four_optimal_matches[[j]],
+                y_vector = y_vector,
+                tolerance_list = tol_list
+            )$standard_error
+        }))
+
+        expected_random <- y_tolerance_diff_ratio(
+            y_vector = y_vector,
+            tolerance_list = tol_list
+        )
+        expected_random_sd <- expected_random[["sd"]]
+        expected_zero_se <- expected_random_sd /
+            sqrt(length(zero_wr_matches[[1]]$treat_index))
+        expected_four_se <- expected_random_sd /
+            sqrt(length(four_wr_matches[[1]]$treat_index))
+
+        c(
+            zero_opt_ratio = mean(zero_opt_se) / expected_zero_se,
+            four_opt_ratio = mean(four_opt_se) / expected_four_se,
+            zero_wr_ratio = mean(zero_wr_se) / expected_zero_se,
+            four_wr_ratio = mean(four_wr_se) / expected_four_se
+        )
+    })
+
+    se_results_mat <- do.call(rbind, se_results)
+    se_results_avg <- apply(se_results_mat, 2L, mean)
 
     ## opt does great here
-    expect_true(mean(zero_opt_sd) < 0.95 * expected_random_sd)
-    expect_true(mean(four_opt_sd) < 0.95 * expected_random_sd)
+    expect_true(se_results_avg["zero_opt_ratio"] < 0.90)
+    expect_true(se_results_avg["four_opt_ratio"] < 0.90)
 
     ## wr not as good on this metric, as expected, since we repeat controls
-    ## might be worth looking into that more # TODO
+    ## should beat expected though
+    ## avg around 0.9, but using 0.99 for tests so it
+    ## passes with high prob
+    expect_true(se_results_avg["zero_wr_ratio"] < 0.99)
+    expect_true(se_results_avg["four_wr_ratio"] < 0.99)
 })
 
 
-test_that("testing sink_brier_bipartite_matches", {
+test_that("testing brier_bipartite_matches", {
     rows <- 100L
     num_weight_vecs <- 5L
     x_mat <- cbind(rnorm(rows),
@@ -487,11 +481,6 @@ test_that("testing sink_brier_bipartite_matches", {
                                              45L)
     y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
     cov_x <- covariance_with_ranks(x_mat)
-
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,
@@ -504,7 +493,7 @@ test_that("testing sink_brier_bipartite_matches", {
                                             match_method = "with_replacement",
                                             n_sinks = c(0L, 4L))
 
-    sink_brier_wr_matches <- sink_brier_bipartite_matches(
+    brier_wr_matches <- brier_bipartite_matches(
         x_mat = x_mat,
         cov_x = cov_x,
         weight_list = weight_vecs,
@@ -513,75 +502,131 @@ test_that("testing sink_brier_bipartite_matches", {
         n_sinks = c(0L, 4L),
         silent = TRUE)
 
-    expect_true(all(lengths(sink_brier_wr_matches) == 2L))
+    expect_true(all(lengths(brier_wr_matches) == 2L))
     expect_true(all(lengths(
-        sink_brier_wr_matches[["matches_by_sinks"]]) == 5L))
+        brier_wr_matches[["matches_by_sinks"]]) == 5L))
     expect_true(all(lengths(
-        sink_brier_wr_matches[["briers_by_sinks"]]) == 5L))
+        brier_wr_matches[["briers_by_sinks"]]) == 5L))
 
-    expect_equal(all_wr_matches[[3]][["0"]],
-                 sink_brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
-    expect_equal(all_wr_matches[[5]][["1"]],
-                 sink_brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
+    expect_equal(all_wr_matches[["0"]][[3]],
+                 brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
+    expect_equal(all_wr_matches[["1"]][[5]],
+                 brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
 
-    brier_scores <- unlist(sink_brier_wr_matches[["briers_by_sinks"]])
+    brier_scores <- unlist(brier_wr_matches[["briers_by_sinks"]])
+    expect_true(all(0 < brier_scores & brier_scores < 1))
+    expect_true(all(abs(brier_scores - 0.25) < 0.15))
+})
+
+
+test_that("testing brier_nonbipartite_matches", {
+    treat_effect <- 0.3
+    rows <- 200L
+    num_weight_vecs <- 5L
+    x_mat <- cbind(rnorm(rows),
+                   runif(rows))
+    tol_vec <- runif(rows) + x_mat[, 1L]
+    y_vector <- x_mat[, 1L] + x_mat[, 2L] + tol_vec * treat_effect + rnorm(rows)
+    cov_x <- covariance_with_ranks(x_mat)
+
+    tol_list <- gen_tolerance_list(
+        tolerance_vec = tol_vec
+    )
+
+    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
+                                           number_vectors = num_weight_vecs,
+                                           minimum_weights = c(0.1, 0.1))
+
+    all_wr_matches <- all_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = c(0L, 4L)
+    )
+
+    brier_wr_matches <- brier_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = c(0L, 4L),
+        silent = TRUE
+    )
+
+    expect_true(all(lengths(brier_wr_matches) == 2L))
+    expect_true(all(lengths(
+        brier_wr_matches[["matches_by_sinks"]]) == 5L))
+    expect_true(all(lengths(
+        brier_wr_matches[["briers_by_sinks"]]) == 5L))
+
+    expect_equal(all_wr_matches[["0"]][[3]],
+                 brier_wr_matches[["matches_by_sinks"]][["0"]][[3]])
+    expect_equal(all_wr_matches[["1"]][[5]],
+                 brier_wr_matches[["matches_by_sinks"]][["1"]][[5]])
+
+    brier_scores <- unlist(brier_wr_matches[["briers_by_sinks"]])
     expect_true(all(0 < brier_scores & brier_scores < 1))
     expect_true(all(abs(brier_scores - 0.25) < 0.15))
 })
 
 
 test_that("testing permutation_matches", {
+    ## ------------------------------------
+    ## bipartite
     rows <- 40L
     num_weight_vecs <- 3L
+    n_sinks_vec <- c(0L, 4L)
+    treat_effect <- 0.3
+
     x_mat <- cbind(rnorm(rows),
                    runif(rows))
     treat_vec <- (1L:rows) %in% fixed_sample(1L:rows,
                                              15L)
-    y_vector <- x_mat[, 1] + x_mat[, 2] + treat_vec * 0.3
+    ## don't need it here
+    ## y_vector <- tol_vec * treat_effect + <x stuff> + <noise>
     cov_x <- covariance_with_ranks(x_mat)
-
-    some_dist_mat <- weighted_mahal(x_mat,
-                                    cov_x = cov_x,
-                                    weight_vec = c(0.66, 0.33),
-                                    treat_vec = treat_vec)
 
     weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
                                            number_vectors = num_weight_vecs,
                                            minimum_weights = c(0.1, 0.1))
 
-    sink_brier_wr_matches <- sink_brier_bipartite_matches(
+    brier_wr_matches <- brier_bipartite_matches(
         x_mat = x_mat,
         cov_x = cov_x,
         weight_list = weight_vecs,
         treat_vec = treat_vec,
         match_method = "with_replacement",
-        n_sinks = c(0L, 4L),
+        n_sinks = n_sinks_vec,
         silent = TRUE)
 
     permutation_result <- permutation_matches(
-        matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
-        briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
         x_mat = x_mat,
-        n_sinks = c(0L, 4L))
+        n_sinks = n_sinks_vec)
 
     perm_briers <- permutation_result[["permutation_brier_scores"]]
     best_matches <- permutation_result[["best_matches"]]
 
-    expect_equal(lengths(perm_briers), c(3L, 3L))
-    expect_equal(lengths(best_matches), c(4L, 4L))
+    expect_equal(lengths(unname(perm_briers)),
+                 rep(num_weight_vecs, times = length(n_sinks_vec)))
+    expect_equal(length(best_matches), length(n_sinks_vec))
     expect_equal(names(best_matches[[1]]),
                  c("n_sinks", "raw_brier", "permutation_brier", "match_list"))
 
     expect_true(all(0 <= unlist(perm_briers) & unlist(perm_briers) <= 1))
 
-    ## ------------------------------------
+    ## ----------------
     ## and if we don't want to approximate (very slow!):
 
     long_permutation_result <- permutation_matches(
-        matches_by_sinks = sink_brier_wr_matches[["matches_by_sinks"]],
-        briers_by_sinks = sink_brier_wr_matches[["briers_by_sinks"]],
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
         x_mat = x_mat,
-        n_sinks = c(0L, 4L),
+        n_sinks = n_sinks_vec,
         approximate_by_best = FALSE
     )
     long_perm_briers <- long_permutation_result[["permutation_brier_scores"]]
@@ -593,5 +638,65 @@ test_that("testing permutation_matches", {
     abs_perc_diff <- 2 * abs(approx_scores - full_scores) /
         abs(approx_scores + full_scores)
 
-    expect_true(mean(abs_perc_diff) < 0.1)
+    expect_true(mean(abs_perc_diff) < 0.2)
+
+    ## ------------------------------------
+    ## nonbipartite
+
+    treat_effect <- 0.3
+    rows <- 200L
+    num_weight_vecs <- 5L
+    n_sinks_vec <- c(0L, 4L)
+
+    x_mat <- cbind(rnorm(rows),
+                   runif(rows))
+    tol_vec <- runif(rows) + x_mat[, 1L]
+    ## don't need it here
+    ## y_vector <- tol_vec * treat_effect + <x stuff> + <noise>
+    cov_x <- covariance_with_ranks(x_mat)
+
+    tol_list <- gen_tolerance_list(
+        tolerance_vec = tol_vec
+    )
+
+    weight_vecs <- generate_random_weights(prior_weights = c(2, 1),
+                                           number_vectors = num_weight_vecs,
+                                           minimum_weights = c(0.1, 0.1))
+
+    brier_wr_matches <- brier_nonbipartite_matches(
+        x_mat = x_mat,
+        cov_x = cov_x,
+        weight_list = weight_vecs,
+        tolerance_list = tol_list,
+        match_method = "with_replacement",
+        n_sinks = n_sinks_vec,
+        silent = TRUE
+    )
+
+    ## wrong number of sinks
+    expect_error(
+        permutation_matches(
+            matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+            briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
+            x_mat = x_mat,
+            n_sinks = n_sinks_vec[1]
+        )
+    )
+
+    permutation_result <- permutation_matches(
+        matches_by_sinks = brier_wr_matches[["matches_by_sinks"]],
+        briers_by_sinks = brier_wr_matches[["briers_by_sinks"]],
+        x_mat = x_mat,
+        n_sinks = n_sinks_vec)
+
+    perm_briers <- permutation_result[["permutation_brier_scores"]]
+    best_matches <- permutation_result[["best_matches"]]
+
+    expect_equal(lengths(unname(perm_briers)),
+                 rep(num_weight_vecs, times = length(n_sinks_vec)))
+    expect_equal(length(best_matches), length(n_sinks_vec))
+    expect_equal(names(best_matches[[1]]),
+                 c("n_sinks", "raw_brier", "permutation_brier", "match_list"))
+
+    expect_true(all(0 <= unlist(perm_briers) & unlist(perm_briers) <= 1))
 })

@@ -11,7 +11,7 @@ all_bipartite_matches(
   weight_list,
   treat_vec,
   match_method = c("with_replacement", "optimal", "greedy"),
-  n_sinks = 0,
+  n_sinks = 0L,
   caliper_list = gen_caliper_list(),
   propensity_list = match_propensity_list(NULL),
   sqrt_mahal = TRUE,
@@ -25,7 +25,7 @@ all_bipartite_matches(
 This means it's possible that \code{cov(x_mat)} is not equal to
 \code{cov_x}; see \code{covariance_with_ranks} for more details.}
 
-\item{weight_list}{list of weight vectors. See `generate_random_weights` to
+\item{weight_list}{list of weight vectors. See \code{generate_random_weights} to
 automatically generate a reasonable set of vectors.}
 
 \item{treat_vec}{Logical (or 1/0) vector, indicating treatment (or control).}

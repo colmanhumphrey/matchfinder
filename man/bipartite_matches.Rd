@@ -9,7 +9,8 @@ bipartite_matches(
   treat_vec,
   match_method = c("with_replacement", "optimal", "greedy"),
   n_sinks = NULL,
-  tol_val = NULL
+  tol_val = NULL,
+  weight_vec = NULL
 )
 }
 \arguments{
@@ -21,11 +22,11 @@ bipartite_matches(
 \item{match_method}{This enum corresponds to the three matching methods
 discussed above:
 \describe{
-  \item{"with_replacement"}{Finds smallest control for each treatment}
-  \item{"greedy"}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{"optimal"}{Minimum total distance}
+\item{"with_replacement"}{Finds smallest control for each treatment}
+\item{"greedy"}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{"optimal"}{Minimum total distance}
 }}
 
 \item{n_sinks}{how many sinks to use; can be vector. Note that for greedy and
@@ -37,27 +38,37 @@ Default NULL to match all and ignore sinks.}
 is acceptable to be from the true optimal value? Speed with large value,
 accuracy with small. Only relevant for \code{!with_replacement && !greedy}.
 Default 1e-4 is reasonable in many cases.}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \value{
-basic return value is a list with five elements:
-  \describe{
-    \item{\code{treat_index}}{index of treated units, from all units}
-    \item{\code{treat_index_within}}{index of treated units, from the set of treated}
-    \item{\code{control_index}}{index of control units, from all units}
-    \item{\code{control_index_within}}{index of control units, from the set of control}
-    \item{\code{distance}}{distances between the pairs}
-  }
-  If \code{n_sinks} is not NULL, you'll get a list of such objects, each
-  with an extra element: the number of sinks used.
+basic return value is a list with five elements and an optional sixth:
+\describe{
+\item{\code{treat_index}}{index of treated units, from all units}
+\item{\code{treat_index_within}}{index of treated units,
+from the set of treated}
+\item{\code{control_index}}{index of control units, from all units}
+\item{\code{control_index_within}}{index of control units,
+from the set of control}
+\item{\code{distance}}{distances between the pairs}
+\item{\code{weight_vec}}{weight vector used to generate
+\code{dist_mat} if supplied}
+}
+You'll get a list of such objects, each
+with an extra element: the number of sinks used. If you
+have \code{n_sinks} as \code{NULL}, then it'll default to
+a single sink value: zero.
 }
 \description{
 Generates matched pairs either:
 \describe{
-  \item{With Replacement}{Finds smallest control for each treatment}
-  \item{Without Replacement, Greedy}{Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.}
-  \item{Without Replacement, Optimally}{Minimum total distance}
+\item{With Replacement}{Finds smallest control for each treatment}
+\item{Without Replacement, Greedy}{Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.}
+\item{Without Replacement, Optimally}{Minimum total distance}
 }
 If you're happy to use control units potentially multiple times,
 then the first way is fast and optimal.

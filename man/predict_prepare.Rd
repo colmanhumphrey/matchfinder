@@ -15,10 +15,10 @@ predict_prepare(
 
 \item{index_list}{list of indices to use in the matching:
 \describe{
-  \item{\code{treat_train}}{Index of treated units for the training matrix}
-  \item{\code{control_train}}{Index of control units for the training matrix}
-  \item{\code{treat_test}}{Index of treated units for the test matrix}
-  \item{\code{control_test}}{Index of control units for the test matrix}
+\item{\code{treat_train}}{Index of treated units for the training matrix}
+\item{\code{control_train}}{Index of control units for the training matrix}
+\item{\code{treat_test}}{Index of treated units for the test matrix}
+\item{\code{control_test}}{Index of control units for the test matrix}
 }}
 
 \item{design}{The design matrix form do you want to use.
@@ -30,7 +30,7 @@ pair will correspond with the \eqn{i^{\text{th}}} row of each),
 and thus each matrix will have dimension \eqn{m \times k},
 where \eqn{2m \leq n}.
 \describe{
-  \item{\code{"cross_all"}}{
+\item{\code{"cross_all"}}{
 This will form the \eqn{2m \times 2k} matrix, by having each matched pair
 give two rows in the design matrix: each of the two
 rows will contain the full treated row of the given pair along with the full
@@ -38,32 +38,32 @@ control row, but in one row the pair will be (treated, control), and in the othe
 (control, treated). For these two rows, the output vector will contain a 1 and a 0
 respectively. We construct the following inputs:
 \deqn{X =
-  \begin{bmatrix}
-  X_t& X_c \\
-  X_c& X_t \\
-  \end{bmatrix}, Y = [1 1 \ldots 1 0 0 \ldots 0]'
-}
+    \begin{bmatrix}
+    X_t& X_c \\
+    X_c& X_t \\
+    \end{bmatrix}, Y = [1 1 \ldots 1 0 0 \ldots 0]'
+  }
 For the test data, we'll only (WLOG more or less) give the (treat, control)
 version, for consistency in evaluation.
 }
-   \item{\code{"cross_random"}}{
+\item{\code{"cross_random"}}{
 This is similar to the above, except instead of forming all rows in both
 ways, we choose (for each pair) between (treated, control) and
 (control, treated) randomly. So
 \deqn{Y_i =
-\begin{cases}
-1 & \text{with probability} 0.5 \\
-0 & \text{with probability} 0.5
-\end{cases}}
+  \begin{cases}
+  1 & \text{with probability} 0.5 \\
+  0 & \text{with probability} 0.5
+  \end{cases}}
 And (\eqn{X_i} here meaning the \eqn{i^{\text{th}}} row of the design matrix):
 \deqn{X_i =
-\begin{cases}
-((X_t)_i, (X_c)_i) & Y_i = 1 \\
-((X_c)_i, (X_t)_i) & Y_i = 0
-\end{cases}}
+  \begin{cases}
+  ((X_t)_i, (X_c)_i) & Y_i = 1 \\
+  ((X_c)_i, (X_t)_i) & Y_i = 0
+  \end{cases}}
 Giving an \eqn{m \times 2k} design matrix.
 }
-  \item{\code{"differences_random"}}{For
+\item{\code{"differences_random"}}{For
 each pair, our design row will be
 the row in \code{x_mat} corresponding to
 one unit minus the row corresponding to the
@@ -73,16 +73,16 @@ be subtracted from the other based on that, and we'll end up with
 an \eqn{m \times k} matrix.
 That is:
 \deqn{Y_i =
-\begin{cases}
-1 & \text{with probability} 0.5 \\
-0 & \text{with probability} 0.5
-\end{cases}}
+  \begin{cases}
+  1 & \text{with probability} 0.5 \\
+  0 & \text{with probability} 0.5
+  \end{cases}}
 And:
 \deqn{X_i =
-\begin{cases}
-(X_t)_i - (X_c)_i & Y_i = 1 \\
-(X_c)_i - (X_t)_i & Y_i = 0
-\end{cases}}
+  \begin{cases}
+  (X_t)_i - (X_c)_i & Y_i = 1 \\
+  (X_c)_i - (X_t)_i & Y_i = 0
+  \end{cases}}
 Note that if your \code{x_mat} contains an intercept, it'll
 now be a column of zeroes.
 }
@@ -97,11 +97,11 @@ all differences are returned as \eqn{(X_t)_i - (X_c)_i}
 }
 \value{
 list:
-  \describe{
-    \item{\code{x_train}}{Design matrix for training}
-    \item{\code{x_test}}{Design matrix for testing}
-    \item{\code{y_train}}{Training outcome vector}
-    \item{\code{y_test}}{Test outcome vector}
+\describe{
+\item{\code{x_train}}{Design matrix for training}
+\item{\code{x_test}}{Design matrix for testing}
+\item{\code{y_train}}{Training outcome vector}
+\item{\code{y_test}}{Test outcome vector}
 }
 }
 \description{

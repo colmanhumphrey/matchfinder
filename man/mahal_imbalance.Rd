@@ -31,10 +31,10 @@ or the square root? (in weighted, \eqn{\Sigma^{-1}} becomes
 \eqn{W \Sigma^{-1} W} in the above)}
 
 \item{match_list}{Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`}
+exactly one of this param or \code{match_list_list}}
 
 \item{match_list_list}{list of match_list results; provide
-exactly one of this param or `match_list`}
+exactly one of this param or \code{match_list}}
 }
 \value{
 a vector of mahalanobis distances

@@ -15,7 +15,7 @@ gen_tolerance_list(
 vector that we use to form
 non-bipartite matches: units i and j can be matched if
 \eqn{\mid \texttt{tolerance_vec}[i] - \texttt{tolerance_vec}[j]\mid >
-\texttt{tolerance_min}}.}
+  \texttt{tolerance_min}}.}
 
 \item{tolerance_min}{See above for what this does - blocks
 matches that are too close on \code{tolerance_vec}. Something like minimum
@@ -31,7 +31,7 @@ day?}
 }
 \value{
 Either \code{NULL}, or a list with the same names as the input,
-  with validated values.
+with validated values.
 }
 \description{
 Note that we will always block equal equality on the tolerance

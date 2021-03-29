@@ -418,3 +418,117 @@ test_that("testing tolerance_check", {
     expect_true(grepl("a further \\d{1,3} pairs have min constraint violated",
                       random_tol[["message"]]))
 })
+
+
+test_that("test build_index_vector", {
+    expect_error(build_index_vector(matrix(1:10, 2, 5)))
+    expect_error(build_index_vector(list(1, 2, 3)))
+    expect_error(
+        build_index_vector(c(1, 2, 3)),
+        NA
+    )
+
+    ## ------------------------------------
+    ## with no duplicates, we get an empty (named) list
+
+    unique_vec <- c("hello", "I", "don't", "have", "duplicates")
+    expect_equal(
+        build_index_vector(unique_vec),
+        setNames(list(), nm = character(0))
+    )
+
+    ## ------------------------------------
+    repeat_each <- rep(unique_vec, each = 2) ## hello, hello, I, I...
+    repeat_times <- rep(unique_vec, times = 2) ## hello, I, ..., hello, I, ...
+
+    each_list <- build_index_vector(repeat_each)
+    times_list <- build_index_vector(repeat_times)
+
+    expect_equal(
+        each_list[["hello"]],
+        c(1L, 2L)
+    )
+
+    expect_equal(
+        times_list[["hello"]],
+        c(1L, 1L + length(unique_vec))
+    )
+
+    expect_equal(
+        length(times_list),
+        length(each_list)
+    )
+
+    ## each is repeated
+    expect_equal(
+        length(times_list),
+        length(unique_vec)
+    )
+
+    ## ------------------------------------
+    ## some last tests
+
+    some_vec <- c(5L, 10L, rep(100L, 1000L))
+    some_res <- build_index_vector(some_vec)
+
+    expect_equal(
+        length(some_res),
+        1L
+    )
+
+    expect_equal(
+        names(some_res),
+        "100"
+    )
+
+    expect_equal(
+        some_res[["100"]],
+        3L:1002L
+    )
+})
+
+test_that("test pair_indexing", {
+    expect_error(
+        pair_indexing(c(1L, 2L, 3L))
+    )
+    expect_error(
+        pair_indexing(list(c(1L, 2L, 3L))),
+        NA
+    )
+
+    ## ------------------------------------
+    ## small test
+    test_list <- list(
+        "colman" = c(1L, 5L, 10L),
+        "3" = c(2L, 4L),
+        "hello" = c(9L, 10L) ## no harm in repeats across vectors
+    )
+
+    test_res <- pair_indexing(test_list)
+
+    expected_rows <- sum(unlist(lapply(test_list, function(x) {
+        ## every pair, and in both directions
+        2L * choose(length(x), 2L)
+    })))
+
+    expect_equal(
+        nrow(test_res),
+        expected_rows
+    )
+
+    ## ------------------------------------
+    ## with repeats in the vector
+
+    rep_list <- list(
+        "normal" = c(1L, 2L, 100L),
+        "badness" = c(5L, 5L, 5L, 10L)
+    )
+
+    expect_error(
+        pair_indexing(rep_list)
+    )
+    expect_error(
+        pair_indexing(rep_list[1]),
+        NA
+    )
+})

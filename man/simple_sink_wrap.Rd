@@ -5,7 +5,7 @@
 \title{Wraps a match_list from a simple match result and slices off
 various numbers of sinks}
 \usage{
-simple_sink_wrap(simple_match_list, n_sinks = NULL)
+simple_sink_wrap(simple_match_list, n_sinks = NULL, weight_vec = NULL)
 }
 \arguments{
 \item{simple_match_list}{match result from one of \code{with_replacement_match},
@@ -13,6 +13,10 @@ simple_sink_wrap(simple_match_list, n_sinks = NULL)
 \code{greedy_nbp_match}.}
 
 \item{n_sinks}{default NULL, vector of sink values to use.}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \value{
 list of lists; see parent function

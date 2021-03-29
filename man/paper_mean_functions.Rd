@@ -9,12 +9,12 @@ paper_mean_functions()
 }
 \value{
 List of four functions that take in a matrix and
-  output a vector of means:
+output a vector of means:
 \describe{
-  \item{\code{constant_mu}}{Vector of zeroes}
-  \item{\code{linear_mu}}{The matrix multiplied by a random vector.}
-  \item{\code{sign_mu}}{Literally \code{sign(x_mat[, 1])}}
-  \item{\code{non_linear_mu}}{Messy non-linear function of the data matrix}
+\item{\code{constant_mu}}{Vector of zeroes}
+\item{\code{linear_mu}}{The matrix multiplied by a random vector.}
+\item{\code{sign_mu}}{Literally \code{sign(x_mat[, 1])}}
+\item{\code{non_linear_mu}}{Messy non-linear function of the data matrix}
 }
 }
 \description{

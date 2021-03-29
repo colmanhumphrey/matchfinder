@@ -5,7 +5,7 @@
 \title{Given a vector of sink values, generates an optimal match
 for each.}
 \usage{
-optimal_sink_wrap(dist_mat, treat_vec, n_sinks, tol_val)
+optimal_sink_wrap(dist_mat, treat_vec, n_sinks, tol_val, weight_vec = NULL)
 }
 \arguments{
 \item{dist_mat}{Matrix of pairwise distances.}
@@ -19,6 +19,10 @@ optimal_sink_wrap(dist_mat, treat_vec, n_sinks, tol_val)
 is acceptable to be from the true optimal value? Speed with large value,
 accuracy with small. Only relevant for \code{!with_replacement && !greedy}.
 Default 1e-4 is reasonable in many cases.}
+
+\item{weight_vec}{Default \code{NULL}: optionally supply the weight vector
+used to generate \code{dist_mat} and it'll be returned in the
+\code{match_list} generated from this function}
 }
 \value{
 list of lists; see parent function

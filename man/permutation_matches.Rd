@@ -9,7 +9,7 @@ permutation_matches(
   matches_by_sinks,
   briers_by_sinks,
   x_mat,
-  n_sinks,
+  n_sinks = 0L,
   approximate_by_best = TRUE,
   silent = !interactive()
 )
@@ -37,9 +37,9 @@ time.}
 }
 \value{
 Returns a list of two lists. The first is vectors
-  of permutation Brier scores (one per match). The second is the
-  best match at each sink value, along with some extra info about that
-  match.
+of permutation Brier scores (one per match). The second is the
+best match at each sink value, along with some extra info about that
+match.
 }
 \description{
 Can work for bipartite or non-bipartite matches,

@@ -11,7 +11,7 @@ permutation_brier(
   design = "cross_all",
   use_cv = TRUE,
   num_permutations = 100L,
-  match_predict_function = match_predict_xgb,
+  match_predict_function = match_predict_xgb(),
   num_folds = 5,
   train_fraction = 0.7
 )

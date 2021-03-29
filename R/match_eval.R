@@ -91,14 +91,17 @@ match_estimate_tolerance <- function(match_list,
 #' function to use, generates brier score
 #'
 #' @param train_test_list output from \code{predict_prepare}
-#' @param match_predict_function function to predict treated unit
+#' @param match_predict_function function to predict treated unit,
+#'   see e.g. \code{match_predict_xgb}
+#'   (produces the default on calling) or
+#'   \code{match_predict_linear}
 #' @param avg logical, default TRUE: should we average (or sum) the briers?
 #' @return result from \code{calc_brier}, length-one double
 #' @author Colman Humphrey
 #'
 #' @export
 brier_score <- function(train_test_list,
-                        match_predict_function = match_predict_xgb,
+                        match_predict_function = match_predict_xgb(),
                         avg = TRUE) {
     calc_brier(match_predict_function(train_test_list),
         train_test_list[["y_test"]],
@@ -119,7 +122,7 @@ brier_score_split <- function(x_mat,
                               match_list,
                               design = "cross_all",
                               train_fraction = 0.7,
-                              match_predict_function = match_predict_xgb) {
+                              match_predict_function = match_predict_xgb()) {
     brier_score(predict_prepare(
         x_mat,
         generate_train_test_split(match_list, train_fraction),
@@ -143,7 +146,7 @@ brier_score_cv <- function(x_mat,
                            match_list,
                            design = "cross_all",
                            num_folds = 5,
-                           match_predict_function = match_predict_xgb) {
+                           match_predict_function = match_predict_xgb()) {
     k_fold_lists <- generate_k_fold_index(
         match_list,
         num_folds
@@ -191,7 +194,7 @@ permutation_brier <- function(x_mat,
                               design = "cross_all",
                               use_cv = TRUE,
                               num_permutations = 100L,
-                              match_predict_function = match_predict_xgb,
+                              match_predict_function = match_predict_xgb(),
                               num_folds = 5,
                               train_fraction = 0.7) {
     if (use_cv) {

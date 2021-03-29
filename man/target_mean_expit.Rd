@@ -14,7 +14,7 @@ target_mean_expit(target_mean, linear_vector)
 }
 \value{
 \code{expit(linear_vector + a)} for some \code{a} such that
-  \code{mean(expit(linear_vector + a))} is close to \code{target_mean}.
+\code{mean(expit(linear_vector + a))} is close to \code{target_mean}.
 }
 \description{
 Shifts the linear component until the mean of the

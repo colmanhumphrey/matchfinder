@@ -15,7 +15,7 @@ propensity_score(x_mat, treat_vec, propensity_list = gen_propensity_list())
 }
 \value{
 Returns a vector equal in length to treat_vec of propensity.
-  score.
+score.
 }
 \description{
 This function takes in an input matrix and a treatment vector,

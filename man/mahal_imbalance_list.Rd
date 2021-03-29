@@ -11,7 +11,7 @@ mahal_imbalance_list(x_mat, match_list, chol_mat, weight_vec, sqrt_mahal)
 already rank-adjusted if desired}
 
 \item{match_list}{Result of any of the matching methods; provide
-exactly one of this param or `match_list_list`}
+exactly one of this param or \code{match_list_list}}
 
 \item{chol_mat}{}
 

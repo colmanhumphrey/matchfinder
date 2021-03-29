@@ -9,7 +9,7 @@ brier_score_split(
   match_list,
   design = "cross_all",
   train_fraction = 0.7,
-  match_predict_function = match_predict_xgb
+  match_predict_function = match_predict_xgb()
 )
 }
 \arguments{

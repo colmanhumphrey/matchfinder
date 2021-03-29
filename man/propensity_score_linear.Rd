@@ -2,22 +2,19 @@
 % Please edit documentation in R/propensity.R
 \name{propensity_score_linear}
 \alias{propensity_score_linear}
-\title{Function to predict treatment using \code{glm} (binomial) or \code{lm}}
+\title{Function factory to predict treatment using \code{glm} (binomial)
+or \code{lm}}
 \usage{
-propensity_score_linear(train_test_list, use_lm_approx = FALSE)
-}
-\arguments{
-\item{train_test_list}{list with \code{x_train}, \code{x_test},
-\code{y_train}, \code{y_test}}
-
-\item{use_lm_approx}{logical, default FALSE; do you want to use
-just `lm` instead of `glm`?}
+propensity_score_linear(use_linear_lm = FALSE)
 }
 \value{
-returns a vector of predictions for the test data
+returns a function that accepts \code{train_test_list}
+and this returns a vector of predictions for the test data
 }
 \description{
 Does simple wrap around \code{glm} / \code{lm}
+The returned function accepts one parameter, \code{train_test_list},
+a list with \code{x_train}, \code{x_test}, \code{y_train}, \code{y_test}
 }
 \author{
 Colman Humphrey

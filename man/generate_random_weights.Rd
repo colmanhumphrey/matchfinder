@@ -26,13 +26,13 @@ weights on top of that.}
 
 \item{hierarchical_list}{List per group / category of variable:
 \describe{
-  \item{\code{"index"}}{Vector of indices that this group corresponds with}
-  \item{\code{"weight"}}{Weight for this group}
-  \item{\code{"variance"}}{(Optional) how much variance you want this group
+\item{\code{"index"}}{Vector of indices that this group corresponds with}
+\item{\code{"weight"}}{Weight for this group}
+\item{\code{"variance"}}{(Optional) how much variance you want this group
 to have}
 }
 If you use this, we'll still combine it with
-`prior_weights` and `minimum_weights`}
+\code{prior_weights} and \code{minimum_weights}}
 }
 \value{
 list of weight vectors

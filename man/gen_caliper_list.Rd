@@ -19,7 +19,7 @@ the max.}
 }
 \value{
 Either \code{NULL}, or a list with the same names as the input, after checking
-  values.
+values.
 }
 \description{
 Simple wrapper to unify caliper input

@@ -36,16 +36,25 @@
 #'   is acceptable to be from the true optimal value? Speed with large value,
 #'   accuracy with small. Only relevant for \code{!with_replacement && !greedy}.
 #'   Default 1e-4 is reasonable in many cases.
-#' @return basic return value is a list with five elements:
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
+#' @return basic return value is a list with five elements and an optional sixth:
 #'   \describe{
 #'     \item{\code{treat_index}}{index of treated units, from all units}
-#'     \item{\code{treat_index_within}}{index of treated units, from the set of treated}
+#'     \item{\code{treat_index_within}}{index of treated units,
+#'           from the set of treated}
 #'     \item{\code{control_index}}{index of control units, from all units}
-#'     \item{\code{control_index_within}}{index of control units, from the set of control}
+#'     \item{\code{control_index_within}}{index of control units,
+#'           from the set of control}
 #'     \item{\code{distance}}{distances between the pairs}
+#'     \item{\code{weight_vec}}{weight vector used to generate
+#'           \code{dist_mat} if supplied}
 #'   }
-#'   If \code{n_sinks} is not NULL, you'll get a list of such objects, each
-#'   with an extra element: the number of sinks used.
+#'   You'll get a list of such objects, each
+#'   with an extra element: the number of sinks used. If you
+#'   have \code{n_sinks} as \code{NULL}, then it'll default to
+#'   a single sink value: zero.
 #' @author Colman Humphrey
 #' @export
 bipartite_matches <- function(dist_mat,
@@ -56,14 +65,15 @@ bipartite_matches <- function(dist_mat,
                                   "greedy"
                               ),
                               n_sinks = NULL,
-                              tol_val = NULL) {
+                              tol_val = NULL,
+                              weight_vec = NULL) {
     stopifnot(is.matrix(dist_mat))
     stopifnot(min(dist_mat) >= 0)
 
     match_method <- match.arg(match_method)
 
-    ## in case of logical
-    treat_vec <- treat_vec * 1L
+    ## in case of logical, or double
+    treat_vec <- as.integer(treat_vec * 1L)
 
     stopifnot(all(unique(treat_vec) %in% c(0L, 1L)))
     stopifnot(length(treat_vec) == (nrow(dist_mat) + ncol(dist_mat)))
@@ -97,7 +107,8 @@ bipartite_matches <- function(dist_mat,
                 dist_mat,
                 treat_vec
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -107,7 +118,8 @@ bipartite_matches <- function(dist_mat,
                 dist_mat,
                 treat_vec
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -115,7 +127,8 @@ bipartite_matches <- function(dist_mat,
         dist_mat,
         treat_vec,
         n_sinks,
-        tol_val
+        tol_val,
+        weight_vec
     )
 }
 
@@ -124,21 +137,21 @@ bipartite_matches <- function(dist_mat,
 #' @keywords internal
 with_replacement_match <- function(dist_mat,
                                    treat_vec) {
-    control_index <- which(treat_vec == 0)
+    control_index <- which(treat_vec == 0L)
 
     match_list <- list(
-        treat_index = which(treat_vec == 1),
-        treat_index_within = 1:sum(treat_vec)
+        treat_index = which(treat_vec == 1L),
+        treat_index_within = seq_len(sum(treat_vec))
     )
 
     matched_vec <- apply(dist_mat, 1, function(x) {
-        which(rank(x, ties.method = "random") == 1)
+        which(rank(x, ties.method = "random") == 1L)
     })
 
     match_list[["control_index"]] <- control_index[matched_vec]
     match_list[["control_index_within"]] <- matched_vec
     match_list[["distance"]] <- dist_mat[cbind(
-        1:nrow(dist_mat),
+        seq_len(nrow(dist_mat)),
         matched_vec
     )]
 
@@ -148,10 +161,10 @@ with_replacement_match <- function(dist_mat,
 #' @keywords internal
 greedy_match <- function(dist_mat,
                          treat_vec) {
-    control_index <- which(treat_vec == 0)
+    control_index <- which(treat_vec == 0L)
 
     match_list <- list(
-        treat_index = which(treat_vec == 1),
+        treat_index = which(treat_vec == 1L),
         treat_index_within = 1:sum(treat_vec)
     )
 
@@ -202,19 +215,19 @@ optimal_match <- function(dist_mat,
         ## sinks are zeros
         matrix(0, nrow = nrow(dist_mat), ncol = n_sinks)
     )
-    main_treat_index <- which(treat_vec == 1)
+    main_treat_index <- which(treat_vec == 1L)
     rownames(dist_mat_sink) <- main_treat_index
 
     all_treated <- treat_vec
     if (n_sinks > 0) {
         ## the sinks are not treated
-        all_treated <- c(treat_vec, rep(0, n_sinks))
+        all_treated <- c(treat_vec, rep(0L, n_sinks))
     }
-    all_control_index <- which(all_treated == 0)
+    all_control_index <- which(all_treated == 0L)
     colnames(dist_mat_sink) <- all_control_index
 
     treat_data <- data.frame(treated = all_treated)
-    rownames(treat_data) <- 1:nrow(treat_data)
+    rownames(treat_data) <- seq_len(nrow(treat_data))
 
     ## Matching using optmatch
     ## if need be:

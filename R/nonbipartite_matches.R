@@ -147,14 +147,19 @@ tolerance_to_caliper_list <- function(tolerance_list,
 #'   the lowest value pairs, since they'll have no control unit).
 #'   But this would form a contrast with all other methods, so we will cut
 #'   down to using half by default.
+#' @param weight_vec Default \code{NULL}: optionally supply the weight vector
+#'   used to generate \code{dist_mat} and it'll be returned in the
+#'   \code{match_list} generated from this function
 #' @return basic return value is a list with three elements:
 #'   \describe{
 #'     \item{\code{treat_index}}{index of treated units}
 #'     \item{\code{control_index}}{index of control units}
 #'     \item{\code{distance}}{distances between the pairs}
 #'   }
-#'   If \code{n_sinks} is not NULL, you'll get a list of such objects, each
+#'   You'll get a list of such objects, each
 #'   with an extra element: the number of sinks used.
+#'   If \code{n_sinks} is NULL, it'll default to using a
+#'   single value: zero.
 #' @author Colman Humphrey
 #' @export
 nonbipartite_matches <- function(dist_mat,
@@ -165,7 +170,8 @@ nonbipartite_matches <- function(dist_mat,
                                      "greedy"
                                  ),
                                  n_sinks = NULL,
-                                 keep_all_with_replacement = FALSE) {
+                                 keep_all_with_replacement = FALSE,
+                                 weight_vec = NULL) {
     stopifnot(is.matrix(dist_mat))
     stopifnot(min(dist_mat) >= 0)
 
@@ -235,7 +241,8 @@ nonbipartite_matches <- function(dist_mat,
                 tolerance_list[["tolerance_vec"]],
                 keep_all = keep_all_with_replacement
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
@@ -245,13 +252,15 @@ nonbipartite_matches <- function(dist_mat,
                 dist_mat,
                 tolerance_list[["tolerance_vec"]]
             ),
-            n_sinks
+            n_sinks,
+            weight_vec
         ))
     }
 
     optimal_nbp_sink_wrap(dist_mat,
         tolerance_vec = tolerance_list[["tolerance_vec"]],
-        n_sinks = n_sinks
+        n_sinks = n_sinks,
+        weight_vec
     )
 }
 
@@ -399,13 +408,13 @@ add_nbp_sinks <- function(dist_mat,
             ncol(dist_mat) + n_sinks
         )
         distmat_add_zeros[
-            1:nrow(dist_mat),
-            1:ncol(dist_mat)
+            seq_len(nrow(dist_mat)),
+            seq_len(ncol(dist_mat))
         ] <- dist_mat
         ## they can't match each other:
         distmat_add_zeros[
-            1:n_sinks + nrow(dist_mat),
-            1:n_sinks + ncol(dist_mat)
+            seq_len(n_sinks) + nrow(dist_mat),
+            seq_len(n_sinks) + ncol(dist_mat)
         ] <- Inf
     } else {
         distmat_add_zeros <- dist_mat

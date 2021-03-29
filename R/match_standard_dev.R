@@ -27,6 +27,7 @@ bipartite_match_sd <- function(x_mat,
             " If you do want both, create the combined caliper separately"
         )
     }
+
     ## ------------------------------------
     ## two variance components
 
@@ -89,6 +90,12 @@ bipartite_match_sd <- function(x_mat,
 }
 
 
+#' Abadie, Alberto and Guido W Imbens (2006).
+#' “Large sample properties of matching estimators
+#' for average treatment effects”.
+#' Econometrica 74.1, pp. 235–267. - see page 251.
+#' More info at “Matching on the estimated propensity score”.
+#' Econometrica 84.2, pp. 781–807.
 #' @inheritParams bipartite_match_sd
 #' @keywords internal
 gen_bipartite_repeated_variance <- function(x_mat,
@@ -107,6 +114,7 @@ gen_bipartite_repeated_variance <- function(x_mat,
 
     ## the second term should actually be K_{sq,i},
     ## but when using just one control, we have K_i = K_{sq,i}
+    ## 2020-10-05: I don't really understand the above comment
     k_sq_minus_k <- count_frame[["count"]]^2 - count_frame[["count"]]
 
     unique_control_index <- as.numeric(as.character(
@@ -170,99 +178,6 @@ gen_bipartite_repeated_variance <- function(x_mat,
 
     ## total variance due to rep
     sum(k_sq_minus_k * sigma_xw_sq) / (length(control_index) - 1)
-}
-
-#' @inheritParams match_standard_scaled_dev
-#' @keywords internal
-gen_nonbipartite_repeated_variance <- function(x_mat,
-                                               cov_x,
-                                               y_vector,
-                                               control_index,
-                                               tolerance_list =
-                                                   gen_tolerance_list(),
-                                               caliper_list =
-                                                   gen_caliper_list(),
-                                               weight_vec = NULL,
-                                               use_all_controls = TRUE,
-                                               sqrt_mahal = TRUE) {
-    count_frame <- data.frame(table(control_index))
-    names(count_frame) <- c("control_index", "count")
-
-    ## the second term should actually be K_{sq,i},
-    ## but when using just one control, we have K_i = K_{sq,i}
-    k_sq_minus_k <- count_frame[["count"]]^2 - count_frame[["count"]]
-
-    unique_control_index <- as.numeric(as.character(
-        count_frame[["control_index"]]
-    ))
-
-    ## ------------------------------------
-
-    partial_index <- list(
-        unique_control_index,
-        seq_len(nrow(x_mat))
-    )
-
-    control_dist_mat <- weighted_mahal(
-        x_mat = x_mat,
-        cov_x = cov_x,
-        weight_vec = weight_vec,
-        sqrt_mahal = sqrt_mahal,
-        partial_index = partial_index
-    )
-
-    if (!is.null(caliper_list)) {
-        caliper_full <- create_caliper(caliper_list)
-        control_dist_mat <- control_dist_mat +
-            caliper_full[cbind(
-                partial_index[[1]],
-                partial_index[[2]]
-            )]
-    }
-
-    min_control_match <- min_blocked_rank(control_dist_mat,
-        blocked_ind = unique_control_index
-    )
-
-    ## ----------------
-
-    tolerance_match <- near_given_match(
-        tolerance_list[["tolerance_vec"]],
-        given_index = unique_control_index
-    )
-
-    ## ----------------
-
-    avg_y_control_controls <- (y_vector[min_control_match] +
-        y_vector[tolerance_match]) / 2
-    avg_y_control_tols <- (
-        tolerance_list[["tolerance_vec"]][min_control_match] +
-            tolerance_list[["tolerance_vec"]][tolerance_match]) / 2
-
-    y_diffs <- y_vector[unique_control_index] -
-        avg_y_control_controls
-    tol_diffs <- tolerance_list[["tolerance_vec"]][unique_control_index] -
-        avg_y_control_tols
-
-    ## somewhat arbitrary work here:
-    if (!is.null(tolerance_list[["tolerance_min"]])) {
-        tol_diffs <- pmax(tol_diffs, tolerance_list[["tolerance_min"]])
-    } else {
-        sorted_tol <- sort(unique(tolerance_list[["tolerance_vec"]]))
-        min_tol_diff <- min(sorted_tol[2L:length(sorted_tol)] -
-            sorted_tol[1L:(length(sorted_tol) - 1L)])
-        tol_diffs <- pmax(tol_diffs, min_tol_diff)
-    }
-
-    if (!is.null(tolerance_list[["tolerance_max"]])) {
-        tol_diffs <- pmin(tol_diffs, tolerance_list[["tolerance_max"]])
-    }
-
-    ## ------------------------------------
-
-    sigma_xw_sq_both <- (2 / 3) * (y_diffs / tol_diffs)^2
-
-    sum(k_sq_minus_k * sigma_xw_sq_both) / (length(control_index) - 1)
 }
 
 
@@ -411,7 +326,9 @@ approx_ratio_sd <- function(numerator_mean,
 ##' }
 ##' And not just \eqn{y_{\text{treat}} - y_{\text{control}}} as
 ##' our "difference": here we say we're caring about the change
-##' in \eqn{y} per unit tol.
+##' in \eqn{y} per unit tol. Note that we use regression
+##' to estimate, but that is really just a statment about error
+##' assumptions.
 ##' This function estimates the standard deviation of this
 ##' if you just did random pairings **that obeyed the tolerance
 ##' rules** with min and max.
@@ -419,8 +336,6 @@ approx_ratio_sd <- function(numerator_mean,
 ##' Also yes this is a terrible function name.
 ##' @param y_vector Vector of outcomes we care about
 ##' @param tolerance_list Usual tolerance list (see \code{gen_tolerance_list})
-##' @param use_regression \code{TRUE} to use regression, \code{FALSE} to use
-##'   the ratios directly. Default \code{TRUE}.
 ##' @param samples How many samples to use. Defaults to a number between 50
 ##'   and 200, depending on the length of the various vectors
 ##' @return Returns a single number: the average of the sds of \code{samples}
@@ -430,7 +345,6 @@ approx_ratio_sd <- function(numerator_mean,
 ##' @export
 y_tolerance_diff_ratio <- function(y_vector,
                                    tolerance_list,
-                                   use_regression = TRUE,
                                    samples = NULL) {
     tol_vector <- tolerance_list[["tolerance_vec"]]
     if (length(y_vector) != length(tol_vector)) {
@@ -453,31 +367,28 @@ y_tolerance_diff_ratio <- function(y_vector,
     ##------------------------------------
 
     random_ratio_res <- lapply(tol_matches, function(match_list) {
-        return(list(
-            match_mean = match_estimate_tolerance(
-                match_list = match_list,
-                y_vector = y_vector,
-                tolerance_list = tolerance_list,
-                use_regression = use_regression
-            ),
-            match_sd = nonbipartite_match_sd_scaled(
-                x_mat = matrix(NA, 1L, 1L),  # won't use it
-                cov_x = matrix(NA, 1L, 1L),  # won't use it
-                y_vector = y_vector,
-                match_list = match_list,
-                tolerance_list = tolerance_list,
-                use_regression = use_regression
-            )
-        ))
+        regression_eval(
+            match_list = match_list,
+            y_vector = y_vector,
+            tolerance_list = tolerance_list
+        )
     })
+
+    ## even with the selection process above in good cases
+    ## we may not get all units used
+    match_lengths <- unlist(lapply(tol_matches, function(tol_match) {
+        length(tol_match$treat_index)
+    }))
+
+    se_vector <- unlist(lapply(random_ratio_res, `[[`, "standard_error"))
+    sd_vector <- se_vector * sqrt(match_lengths)
 
     list(
         mean = mean(unlist(
-            lapply(random_ratio_res, `[[`, "match_mean")
+            lapply(random_ratio_res, `[[`, "estimate")
         )),
-        sd = mean(unlist(
-            lapply(random_ratio_res, `[[`, "match_sd")
-        ))
+        se = mean(se_vector),
+        sd = mean(sd_vector)
     )
 }
 

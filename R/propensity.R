@@ -14,7 +14,7 @@
 #' @author Colman Humphrey
 #'
 #' @export
-gen_propensity_list <- function(propensity_function = propensity_score_xgb,
+gen_propensity_list <- function(propensity_function = propensity_score_xgb(),
                                 oos_propensity = FALSE,
                                 n_folds = NULL) {
     stopifnot(is_tf(oos_propensity))
@@ -54,7 +54,7 @@ gen_propensity_list <- function(propensity_function = propensity_score_xgb,
 #'   add a penalty for going above.
 #' @return list with names equal to all input params
 #' @export
-match_propensity_list <- function(propensity_function = propensity_score_xgb,
+match_propensity_list <- function(propensity_function = propensity_score_xgb(),
                                   oos_propensity = FALSE,
                                   n_folds = NULL,
                                   caliper_sd_mult = 0.6,
@@ -91,7 +91,8 @@ propensity_bipartite_matches <- function(x_mat,
                                              "optimal",
                                              "greedy"
                                          ),
-                                         propensity_list = gen_propensity_list(),
+                                         propensity_list =
+                                             gen_propensity_list(),
                                          n_sinks = 0,
                                          caliper_list = gen_caliper_list(),
                                          sqrt_mahal = TRUE,
@@ -130,8 +131,10 @@ propensity_bipartite_matches <- function(x_mat,
 #' @inheritParams all_nonbipartite_matches
 #' @param propensity_list See \code{gen_propensity_list}
 propensity_nonbipartite_matches <- function(x_mat,
-                                            tolerance_list = gen_tolerance_list(),
-                                            propensity_list = gen_propensity_list(),
+                                            tolerance_list =
+                                                gen_tolerance_list(),
+                                            propensity_list =
+                                                gen_propensity_list(),
                                             match_method = c(
                                                 "with_replacement",
                                                 "optimal",
@@ -214,55 +217,57 @@ propensity_score <- function(x_mat,
 }
 
 
-#' Function to predict treatment using xgboost
+#' Function factory to predict treatment using xgboost
 #'
 #' This operates the exact same as \code{match_predict_xgb}, which
 #' is itself quite a simple wrap of regular xgboost code.
 #' Main difference here is the input data is even simpler.
-#' @param train_test_list list with \code{x_train}, \code{x_test},
-#'   \code{y_train}, \code{y_test}
+#' The returned function accepts one parameter, \code{train_test_list},
+#' a list with \code{x_train}, \code{x_test}, \code{y_train}, \code{y_test}
 #' @inheritParams match_predict_xgb
-#' @return returns a vector of predictions for the test data
+#' @return returns a function that accepts \code{train_test_list}
+#' and this returns a vector of predictions for the test data
 #' @author Colman Humphrey
 #'
 #' @export
-propensity_score_xgb <- function(train_test_list,
-                                 nrounds = 50,
+propensity_score_xgb <- function(nrounds = 50,
                                  nthread = 1,
                                  params = list(eta = 0.1, max.depth = 3),
                                  ...) {
-    match_predict_xgb(train_test_list,
-        nrounds = nrounds,
-        nthread = nthread,
-        params = params,
-        ...
-    )
+    match_predict_xgb(nrounds = nrounds,
+                      nthread = nthread,
+                      params = params,
+                      ...)
 }
 
 
-#' Function to predict treatment using \code{glm} (binomial) or \code{lm}
+#' Function factory to predict treatment using \code{glm} (binomial)
+#' or \code{lm}
 #'
 #' Does simple wrap around \code{glm} / \code{lm}
-#' @inheritParams propensity_score_xgb
-#' @param use_lm_approx logical, default FALSE; do you want to use
-#'   just `lm` instead of `glm`?
-#' @return returns a vector of predictions for the test data
+#' The returned function accepts one parameter, \code{train_test_list},
+#' a list with \code{x_train}, \code{x_test}, \code{y_train}, \code{y_test}
+#' @inheritParams propensity_score_linear
+#' @return returns a function that accepts \code{train_test_list}
+#' and this returns a vector of predictions for the test data
 #' @author Colman Humphrey
 #'
 #' @export
-propensity_score_linear <- function(train_test_list,
-                                    use_lm_approx = FALSE) {
-    train_frame <- as.data.frame(train_test_list[["x_train"]])
-    train_frame[["y"]] <- train_test_list[["y_train"]]
+propensity_score_linear <- function(use_linear_lm = FALSE) {
+    function(train_test_list) {
+        train_frame <- as.data.frame(train_test_list[["x_train"]])
+        train_frame[["y"]] <- train_test_list[["y_train"]]
 
-    test_frame <- as.data.frame(train_test_list[["x_test"]])
+        test_frame <- as.data.frame(train_test_list[["x_test"]])
 
-    if (use_lm_approx) {
-        train_res <- lm(y ~ ., data = train_frame)
-        lin_pred <- predict(train_res, newdata = test_frame, type = "response")
-        return(pmax(pmin(lin_pred, 1), 0))
+        if (use_linear_lm) {
+            train_res <- lm(y ~ ., data = train_frame)
+            lin_pred <- predict(train_res, newdata = test_frame,
+                                type = "response")
+            return(pmax(pmin(lin_pred, 1), 0))
+        }
+
+        train_res <- glm(y ~ ., data = train_frame, family = "binomial")
+        predict(train_res, newdata = test_frame, type = "response")
     }
-
-    train_res <- glm(y ~ ., data = train_frame, family = "binomial")
-    predict(train_res, newdata = test_frame, type = "response")
 }
