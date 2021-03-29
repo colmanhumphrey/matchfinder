@@ -88,7 +88,7 @@ want to lump together (see below)" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -127,12 +127,12 @@ and set up hierarchical info if you have categories you
 want to lump together (see below)</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_random_weights</span>(
-  <span class='no'>prior_weights</span>,
-  <span class='no'>number_vectors</span>,
-  <span class='kw'>minimum_weights</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>hierarchical_list</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>generate_random_weights</span><span class='op'>(</span>
+  <span class='va'>prior_weights</span>,
+  <span class='va'>number_vectors</span>,
+  minimum_weights <span class='op'>=</span> <span class='cn'>NULL</span>,
+  hierarchical_list <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -156,20 +156,23 @@ weights on top of that.</p></td>
     </tr>
     <tr>
       <th>hierarchical_list</th>
-      <td><p>List per group / category of variable:</p><dl'>
-  <dt><code>"index"</code></dt><dd><p>Vector of indices that this group corresponds with</p></dd>
-  <dt><code>"weight"</code></dt><dd><p>Weight for this group</p></dd>
-  <dt><code>"variance"</code></dt><dd><p>(Optional) how much variance you want this group
+      <td><p>List per group / category of variable:</p><dl>
+<dt><code>"index"</code></dt><dd><p>Vector of indices that this group corresponds with</p></dd>
+<dt><code>"weight"</code></dt><dd><p>Weight for this group</p></dd>
+<dt><code>"variance"</code></dt><dd><p>(Optional) how much variance you want this group
 to have</p></dd>
 
 </dl><p>If you use this, we'll still combine it with
-`prior_weights` and `minimum_weights`</p></td>
+<code>prior_weights</code> and <code>minimum_weights</code></p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>list of weight vectors</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -186,7 +189,7 @@ to have</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

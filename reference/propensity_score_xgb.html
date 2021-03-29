@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to predict treatment using xgboost — propensity_score_xgb • matchfinder</title>
+<title>Function factory to predict treatment using xgboost — propensity_score_xgb • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,12 @@
 
 
 
-<meta property="og:title" content="Function to predict treatment using xgboost — propensity_score_xgb" />
+<meta property="og:title" content="Function factory to predict treatment using xgboost — propensity_score_xgb" />
 <meta property="og:description" content="This operates the exact same as match_predict_xgb, which
 is itself quite a simple wrap of regular xgboost code.
-Main difference here is the input data is even simpler." />
+Main difference here is the input data is even simpler.
+The returned function accepts one parameter, train_test_list,
+a list with x_train, x_test, y_train, y_test" />
 
 
 
@@ -82,7 +84,7 @@ Main difference here is the input data is even simpler." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -105,7 +107,7 @@ Main difference here is the input data is even simpler." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to predict treatment using xgboost</h1>
+    <h1>Function factory to predict treatment using xgboost</h1>
     
     <div class="hidden name"><code>propensity_score_xgb.Rd</code></div>
     </div>
@@ -113,25 +115,21 @@ Main difference here is the input data is even simpler." />
     <div class="ref-description">
     <p>This operates the exact same as <code>match_predict_xgb</code>, which
 is itself quite a simple wrap of regular xgboost code.
-Main difference here is the input data is even simpler.</p>
+Main difference here is the input data is even simpler.
+The returned function accepts one parameter, <code>train_test_list</code>,
+a list with <code>x_train</code>, <code>x_test</code>, <code>y_train</code>, <code>y_test</code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>propensity_score_xgb</span>(
-  <span class='no'>train_test_list</span>,
-  <span class='kw'>nrounds</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>nthread</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>params</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>eta</span> <span class='kw'>=</span> <span class='fl'>0.1</span>, <span class='kw'>max.depth</span> <span class='kw'>=</span> <span class='fl'>3</span>),
-  <span class='no'>...</span>
-)</pre>
+    <pre class="usage"><span class='fu'>propensity_score_xgb</span><span class='op'>(</span>
+  nrounds <span class='op'>=</span> <span class='fl'>50</span>,
+  nthread <span class='op'>=</span> <span class='fl'>1</span>,
+  params <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span>eta <span class='op'>=</span> <span class='fl'>0.1</span>, max.depth <span class='op'>=</span> <span class='fl'>3</span><span class='op'>)</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>train_test_list</th>
-      <td><p>list with <code>x_train</code>, <code>x_test</code>,
-<code>y_train</code>, <code>y_test</code></p></td>
-    </tr>
     <tr>
       <th>nrounds</th>
       <td><p>training rounds for the xgb algorithm</p></td>
@@ -149,7 +147,11 @@ most likely something like <code>eta</code> and <code>max.depth</code></p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>returns a vector of predictions for the test data</p>
+    <p>returns a function that accepts <code>train_test_list</code>
+and this returns a vector of predictions for the test data</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -166,7 +168,7 @@ most likely something like <code>eta</code> and <code>max.depth</code></p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

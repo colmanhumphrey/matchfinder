@@ -83,7 +83,7 @@ the permutation is just over the labels." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,14 +117,14 @@ permutation Brier scores and the best matches</h1>
 the permutation is just over the labels.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>permutation_matches</span>(
-  <span class='no'>matches_by_sinks</span>,
-  <span class='no'>briers_by_sinks</span>,
-  <span class='no'>x_mat</span>,
-  <span class='no'>n_sinks</span>,
-  <span class='kw'>approximate_by_best</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>silent</span> <span class='kw'>=</span> !<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()
-)</pre>
+    <pre class="usage"><span class='fu'>permutation_matches</span><span class='op'>(</span>
+  <span class='va'>matches_by_sinks</span>,
+  <span class='va'>briers_by_sinks</span>,
+  <span class='va'>x_mat</span>,
+  n_sinks <span class='op'>=</span> <span class='fl'>0L</span>,
+  approximate_by_best <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  silent <span class='op'>=</span> <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -166,9 +166,12 @@ time.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Returns a list of two lists. The first is vectors
-  of permutation Brier scores (one per match). The second is the
-  best match at each sink value, along with some extra info about that
-  match.</p>
+of permutation Brier scores (one per match). The second is the
+best match at each sink value, along with some extra info about that
+match.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -185,7 +188,7 @@ time.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

@@ -88,7 +88,7 @@ to predict if (WLOG) \(x\) is the treated unit or not." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -128,11 +128,11 @@ be nothing to do. In fact, the definition of \(f\) would likely be
 to predict if (WLOG) \(x\) is the treated unit or not.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>predict_prepare</span>(
-  <span class='no'>x_mat</span>,
-  <span class='no'>index_list</span>,
-  <span class='kw'>design</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"cross_all"</span>, <span class='st'>"cross_random"</span>, <span class='st'>"differences_random"</span>, <span class='st'>"differences_plain"</span>)
-)</pre>
+    <pre class="usage"><span class='fu'>predict_prepare</span><span class='op'>(</span>
+  <span class='va'>x_mat</span>,
+  <span class='va'>index_list</span>,
+  design <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"cross_all"</span>, <span class='st'>"cross_random"</span>, <span class='st'>"differences_random"</span>, <span class='st'>"differences_plain"</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,11 +143,11 @@ to predict if (WLOG) \(x\) is the treated unit or not.</p>
     </tr>
     <tr>
       <th>index_list</th>
-      <td><p>list of indices to use in the matching:</p><dl'>
-  <dt><code>treat_train</code></dt><dd><p>Index of treated units for the training matrix</p></dd>
-  <dt><code>control_train</code></dt><dd><p>Index of control units for the training matrix</p></dd>
-  <dt><code>treat_test</code></dt><dd><p>Index of treated units for the test matrix</p></dd>
-  <dt><code>control_test</code></dt><dd><p>Index of control units for the test matrix</p></dd>
+      <td><p>list of indices to use in the matching:</p><dl>
+<dt><code>treat_train</code></dt><dd><p>Index of treated units for the training matrix</p></dd>
+<dt><code>control_train</code></dt><dd><p>Index of control units for the training matrix</p></dd>
+<dt><code>treat_test</code></dt><dd><p>Index of treated units for the test matrix</p></dd>
+<dt><code>control_test</code></dt><dd><p>Index of control units for the test matrix</p></dd>
 
 </dl></td>
     </tr>
@@ -160,37 +160,37 @@ to the control units, and \(X_t\) the treated units that
 pair with \(X_c\) (i.e. so the \(i^{\text{th}}\) matched
 pair will correspond with the \(i^{\text{th}}\) row of each),
 and thus each matrix will have dimension \(m \times k\),
-where \(2m \leq n\).</p><dl'>
-  <dt><code>"cross_all"</code></dt><dd><p>This will form the \(2m \times 2k\) matrix, by having each matched pair
+where \(2m \leq n\).</p><dl>
+<dt><code>"cross_all"</code></dt><dd><p>This will form the \(2m \times 2k\) matrix, by having each matched pair
 give two rows in the design matrix: each of the two
 rows will contain the full treated row of the given pair along with the full
 control row, but in one row the pair will be (treated, control), and in the other
 (control, treated). For these two rows, the output vector will contain a 1 and a 0
 respectively. We construct the following inputs:
 $$X =
-  \begin{bmatrix}
-  X_t&amp; X_c \\
-  X_c&amp; X_t \\
-  \end{bmatrix}, Y = [1 1 \ldots 1 0 0 \ldots 0]'
-$$
+    \begin{bmatrix}
+    X_t&amp; X_c \\
+    X_c&amp; X_t \\
+    \end{bmatrix}, Y = [1 1 \ldots 1 0 0 \ldots 0]'
+  $$
 For the test data, we'll only (WLOG more or less) give the (treat, control)
 version, for consistency in evaluation.</p></dd>
-   <dt><code>"cross_random"</code></dt><dd><p>This is similar to the above, except instead of forming all rows in both
+<dt><code>"cross_random"</code></dt><dd><p>This is similar to the above, except instead of forming all rows in both
 ways, we choose (for each pair) between (treated, control) and
 (control, treated) randomly. So
 $$Y_i =
-\begin{cases}
-1 &amp; \text{with probability} 0.5 \\
-0 &amp; \text{with probability} 0.5
-\end{cases}$$
+  \begin{cases}
+  1 &amp; \text{with probability} 0.5 \\
+  0 &amp; \text{with probability} 0.5
+  \end{cases}$$
 And (\(X_i\) here meaning the \(i^{\text{th}}\) row of the design matrix):
 $$X_i =
-\begin{cases}
-((X_t)_i, (X_c)_i) &amp; Y_i = 1 \\
-((X_c)_i, (X_t)_i) &amp; Y_i = 0
-\end{cases}$$
+  \begin{cases}
+  ((X_t)_i, (X_c)_i) &amp; Y_i = 1 \\
+  ((X_c)_i, (X_t)_i) &amp; Y_i = 0
+  \end{cases}$$
 Giving an \(m \times 2k\) design matrix.</p></dd>
-  <dt><code>"differences_random"</code></dt><dd><p>For
+<dt><code>"differences_random"</code></dt><dd><p>For
 each pair, our design row will be
 the row in <code>x_mat</code> corresponding to
 one unit minus the row corresponding to the
@@ -200,16 +200,16 @@ be subtracted from the other based on that, and we'll end up with
 an \(m \times k\) matrix.
 That is:
 $$Y_i =
-\begin{cases}
-1 &amp; \text{with probability} 0.5 \\
-0 &amp; \text{with probability} 0.5
-\end{cases}$$
+  \begin{cases}
+  1 &amp; \text{with probability} 0.5 \\
+  0 &amp; \text{with probability} 0.5
+  \end{cases}$$
 And:
 $$X_i =
-\begin{cases}
-(X_t)_i - (X_c)_i &amp; Y_i = 1 \\
-(X_c)_i - (X_t)_i &amp; Y_i = 0
-\end{cases}$$
+  \begin{cases}
+  (X_t)_i - (X_c)_i &amp; Y_i = 1 \\
+  (X_c)_i - (X_t)_i &amp; Y_i = 0
+  \end{cases}$$
 Note that if your <code>x_mat</code> contains an intercept, it'll
 now be a column of zeroes.</p></dd>
 <dt><code>"differences_plain"</code></dt><dd><p>In some cases, you may wish to have the differences and add
@@ -224,11 +224,11 @@ all differences are returned as \((X_t)_i - (X_c)_i\)
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>list:</p><dl'>
-    <dt><code>x_train</code></dt><dd><p>Design matrix for training</p></dd>
-    <dt><code>x_test</code></dt><dd><p>Design matrix for testing</p></dd>
-    <dt><code>y_train</code></dt><dd><p>Training outcome vector</p></dd>
-    <dt><code>y_test</code></dt><dd><p>Test outcome vector</p></dd>
+    <p>list:</p><dl>
+<dt><code>x_train</code></dt><dd><p>Design matrix for training</p></dd>
+<dt><code>x_test</code></dt><dd><p>Design matrix for testing</p></dd>
+<dt><code>y_train</code></dt><dd><p>Training outcome vector</p></dd>
+<dt><code>y_test</code></dt><dd><p>Test outcome vector</p></dd>
 
 </dl>
 
@@ -239,6 +239,9 @@ and corresponding output vectors that all can be used to solve the
 above prediction problem. In some scenarios (e.g. if we were content
 to use linear models), differences alone might be appropriate. For full
 generality, we may wish to use both full vectors.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -255,7 +258,7 @@ generality, we may wish to use both full vectors.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

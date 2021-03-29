@@ -83,7 +83,7 @@ function to use, generates brier score" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,11 +117,11 @@ function to use, generates brier score</h1>
 function to use, generates brier score</p>
     </div>
 
-    <pre class="usage"><span class='fu'>brier_score</span>(
-  <span class='no'>train_test_list</span>,
-  <span class='kw'>match_predict_function</span> <span class='kw'>=</span> <span class='no'>match_predict_xgb</span>,
-  <span class='kw'>avg</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>brier_score</span><span class='op'>(</span>
+  <span class='va'>train_test_list</span>,
+  match_predict_function <span class='op'>=</span> <span class='fu'><a href='match_predict_xgb.html'>match_predict_xgb</a></span><span class='op'>(</span><span class='op'>)</span>,
+  avg <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,7 +132,10 @@ function to use, generates brier score</p>
     </tr>
     <tr>
       <th>match_predict_function</th>
-      <td><p>function to predict treated unit</p></td>
+      <td><p>function to predict treated unit,
+see e.g. <code>match_predict_xgb</code>
+(produces the default on calling) or
+<code>match_predict_linear</code></p></td>
     </tr>
     <tr>
       <th>avg</th>
@@ -143,6 +146,9 @@ function to use, generates brier score</p>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>result from <code>calc_brier</code>, length-one double</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -159,7 +165,7 @@ function to use, generates brier score</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

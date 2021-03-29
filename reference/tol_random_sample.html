@@ -81,7 +81,7 @@ a &quot;simple&quot; match list by naive random sampling." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -114,14 +114,14 @@ a &quot;simple&quot; match list by naive random sampling." />
 a "simple" match list by naive random sampling.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>tol_random_sample</span>(
-  <span class='no'>tolerance_list</span>,
-  <span class='kw'>prior_pairs</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fl'>NA</span>, <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>0L</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2L</span>),
-  <span class='kw'>pairable_units</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>iteration</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-  <span class='kw'>max_iterations</span> <span class='kw'>=</span> <span class='fl'>10L</span>,
-  <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>tol_random_sample</span><span class='op'>(</span>
+  <span class='va'>tolerance_list</span>,
+  prior_pairs <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='cn'>NA</span>, nrow <span class='op'>=</span> <span class='fl'>0L</span>, ncol <span class='op'>=</span> <span class='fl'>2L</span><span class='op'>)</span>,
+  pairable_units <span class='op'>=</span> <span class='cn'>NULL</span>,
+  iteration <span class='op'>=</span> <span class='fl'>0L</span>,
+  max_iterations <span class='op'>=</span> <span class='fl'>10L</span>,
+  verbose <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -161,6 +161,9 @@ to form pairs (<code>NULL</code> is all, hence for the first iteration)</p></td>
 <li><p><code>control_index</code> Control units</p></li>
 </ul>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -177,7 +180,7 @@ to form pairs (<code>NULL</code> is all, hence for the first iteration)</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

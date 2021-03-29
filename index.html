@@ -40,7 +40,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -90,13 +90,14 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>We’re not yet on <a href="https://CRAN.R-project.org">CRAN</a>, but you can install from github with <code>devtools</code> or <code>remotes</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="co">## install.packages("devtools")</span>
-<span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"ColmanHumphrey/matchfinder"</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## install.packages("devtools")</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ColmanHumphrey/matchfinder"</span><span class="op">)</span>
 
 <span class="co">## OR:</span>
 
 <span class="co">## install.packages("remotes")</span>
-<span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"ColmanHumphrey/matchfinder"</span>)</pre></div>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"ColmanHumphrey/matchfinder"</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="example" class="section level2">
 <h2 class="hasAnchor">
@@ -105,51 +106,200 @@
 <div id="bipartite" class="section level3">
 <h3 class="hasAnchor">
 <a href="#bipartite" class="anchor"></a>Bipartite</h3>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">matchfinder</span>)
+<p>First we’ll load the library and setup some data:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">matchfinder</span><span class="op">)</span>
 
-<span class="no">rows</span> <span class="kw">&lt;-</span> <span class="fl">100L</span>
-<span class="no">num_weight_vecs</span> <span class="kw">&lt;-</span> <span class="fl">5L</span>
-<span class="no">x_mat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">rows</span>),
-               <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span>(<span class="no">rows</span>))
-<span class="no">treat_vec</span> <span class="kw">&lt;-</span> (<span class="fl">1L</span>:<span class="no">rows</span>) <span class="kw">%in%</span> <span class="fu"><a href="reference/fixed_sample.html">fixed_sample</a></span>(<span class="fl">1L</span>:<span class="no">rows</span>,
-                                         <span class="fl">45L</span>)
-<span class="no">y_vector</span> <span class="kw">&lt;-</span> <span class="no">x_mat</span>[, <span class="fl">1</span>] + <span class="no">x_mat</span>[, <span class="fl">2</span>] + <span class="no">treat_vec</span> * <span class="fl">0.3</span>
-<span class="no">cov_x</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/covariance_with_ranks.html">covariance_with_ranks</a></span>(<span class="no">x_mat</span>)
+<span class="va">treat_effect</span> <span class="op">&lt;-</span> <span class="fl">0.3</span>
 
-<span class="no">some_dist_mat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/weighted_mahal.html">weighted_mahal</a></span>(<span class="no">x_mat</span>,
-    <span class="kw">cov_x</span> <span class="kw">=</span> <span class="no">cov_x</span>,
-    <span class="kw">weight_vec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.66</span>, <span class="fl">0.33</span>),
-    <span class="kw">treat_vec</span> <span class="kw">=</span> <span class="no">treat_vec</span>
-)
+<span class="va">rows</span> <span class="op">&lt;-</span> <span class="fl">600L</span>
+<span class="va">num_weight_vecs</span> <span class="op">&lt;-</span> <span class="fl">25L</span>
+<span class="va">x_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span>,
+               <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span><span class="op">)</span>
+<span class="va">treat_vec</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="fl">1L</span><span class="op">:</span><span class="va">rows</span><span class="op">)</span> <span class="op">%in%</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">1L</span><span class="op">:</span><span class="va">rows</span>, size <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">floor</a></span><span class="op">(</span><span class="va">rows</span> <span class="op">*</span> <span class="fl">0.45</span><span class="op">)</span>,
+           prob <span class="op">=</span> <span class="op">(</span><span class="va">x_mat</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">5</span><span class="op">)</span>
+<span class="va">y_vector</span> <span class="op">&lt;-</span> <span class="va">x_mat</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="va">x_mat</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op">+</span> <span class="va">treat_vec</span> <span class="op">*</span> <span class="va">treat_effect</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">rows</span><span class="op">)</span></code></pre></div>
+<p>Next let’s compute the covariance matrix (and distance matrix). Note that <code>covariance_with_ranks</code> allows us to specify which columns should be used on a rank level if desired.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">cov_x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/covariance_with_ranks.html">covariance_with_ranks</a></span><span class="op">(</span><span class="va">x_mat</span><span class="op">)</span>
 
-<span class="no">weight_vecs</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/generate_random_weights.html">generate_random_weights</a></span>(
-    <span class="kw">prior_weights</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>, <span class="fl">1</span>),
-    <span class="kw">number_vectors</span> <span class="kw">=</span> <span class="no">num_weight_vecs</span>,
-    <span class="kw">minimum_weights</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.1</span>)
-)
+<span class="co">## we don't use this, just showing how it's done</span>
+<span class="co">## under the hood within the higher-level functions</span>
+<span class="co">## or if you wanted to call `bipartite_matches` directly</span>
+<span class="va">dist_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/weighted_mahal.html">weighted_mahal</a></span><span class="op">(</span><span class="va">x_mat</span>,
+    cov_x <span class="op">=</span> <span class="va">cov_x</span>,
+    weight_vec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.66</span>, <span class="fl">0.33</span><span class="op">)</span>,
+    treat_vec <span class="op">=</span> <span class="va">treat_vec</span>
+<span class="op">)</span></code></pre></div>
+<p>We generate some random weight vectors: idea is that we’ll end up using the one that gave us the best match. You don’t have to use this function, it just has some reasonble features for generating random vectors, including setting minimum weights, prior weights etc.</p>
+<p>We’re only generating 25 here, but for a serious go of things, we’d probably want closer to 1,000.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">weight_vecs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_random_weights.html">generate_random_weights</a></span><span class="op">(</span>
+    prior_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>,
+    number_vectors <span class="op">=</span> <span class="va">num_weight_vecs</span>,
+    minimum_weights <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
+<p>We’ll now generate many matches. Here we only try two different sink values; in general we can either try many more here, or increase until we get the desired randomness in the match.</p>
+<p>We’ll do this two ways. Firstly, the two steps explicitly:</p>
+<ol>
+<li>Generate the matches</li>
+<li>Compute the Brier score for each match</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">## 1. Here we generate all the matches: one for each pair</span>
+<span class="co">##    of weight vector and sink value</span>
+<span class="va">all_wr_matches</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/all_bipartite_matches.html">all_bipartite_matches</a></span><span class="op">(</span>
+    x_mat <span class="op">=</span> <span class="va">x_mat</span>,
+    cov_x <span class="op">=</span> <span class="va">cov_x</span>,
+    weight_list <span class="op">=</span> <span class="va">weight_vecs</span>,
+    treat_vec <span class="op">=</span> <span class="va">treat_vec</span>,
+    match_method <span class="op">=</span> <span class="st">"with_replacement"</span>,
+    n_sinks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fl">30L</span>, <span class="fl">100L</span>, <span class="fl">200L</span><span class="op">)</span>
+<span class="op">)</span>
 
-<span class="no">all_wr_matches</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/all_bipartite_matches.html">all_bipartite_matches</a></span>(
-    <span class="kw">x_mat</span> <span class="kw">=</span> <span class="no">x_mat</span>,
-    <span class="kw">cov_x</span> <span class="kw">=</span> <span class="no">cov_x</span>,
-    <span class="kw">weight_list</span> <span class="kw">=</span> <span class="no">weight_vecs</span>,
-    <span class="kw">treat_vec</span> <span class="kw">=</span> <span class="no">treat_vec</span>,
-    <span class="kw">match_method</span> <span class="kw">=</span> <span class="st">"with_replacement"</span>,
-    <span class="kw">n_sinks</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0L</span>, <span class="fl">4L</span>)
-)
-
-<span class="no">sink_brier_wr_matches</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/sink_brier_bipartite_matches.html">sink_brier_bipartite_matches</a></span>(
-    <span class="kw">x_mat</span> <span class="kw">=</span> <span class="no">x_mat</span>,
-    <span class="kw">cov_x</span> <span class="kw">=</span> <span class="no">cov_x</span>,
-    <span class="kw">weight_list</span> <span class="kw">=</span> <span class="no">weight_vecs</span>,
-    <span class="kw">treat_vec</span> <span class="kw">=</span> <span class="no">treat_vec</span>,
-    <span class="kw">match_method</span> <span class="kw">=</span> <span class="st">"with_replacement"</span>,
-    <span class="kw">n_sinks</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0L</span>, <span class="fl">4L</span>),
-    <span class="kw">silent</span> <span class="kw">=</span> <span class="fl">TRUE</span>
-)</pre></div>
+<span class="co">## 2. get all brier scores for all results</span>
+<span class="va">wr_briers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">all_wr_matches</span>, <span class="kw">function</span><span class="op">(</span><span class="va">by_sinks</span><span class="op">)</span> <span class="op">{</span>
+    <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="va">by_sinks</span>, <span class="kw">function</span><span class="op">(</span><span class="va">indiv_match_list</span><span class="op">)</span> <span class="op">{</span>
+        <span class="fu"><a href="reference/brier_score_cv.html">brier_score_cv</a></span><span class="op">(</span>
+            x_mat <span class="op">=</span> <span class="va">x_mat</span>,
+            match_list <span class="op">=</span> <span class="va">indiv_match_list</span>,
+        <span class="op">)</span>
+    <span class="op">}</span><span class="op">)</span><span class="op">)</span>
+<span class="op">}</span><span class="op">)</span></code></pre></div>
+<p>Or we can call <code>brier_bipartite_matches</code>, which performs both steps for us:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">brier_wr_matches</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/brier_bipartite_matches.html">brier_bipartite_matches</a></span><span class="op">(</span>
+    x_mat <span class="op">=</span> <span class="va">x_mat</span>,
+    cov_x <span class="op">=</span> <span class="va">cov_x</span>,
+    weight_list <span class="op">=</span> <span class="va">weight_vecs</span>,
+    treat_vec <span class="op">=</span> <span class="va">treat_vec</span>,
+    match_method <span class="op">=</span> <span class="st">"with_replacement"</span>,
+    n_sinks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fl">30L</span>, <span class="fl">100L</span>, <span class="fl">200L</span><span class="op">)</span>,
+    silent <span class="op">=</span> <span class="cn">TRUE</span>
+<span class="op">)</span></code></pre></div>
+<p>And indeed they’re identical in terms of the matches:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="co">## to verify (can use any of the matches):</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="er">&gt;</span><span class="st"> </span><span class="kw">all.equal</span>(all_wr_matches[[<span class="st">"100"</span>]][[<span class="dv">2</span>]],</span>
+<span id="cb7-3"><a href="#cb7-3"></a>          brier_wr_matches[[<span class="st">"matches_by_sinks"</span>]][[<span class="st">"100"</span>]][[<span class="dv">2</span>]])</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="op">&gt;</span><span class="st"> </span>[<span class="dv">1</span>] <span class="ot">TRUE</span></span></code></pre></div>
+<p>The Brier scores however won’t be the same, since they’re based off random draws to split training and testing. Note that by default, the prediction method used is <a href="https://cran.r-project.org/web/packages/xgboost/"><code>xgboost</code></a>. You may want to change this. Both <code>brier_score</code> (and therefore <code>brier_score_cv</code>) and <code>brier_[non]bipartite_matches</code> take a parameter <code>match_predict_function</code>, which is by default the result of calling <code><a href="reference/match_predict_xgb.html">match_predict_xgb()</a></code>: <code>match_predict_xgb</code> with all its defaults (defaults for defaults!). This generates a function that only takes one parameter, <code>train_test_list</code>; this is what <code>match_predict_function</code> is expected to be. See <code>match_predict_xgb</code> and <code>match_predict_linear</code> for more details. Both take parameters, so can be adjusted to your preference:</p>
+<ul>
+<li>
+<p>if you’re happy with <code>xgboost</code> but just want to change the parameters, you just call <code>match_predict_xgb</code> with your desired params:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">some_result</span> <span class="op">&lt;-</span> <span class="fu">any_function_that_uses_match_predict_function</span><span class="op">(</span>
+    <span class="va">...</span>,
+    <span class="va">...</span>,
+    match_predict_function <span class="op">=</span> <span class="fu"><a href="reference/match_predict_xgb.html">match_predict_xgb</a></span><span class="op">(</span>
+        nrounds <span class="op">=</span> <span class="fl">100</span>,
+        nthread <span class="op">=</span> <span class="fl">4</span>,
+        params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>eta <span class="op">=</span> <span class="fl">0.3</span>, max.depth <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>
+        <span class="co">## anything else gets passed to xgboost::xgb.train</span>
+   <span class="op">)</span>,
+   <span class="va">...</span>
+<span class="op">)</span></code></pre></div>
+<p>If you need more flexibility than that (e.g. you want to change <code>objective = "binary:logistic"</code> or anything), the functions produced by <code>match_predict_xgb</code> aren’t too complex, you can build it manually</p>
+</li>
+<li><p>if you want a simpler linear model - either logistic (<code>glm</code>) or actually linear (<code>lm</code>), pass <code><a href="reference/match_predict_linear.html">match_predict_linear(use_linear_lm = FALSE) # or true!</a></code>. It’ll default to <code>glm</code>; to use <code>lm</code>, pass in <code>use_linear_lm = TRUE</code>.</p></li>
+<li><p>For a totally custom prediction function, again the internals of either should make clear what’s happening</p></li>
+</ul>
+<p>Anyway, now that we have our matches we want to choose one of them! For a given number of sinks, we can default to using the hardest to predict match: the match with the largest Brier score. But there are two things left to consider:</p>
+<ul>
+<li>For any given number of sinks, even if we choose the best, how good is this resulting match? Close to random, or still highly separable / easy to predict?</li>
+<li>If we have the best match per sink number, which match should we actually go with? What number of sinks is appropriate?</li>
+</ul>
+<p>The corresponding paper goes into more detail, but essentially what we do is score each match based on a permutation test. We could in theory just check if the Brier score is above 0.25 or not, but this ignores many factors including the overfitting behaviour of the chosen prediction function.</p>
+<p>The permutation test:</p>
+<ul>
+<li>We take a given match</li>
+<li>For each iteration: we randomly choose the labelling for each pair (i.e. randomly choose which is treated vs control)</li>
+<li>We run the prediction algorithm and record the resulting Brier score</li>
+<li>We do this “some large number” of times</li>
+<li>The permutation score is how many permutation Briers were below the match’s</li>
+</ul>
+<p>This answers both questions:</p>
+<ul>
+<li>We can now effectively judge a match on a non-relative level</li>
+<li>We choose the number of sinks that first gives us an acceptable permutation score (going beyond that is throwing data away for higher variance in the actual result)</li>
+</ul>
+<p>Let’s now calculate this permutation score. In the below, you could of course have used the two named elements of <code>brier_wr_matches</code> either:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">perm_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/permutation_matches.html">permutation_matches</a></span><span class="op">(</span>
+    matches_by_sinks <span class="op">=</span> <span class="va">all_wr_matches</span>,
+    briers_by_sinks <span class="op">=</span> <span class="va">wr_briers</span>,
+    x_mat <span class="op">=</span> <span class="va">x_mat</span>,
+    n_sinks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fl">30L</span>, <span class="fl">100L</span>, <span class="fl">200L</span><span class="op">)</span>
+<span class="op">)</span></code></pre></div>
+<p>It’s useful (but not necessary) to use <code>purrr</code> for the results, so let’s load that up:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://purrr.tidyverse.org">purrr</a></span><span class="op">)</span></code></pre></div>
+<p>The resulting object has two named elements:</p>
+<ul>
+<li>
+<code>permutation_brier_scores</code>: this is a list with the same shape as <code>all_wr_matches</code> and <code>wr_briers</code>: that is, a list with an element per sink, and each of those is a result per match (in this case just a list of vectors). Let’s look at this now (this is from a random run; you’ll have different results):</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="op">&gt;</span><span class="st"> </span>perm_results<span class="op">$</span>permutation_brier_scores</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="op">$</span><span class="st">`</span><span class="dt">0</span><span class="st">`</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a> [<span class="dv">1</span>] <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span> <span class="dv">1</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="op">$</span><span class="st">`</span><span class="dt">30</span><span class="st">`</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a> [<span class="dv">1</span>] <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">0.96</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">0.93</span> <span class="fl">1.00</span> <span class="fl">1.00</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a>[<span class="dv">16</span>] <span class="fl">1.00</span> <span class="fl">0.99</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">0.96</span> <span class="fl">1.00</span> <span class="fl">0.99</span> <span class="fl">1.00</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="op">$</span><span class="st">`</span><span class="dt">100</span><span class="st">`</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a> [<span class="dv">1</span>] <span class="fl">0.95</span> <span class="fl">1.00</span> <span class="fl">0.95</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">0.83</span> <span class="fl">0.97</span> <span class="fl">0.91</span> <span class="fl">0.93</span> <span class="fl">1.00</span> <span class="fl">0.91</span> <span class="fl">0.81</span> <span class="fl">1.00</span> <span class="fl">1.00</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>[<span class="dv">16</span>] <span class="fl">1.00</span> <span class="fl">1.00</span> <span class="fl">0.93</span> <span class="fl">1.00</span> <span class="fl">0.83</span> <span class="fl">1.00</span> <span class="fl">0.95</span> <span class="fl">1.00</span> <span class="fl">0.95</span> <span class="fl">0.96</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="op">$</span><span class="st">`</span><span class="dt">200</span><span class="st">`</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a> [<span class="dv">1</span>] <span class="fl">0.76</span> <span class="fl">0.84</span> <span class="fl">0.62</span> <span class="fl">0.52</span> <span class="fl">0.64</span> <span class="fl">0.84</span> <span class="fl">0.94</span> <span class="fl">0.54</span> <span class="fl">0.46</span> <span class="fl">0.92</span> <span class="fl">0.85</span> <span class="fl">0.80</span> <span class="fl">1.00</span> <span class="fl">0.67</span> <span class="fl">0.92</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a>[<span class="dv">16</span>] <span class="fl">0.82</span> <span class="fl">0.76</span> <span class="fl">0.88</span> <span class="fl">0.21</span> <span class="fl">0.68</span> <span class="fl">0.93</span> <span class="fl">0.64</span> <span class="fl">0.68</span> <span class="fl">0.82</span> <span class="fl">0.81</span></span></code></pre></div>
+<ul>
+<li>
+<code>best_matches</code>: this gives a list with each element being a match, one per sink value. That is, we simply choose the best match by Brier score for each sink level and return it. Well that would be too little, we actually return a new list/object with the following elements:
+<ul>
+<li>
+<code>n_sinks</code> : somewhat simple here, try <code><a href="https://purrr.tidyverse.org/reference/map.html">map(perm_results$best_matches, "n_sinks")</a></code> or <code>map_int</code> if you want to get spooky</li>
+<li>
+<code>raw_brier</code>: the raw Brier score from the input match. We already inputted the data that generated this result with <code>wr_briers</code>. We can see this with <code><a href="https://rdrr.io/r/base/lapply.html">lapply(wr_briers, max)</a></code> vs <code><a href="https://purrr.tidyverse.org/reference/map.html">map(perm_results$best_matches, "raw_brier")</a></code>
+</li>
+<li>
+<code>permutation_brier</code>: the result of running the permutation Briers and counting how many scores were above the actual Brier. By default the process will only actually run the Brier scoring on the best outcome, <strong>so we’ll have the best raw Brier also gives the best permutation Brier, but this doesn’t have to be true in general</strong>. Hence why <code><a href="https://rdrr.io/r/base/lapply.html">lapply(wr_briers, which.max)</a></code> matches <code><a href="https://rdrr.io/r/base/lapply.html">lapply(perm_results$permutation_brier_scores, which.min)</a></code>.</li>
+<li>
+<code>match_list</code>: the original match that we inputted into <code>permutation_matches</code>! Let’s look at 30 for a second: <code>best_30_index &lt;- which.max(wr_briers[["30"]])</code>. Then we’ll see that <code>perm_results$best_matches[["30"]]$match_list</code> is identical to the input <code>all_wr_matches[["30"]][[best_30_index]]</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Having the whole distribution of permutation scores available to us can be very handy, in case we’re worried we got a weird outlier etc. For example, in my case I get the following results:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="op">&gt;</span><span class="st"> </span><span class="kw">map_dbl</span>(perm_results<span class="op">$</span>best_matches, <span class="st">"permutation_brier"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>   <span class="dv">0</span>    <span class="dv">30</span>   <span class="dv">100</span>   <span class="dv">200</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="fl">1.00</span>  <span class="fl">0.93</span>  <span class="fl">0.81</span>  <span class="fl">0.21</span></span></code></pre></div>
+<p>In contrast, drawing a histogram can reveal what’s really happening:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="op">$</span><span class="st">`</span><span class="dt">0</span><span class="st">`</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="dv">0</span> <span class="op">|</span><span class="st">                             </span>█<span class="op">|</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb13-3"><a href="#cb13-3"></a></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="op">$</span><span class="st">`</span><span class="dt">30</span><span class="st">`</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="dv">0</span> <span class="op">|</span><span class="st">                           </span>▁▁█<span class="op">|</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="op">$</span><span class="st">`</span><span class="dt">100</span><span class="st">`</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="dv">0</span> <span class="op">|</span><span class="st">                        </span>▂  ▂▃█<span class="op">|</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="op">$</span><span class="st">`</span><span class="dt">200</span><span class="st">`</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="dv">0</span> <span class="op">|</span><span class="st">      </span>▂      ▂ ▂▂ ▂▅█ ▅▂██▂█▂▂<span class="op">|</span><span class="st"> </span><span class="dv">1</span></span></code></pre></div>
+<p>Here’s the output for the four best matches:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>    treat_est  treat_se num_matches num_sinks treat_sd raw_brier perm_brier</span>
+<span id="cb14-2"><a href="#cb14-2"></a>    <span class="fl">0.50753</span>   <span class="fl">0.10678</span>           <span class="dv">270</span>         <span class="dv">0</span> <span class="fl">1.7546</span>   <span class="fl">0.23732</span>         <span class="fl">1.00</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>    <span class="fl">0.44120</span>   <span class="fl">0.10370</span>           <span class="dv">240</span>        <span class="dv">30</span> <span class="fl">1.6066</span>   <span class="fl">0.24966</span>         <span class="fl">0.93</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>    <span class="fl">0.34341</span>   <span class="fl">0.11819</span>           <span class="dv">170</span>       <span class="dv">100</span> <span class="fl">1.5410</span>   <span class="fl">0.25219</span>         <span class="fl">0.81</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>    <span class="fl">0.14635</span>   <span class="fl">0.15058</span>            <span class="dv">70</span>       <span class="dv">200</span> <span class="fl">1.2598</span>   <span class="fl">0.27098</span>         <span class="fl">0.21</span></span></code></pre></div>
+<p>The simple regression, <code>y ~ treatment_vector</code>, gives an estimate of <code>0.57579</code> with a standard error of <code>0.12375</code>. In this case, the full regression of <code>y ~ treatment_vector + X</code> is nearly optimal (but we only know that because we generated the data), which gives an estimate of <code>0.43776</code> with a standard error of <code>0.08504</code>.</p>
+<p>So what do we see?</p>
 </div>
 <div id="non-bipartite" class="section level3">
 <h3 class="hasAnchor">
 <a href="#non-bipartite" class="anchor"></a>Non Bipartite</h3>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"></code></pre></div>
 </div>
 </div>
 </div>
@@ -179,7 +329,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

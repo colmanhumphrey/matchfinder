@@ -6,8 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function to predict treatment / control pairs using
-<code>glm</code> (binomial) or <code>lm</code> — match_predict_linear • matchfinder</title>
+<title>Function factory to predict treatment / control pairs using
+glm (binomial) or lm — match_predict_linear • matchfinder</title>
 
 
 <!-- jquery -->
@@ -40,13 +40,17 @@
 
 
 
-<meta property="og:title" content="Function to predict treatment / control pairs using
-<code>glm</code> (binomial) or <code>lm</code> — match_predict_linear" />
-<meta property="og:description" content="This function takes in training and test data, trains a
+<meta property="og:title" content="Function factory to predict treatment / control pairs using
+glm (binomial) or lm — match_predict_linear" />
+<meta property="og:description" content="The returned function takes in training and test data
+(output from predict_prepare), trains a
 &quot;linear&quot; model on the training, predicts on the test, and
 returns the test vector. NOTE: the glm model will
 fail if the data is too &quot;tricky&quot;, so be sure to check.
-Also the pure lm model will be fast" />
+Also the pure lm model will be fast - so if either
+of these cases is what you need, set use_linear_lm
+to TRUE. In this case we'll bound the probabilities
+returned at 0 and 1." />
 
 
 
@@ -86,7 +90,7 @@ Also the pure lm model will be fast" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -109,38 +113,44 @@ Also the pure lm model will be fast" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Function to predict treatment / control pairs using
+    <h1>Function factory to predict treatment / control pairs using
 <code>glm</code> (binomial) or <code>lm</code></h1>
     
     <div class="hidden name"><code>match_predict_linear.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function takes in training and test data, trains a
+    <p>The returned function takes in training and test data
+(output from <code>predict_prepare</code>), trains a
 "linear" model on the training, predicts on the test, and
 returns the test vector. NOTE: the glm model will
 fail if the data is too "tricky", so be sure to check.
-Also the pure <code>lm</code> model will be fast</p>
+Also the pure <code>lm</code> model will be fast - so if either
+of these cases is what you need, set <code>use_linear_lm</code>
+to TRUE. In this case we'll bound the probabilities
+returned at 0 and 1.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>match_predict_linear</span>(<span class='no'>train_test_list</span>, <span class='kw'>use_lm_approx</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    <pre class="usage"><span class='fu'>match_predict_linear</span><span class='op'>(</span>use_linear_lm <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>train_test_list</th>
-      <td><p>output from <code>predict_prepare</code></p></td>
-    </tr>
-    <tr>
-      <th>use_lm_approx</th>
-      <td><p>logical, default FALSE; if</p></td>
+      <th>use_linear_lm</th>
+      <td><p>logical, default FALSE; if you want
+to use regular <code>lm</code> instead of <code>glm</code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>returns a vector of predictions for the test data</p>
+    <p>returns a function that takes in a <code>train_test_list</code>
+from <code>predict_prepare</code>; this function returns a
+vector of predictions for the test data</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -157,7 +167,7 @@ Also the pure <code>lm</code> model will be fast</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

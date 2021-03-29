@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,14 +112,14 @@
     <p>Generates input needed for a simulation run</p>
     </div>
 
-    <pre class="usage"><span class='fu'>generate_simulation_input</span>(
-  <span class='kw'>n_rows</span> <span class='kw'>=</span> <span class='fl'>500L</span>,
-  <span class='kw'>n_cols</span> <span class='kw'>=</span> <span class='fl'>5L</span>,
-  <span class='kw'>x_generator</span> <span class='kw'>=</span> <span class='no'>default_x_generator</span>,
-  <span class='kw'>treat_prob_generator</span> <span class='kw'>=</span> <span class='no'>example_treat_prob_generator</span>,
-  <span class='kw'>mean_generator</span> <span class='kw'>=</span> <span class='no'>example_mean_generator</span>,
-  <span class='kw'>error_generator</span> <span class='kw'>=</span> <span class='no'>default_error_generator</span>
-)</pre>
+    <pre class="usage"><span class='fu'>generate_simulation_input</span><span class='op'>(</span>
+  n_rows <span class='op'>=</span> <span class='fl'>500L</span>,
+  n_cols <span class='op'>=</span> <span class='fl'>5L</span>,
+  x_generator <span class='op'>=</span> <span class='va'>default_x_generator</span>,
+  treat_prob_generator <span class='op'>=</span> <span class='va'>example_treat_prob_generator</span>,
+  mean_generator <span class='op'>=</span> <span class='va'>example_mean_generator</span>,
+  error_generator <span class='op'>=</span> <span class='va'>default_error_generator</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -157,13 +157,16 @@ generate zero-mean data.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List:</p><dl'>
-  <dt><code>x_mat</code></dt><dd><p>Data Matrix</p></dd>
-  <dt><code>treat_vec</code></dt><dd><p>Treatment Vector</p></dd>
-  <dt><code>y_vec</code></dt><dd><p>Output Vector</p></dd>
+    <p>List:</p><dl>
+<dt><code>x_mat</code></dt><dd><p>Data Matrix</p></dd>
+<dt><code>treat_vec</code></dt><dd><p>Treatment Vector</p></dd>
+<dt><code>y_vec</code></dt><dd><p>Output Vector</p></dd>
 
 </dl>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -180,7 +183,7 @@ generate zero-mean data.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

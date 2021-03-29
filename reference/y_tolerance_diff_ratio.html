@@ -49,11 +49,13 @@ $$
 $$
 And not just \(y_{\text{treat}} - y_{\text{control}}\) as
 our &quot;difference&quot;: here we say we're caring about the change
-in \(y\) per unit tol.
+in \(y\) per unit tol. Note that we use regression
+to estimate, but that is really just a statment about error
+assumptions.
 This function estimates the standard deviation of this
-if you just did random pairings **that obeyed the tolerance
-rules** with min and max.
-This function computes approx sd for the **optimal** case.
+if you just did random pairings that obeyed the tolerance
+rules with min and max.
+This function computes approx sd for the optimal case.
 Also yes this is a terrible function name." />
 
 
@@ -94,7 +96,7 @@ Also yes this is a terrible function name." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -131,20 +133,17 @@ $$
 $$
 And not just \(y_{\text{treat}} - y_{\text{control}}\) as
 our "difference": here we say we're caring about the change
-in \(y\) per unit tol.
+in \(y\) per unit tol. Note that we use regression
+to estimate, but that is really just a statment about error
+assumptions.
 This function estimates the standard deviation of this
-if you just did random pairings **that obeyed the tolerance
-rules** with min and max.
-This function computes approx sd for the **optimal** case.
+if you just did random pairings <strong>that obeyed the tolerance
+rules</strong> with min and max.
+This function computes approx sd for the <strong>optimal</strong> case.
 Also yes this is a terrible function name.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>y_tolerance_diff_ratio</span>(
-  <span class='no'>y_vector</span>,
-  <span class='no'>tolerance_list</span>,
-  <span class='kw'>use_regression</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>samples</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>y_tolerance_diff_ratio</span><span class='op'>(</span><span class='va'>y_vector</span>, <span class='va'>tolerance_list</span>, samples <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -158,11 +157,6 @@ Also yes this is a terrible function name.</p>
       <td><p>Usual tolerance list (see <code>gen_tolerance_list</code>)</p></td>
     </tr>
     <tr>
-      <th>use_regression</th>
-      <td><p><code>TRUE</code> to use regression, <code>FALSE</code> to use
-the ratios directly. Default <code>TRUE</code>.</p></td>
-    </tr>
-    <tr>
       <th>samples</th>
       <td><p>How many samples to use. Defaults to a number between 50
 and 200, depending on the length of the various vectors</p></td>
@@ -172,7 +166,10 @@ and 200, depending on the length of the various vectors</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>Returns a single number: the average of the sds of <code>samples</code>
-  random runs</p>
+random runs</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -189,7 +186,7 @@ and 200, depending on the length of the various vectors</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

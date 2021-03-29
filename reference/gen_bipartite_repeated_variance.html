@@ -6,7 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance • matchfinder</title>
+<title>Abadie, Alberto and Guido W Imbens (2006).
+“Large sample properties of matching estimators
+for average treatment effects”.
+Econometrica 74.1, pp. 235–267. - see page 251.
+More info at “Matching on the estimated propensity score”.
+Econometrica 84.2, pp. 781–807. — gen_bipartite_repeated_variance • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,10 +44,18 @@
 
 
 
-<meta property="og:title" content="Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance" />
-<meta property="og:description" content="This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights" />
+<meta property="og:title" content="Abadie, Alberto and Guido W Imbens (2006).
+“Large sample properties of matching estimators
+for average treatment effects”.
+Econometrica 74.1, pp. 235–267. - see page 251.
+More info at “Matching on the estimated propensity score”.
+Econometrica 84.2, pp. 781–807. — gen_bipartite_repeated_variance" />
+<meta property="og:description" content="Abadie, Alberto and Guido W Imbens (2006).
+“Large sample properties of matching estimators
+for average treatment effects”.
+Econometrica 74.1, pp. 235–267. - see page 251.
+More info at “Matching on the estimated propensity score”.
+Econometrica 84.2, pp. 781–807." />
 
 
 
@@ -105,24 +118,35 @@ if given, and scales this by both the covariances, and the given weights" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computes the Mahalanobis Imbalance of a match, or set of matches</h1>
+    <h1>Abadie, Alberto and Guido W Imbens (2006).
+“Large sample properties of matching estimators
+for average treatment effects”.
+Econometrica 74.1, pp. 235–267. - see page 251.
+More info at “Matching on the estimated propensity score”.
+Econometrica 84.2, pp. 781–807.</h1>
     
-    <div class="hidden name"><code>mahal_imbalance.Rd</code></div>
+    <div class="hidden name"><code>gen_bipartite_repeated_variance.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights</p>
+    <p>Abadie, Alberto and Guido W Imbens (2006).
+“Large sample properties of matching estimators
+for average treatment effects”.
+Econometrica 74.1, pp. 235–267. - see page 251.
+More info at “Matching on the estimated propensity score”.
+Econometrica 84.2, pp. 781–807.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>gen_bipartite_repeated_variance</span><span class='op'>(</span>
   <span class='va'>x_mat</span>,
   <span class='va'>cov_x</span>,
+  <span class='va'>y_vector</span>,
+  <span class='va'>control_index</span>,
+  <span class='va'>treat_vec</span>,
+  caliper_list <span class='op'>=</span> <span class='fu'><a href='gen_caliper_list.html'>gen_caliper_list</a></span><span class='op'>(</span><span class='op'>)</span>,
   weight_vec <span class='op'>=</span> <span class='cn'>NULL</span>,
-  sqrt_mahal <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  match_list <span class='op'>=</span> <span class='cn'>NULL</span>,
-  match_list_list <span class='op'>=</span> <span class='cn'>NULL</span>
+  use_all_controls <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  sqrt_mahal <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -130,46 +154,35 @@ if given, and scales this by both the covariances, and the given weights</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <td><p>input/design matrix (already rank-adjusted etc)</p></td>
     </tr>
     <tr>
       <th>cov_x</th>
-      <td><p>covariance of x, calculated potentially with ranks</p></td>
+      <td><p>the (potentially rank-adjusted) covariance of <code>x_mat</code>.
+This means it's possible that <code><a href='https://rdrr.io/r/stats/cor.html'>cov(x_mat)</a></code> is not equal to
+<code>cov_x</code>; see <code>covariance_with_ranks</code> for more details.</p></td>
     </tr>
     <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
+      <th>y_vector</th>
+      <td><p>Outcome vector (not used in match generation).</p></td>
     </tr>
     <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>treat_vec</th>
+      <td><p>Logical (or 1/0) vector, indicating treatment (or control).</p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or <code>match_list_list</code></p></td>
+      <th>caliper_list</th>
+      <td><p>Optional, see <code>gen_caliper_list</code>. Provide
+this to force matches that are close on some metric.</p></td>
     </tr>
     <tr>
-      <th>match_list_list</th>
-      <td><p>list of match_list results; provide
-exactly one of this param or <code>match_list</code></p></td>
+      <th>use_all_controls</th>
+      <td><p>logical; if using bipartite matches, should we
+estimate the variance using all controls possible? Default <code>TRUE</code>.
+If <code>FALSE</code>, will only use controls from the match given</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>a vector of mahalanobis distances</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
-
-    <p>You can provide a single match, or a list of matches</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

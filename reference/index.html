@@ -79,7 +79,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -172,6 +172,20 @@ for a given function.</p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="brier_bipartite_matches.html">brier_bipartite_matches()</a></code> </p>
+        </td>
+        <td><p>Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks.</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="brier_nonbipartite_matches.html">brier_nonbipartite_matches()</a></code> </p>
+        </td>
+        <td><p>Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks.</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="brier_score.html">brier_score()</a></code> </p>
         </td>
         <td><p>Takes in training/test data and a prediction
@@ -188,6 +202,13 @@ function to use, generates brier score</p></td>
           <p><code><a href="brier_score_split.html">brier_score_split()</a></code> </p>
         </td>
         <td><p>For a match, calculates brier score on a test split of the data</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="build_index_vector.html">build_index_vector()</a></code> </p>
+        </td>
+        <td><p>Takes a vector, returns a named list of repeated elements
+along with indices.</p></td>
       </tr><tr>
         
         <td>
@@ -313,6 +334,12 @@ according to <code>train_fraction</code></p></td>
       </tr><tr>
         
         <td>
+          <p><code><a href="gls_known_relative_variance.html">gls_known_relative_variance()</a></code> </p>
+        </td>
+        <td><p>Solving GLS when variance is known up to a scale factor</p></td>
+      </tr><tr>
+        
+        <td>
           <p><code><a href="index_list_from_match.html">index_list_from_match()</a></code> </p>
         </td>
         <td><p>Constructs an <code>index_list</code> from a <code>match_list</code> and a logical
@@ -342,14 +369,14 @@ change per "unit" of tolerance vector</p></td>
         <td>
           <p><code><a href="match_predict_linear.html">match_predict_linear()</a></code> </p>
         </td>
-        <td><p>Function to predict treatment / control pairs using
+        <td><p>Function factory to predict treatment / control pairs using
 <code>glm</code> (binomial) or <code>lm</code></p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="match_predict_xgb.html">match_predict_xgb()</a></code> </p>
         </td>
-        <td><p>Function to predict treatment / control pairs using
+        <td><p>Function factory to predict treatment / control pairs using
 xgboost</p></td>
       </tr><tr>
         
@@ -451,13 +478,20 @@ permutation Brier scores and the best matches</p></td>
         <td>
           <p><code><a href="propensity_score_linear.html">propensity_score_linear()</a></code> </p>
         </td>
-        <td><p>Function to predict treatment using <code>glm</code> (binomial) or <code>lm</code></p></td>
+        <td><p>Function factory to predict treatment using <code>glm</code> (binomial)
+or <code>lm</code></p></td>
       </tr><tr>
         
         <td>
           <p><code><a href="propensity_score_xgb.html">propensity_score_xgb()</a></code> </p>
         </td>
-        <td><p>Function to predict treatment using xgboost</p></td>
+        <td><p>Function factory to predict treatment using xgboost</p></td>
+      </tr><tr>
+        
+        <td>
+          <p><code><a href="regression_eval.html">regression_eval()</a></code> </p>
+        </td>
+        <td><p>Evaluate match using regression</p></td>
       </tr><tr>
         
         <td>
@@ -476,13 +510,6 @@ permutation Brier scores and the best matches</p></td>
           <p><code><a href="rmse_from_one_func.html">rmse_from_one_func()</a></code> </p>
         </td>
         <td><p>Calculates RMSE with a known target of one</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="sink_brier_bipartite_matches.html">sink_brier_bipartite_matches()</a></code> </p>
-        </td>
-        <td><p>Computes all matches, then gets the brier scores for each. Reorder by
-number of sinks.</p></td>
       </tr><tr>
         
         <td>
@@ -535,7 +562,7 @@ of the ratio of the differences</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

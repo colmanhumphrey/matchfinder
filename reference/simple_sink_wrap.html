@@ -85,7 +85,7 @@ of more sinks = lower distances." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -121,7 +121,7 @@ it isn't obviously correct, but does give the nice property
 of more sinks = lower distances.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>simple_sink_wrap</span>(<span class='no'>simple_match_list</span>, <span class='kw'>n_sinks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>simple_sink_wrap</span><span class='op'>(</span><span class='va'>simple_match_list</span>, n_sinks <span class='op'>=</span> <span class='cn'>NULL</span>, weight_vec <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -136,11 +136,20 @@ of more sinks = lower distances.</p>
       <th>n_sinks</th>
       <td><p>default NULL, vector of sink values to use.</p></td>
     </tr>
+    <tr>
+      <th>weight_vec</th>
+      <td><p>Default <code>NULL</code>: optionally supply the weight vector
+used to generate <code>dist_mat</code> and it'll be returned in the
+<code>match_list</code> generated from this function</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>list of lists; see parent function</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -157,7 +166,7 @@ of more sinks = lower distances.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

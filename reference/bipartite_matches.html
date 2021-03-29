@@ -41,11 +41,11 @@
 
 <meta property="og:title" content="Generating bipartite matched pairs — bipartite_matches" />
 <meta property="og:description" content="Generates matched pairs either:
-  With ReplacementFinds smallest control for each treatment
-  Without Replacement, GreedyGreedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.
-  Without Replacement, OptimallyMinimum total distance
+With ReplacementFinds smallest control for each treatment
+Without Replacement, GreedyGreedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.
+Without Replacement, OptimallyMinimum total distance
 
 If you're happy to use control units potentially multiple times,
 then the first way is fast and optimal." />
@@ -88,7 +88,7 @@ then the first way is fast and optimal." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,24 +117,25 @@ then the first way is fast and optimal." />
     </div>
 
     <div class="ref-description">
-    <p>Generates matched pairs either:</p><dl'>
-  <dt>With Replacement</dt><dd><p>Finds smallest control for each treatment</p></dd>
-  <dt>Without Replacement, Greedy</dt><dd><p>Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.</p></dd>
-  <dt>Without Replacement, Optimally</dt><dd><p>Minimum total distance</p></dd>
+    <p>Generates matched pairs either:</p><dl>
+<dt>With Replacement</dt><dd><p>Finds smallest control for each treatment</p></dd>
+<dt>Without Replacement, Greedy</dt><dd><p>Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.</p></dd>
+<dt>Without Replacement, Optimally</dt><dd><p>Minimum total distance</p></dd>
 
 </dl><p>If you're happy to use control units potentially multiple times,
 then the first way is fast and optimal.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>bipartite_matches</span>(
-  <span class='no'>dist_mat</span>,
-  <span class='no'>treat_vec</span>,
-  <span class='kw'>match_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"with_replacement"</span>, <span class='st'>"optimal"</span>, <span class='st'>"greedy"</span>),
-  <span class='kw'>n_sinks</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>tol_val</span> <span class='kw'>=</span> <span class='kw'>NULL</span>
-)</pre>
+    <pre class="usage"><span class='fu'>bipartite_matches</span><span class='op'>(</span>
+  <span class='va'>dist_mat</span>,
+  <span class='va'>treat_vec</span>,
+  match_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"with_replacement"</span>, <span class='st'>"optimal"</span>, <span class='st'>"greedy"</span><span class='op'>)</span>,
+  n_sinks <span class='op'>=</span> <span class='cn'>NULL</span>,
+  tol_val <span class='op'>=</span> <span class='cn'>NULL</span>,
+  weight_vec <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -151,12 +152,12 @@ then the first way is fast and optimal.</p>
     <tr>
       <th>match_method</th>
       <td><p>This enum corresponds to the three matching methods
-discussed above:</p><dl'>
-  <dt>"with_replacement"</dt><dd><p>Finds smallest control for each treatment</p></dd>
-  <dt>"greedy"</dt><dd><p>Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.</p></dd>
-  <dt>"optimal"</dt><dd><p>Minimum total distance</p></dd>
+discussed above:</p><dl>
+<dt>"with_replacement"</dt><dd><p>Finds smallest control for each treatment</p></dd>
+<dt>"greedy"</dt><dd><p>Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.</p></dd>
+<dt>"optimal"</dt><dd><p>Minimum total distance</p></dd>
 
 </dl></td>
     </tr>
@@ -174,25 +175,40 @@ is acceptable to be from the true optimal value? Speed with large value,
 accuracy with small. Only relevant for <code>!with_replacement &amp;&amp; !greedy</code>.
 Default 1e-4 is reasonable in many cases.</p></td>
     </tr>
+    <tr>
+      <th>weight_vec</th>
+      <td><p>Default <code>NULL</code>: optionally supply the weight vector
+used to generate <code>dist_mat</code> and it'll be returned in the
+<code>match_list</code> generated from this function</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>basic return value is a list with five elements:</p><dl'>
-    <dt><code>treat_index</code></dt><dd><p>index of treated units, from all units</p></dd>
-    <dt><code>treat_index_within</code></dt><dd><p>index of treated units, from the set of treated</p></dd>
-    <dt><code>control_index</code></dt><dd><p>index of control units, from all units</p></dd>
-    <dt><code>control_index_within</code></dt><dd><p>index of control units, from the set of control</p></dd>
-    <dt><code>distance</code></dt><dd><p>distances between the pairs</p></dd>
-  
-</dl><p>If <code>n_sinks</code> is not NULL, you'll get a list of such objects, each
-  with an extra element: the number of sinks used.</p>
+    <p>basic return value is a list with five elements and an optional sixth:</p><dl>
+<dt><code>treat_index</code></dt><dd><p>index of treated units, from all units</p></dd>
+<dt><code>treat_index_within</code></dt><dd><p>index of treated units,
+from the set of treated</p></dd>
+<dt><code>control_index</code></dt><dd><p>index of control units, from all units</p></dd>
+<dt><code>control_index_within</code></dt><dd><p>index of control units,
+from the set of control</p></dd>
+<dt><code>distance</code></dt><dd><p>distances between the pairs</p></dd>
+<dt><code>weight_vec</code></dt><dd><p>weight vector used to generate
+<code>dist_mat</code> if supplied</p></dd>
+
+</dl><p>You'll get a list of such objects, each
+with an extra element: the number of sinks used. If you
+have <code>n_sinks</code> as <code>NULL</code>, then it'll default to
+a single sink value: zero.</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>If not, you have to trade off speed vs optimality. Greedy runs
 over all units in a random order, so if you want to run greedy a bunch of
 times and take the best, it would still be (likely) much faster than
 running optimal matching.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -209,7 +225,7 @@ running optimal matching.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

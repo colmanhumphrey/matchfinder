@@ -83,7 +83,7 @@ for simulations in the paper." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -117,7 +117,7 @@ for simulations in the paper.</h1>
 for simulations in the paper.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>paper_treatment_functions</span>(<span class='kw'>target_mean</span> <span class='kw'>=</span> <span class='fl'>0.425</span>)</pre>
+    <pre class="usage"><span class='fu'>paper_treatment_functions</span><span class='op'>(</span>target_mean <span class='op'>=</span> <span class='fl'>0.425</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -132,17 +132,20 @@ should be in (0, 1).</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>List of four functions that take in a matrix and
-  output a vector of probabilities:</p><dl'>
-  <dt><code>constant_treat_prob</code></dt><dd><p>Just repeats <code>target_mean</code></p></dd>
-  <dt><code>logistic_treat_prob</code></dt><dd><p>Computes a logistic style relationship
-  between the data matrix and the output vector</p></dd>
-  <dt><code>sparse_treat_prob</code></dt><dd><p>Based on the sign of the first data matrix
-  column; gives a number a bit above the mean and a bit below.</p></dd>
-  <dt><code>sparse_nonlin_treat_prob</code></dt><dd><p>Cubic logit function of the
-  first vector</p></dd>
+output a vector of probabilities:</p><dl>
+<dt><code>constant_treat_prob</code></dt><dd><p>Just repeats <code>target_mean</code></p></dd>
+<dt><code>logistic_treat_prob</code></dt><dd><p>Computes a logistic style relationship
+between the data matrix and the output vector</p></dd>
+<dt><code>sparse_treat_prob</code></dt><dd><p>Based on the sign of the first data matrix
+column; gives a number a bit above the mean and a bit below.</p></dd>
+<dt><code>sparse_nonlin_treat_prob</code></dt><dd><p>Cubic logit function of the
+first vector</p></dd>
 
 </dl>
 
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -159,7 +162,7 @@ should be in (0, 1).</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

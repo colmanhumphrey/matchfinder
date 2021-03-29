@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance • matchfinder</title>
+<title>Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks. — brier_nonbipartite_matches • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,10 +40,10 @@
 
 
 
-<meta property="og:title" content="Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance" />
-<meta property="og:description" content="This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights" />
+<meta property="og:title" content="Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks. — brier_nonbipartite_matches" />
+<meta property="og:description" content="Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks." />
 
 
 
@@ -105,24 +106,32 @@ if given, and scales this by both the covariances, and the given weights" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computes the Mahalanobis Imbalance of a match, or set of matches</h1>
+    <h1>Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks.</h1>
     
-    <div class="hidden name"><code>mahal_imbalance.Rd</code></div>
+    <div class="hidden name"><code>brier_nonbipartite_matches.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights</p>
+    <p>Computes all matches, then gets the brier scores for each. Reorder by
+number of sinks.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>brier_nonbipartite_matches</span><span class='op'>(</span>
   <span class='va'>x_mat</span>,
   <span class='va'>cov_x</span>,
-  weight_vec <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>weight_list</span>,
+  tolerance_list <span class='op'>=</span> <span class='fu'><a href='gen_tolerance_list.html'>gen_tolerance_list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  match_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"with_replacement"</span>, <span class='st'>"optimal"</span>, <span class='st'>"greedy"</span><span class='op'>)</span>,
+  n_sinks <span class='op'>=</span> <span class='fl'>0L</span>,
+  caliper_list <span class='op'>=</span> <span class='fu'><a href='gen_caliper_list.html'>gen_caliper_list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  propensity_list <span class='op'>=</span> <span class='fu'><a href='match_propensity_list.html'>match_propensity_list</a></span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>,
   sqrt_mahal <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  match_list <span class='op'>=</span> <span class='cn'>NULL</span>,
-  match_list_list <span class='op'>=</span> <span class='cn'>NULL</span>
+  keep_all_with_replacement <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  design <span class='op'>=</span> <span class='st'>"cross_all"</span>,
+  num_folds <span class='op'>=</span> <span class='fl'>5</span>,
+  match_predict_function <span class='op'>=</span> <span class='fu'><a href='match_predict_xgb.html'>match_predict_xgb</a></span><span class='op'>(</span><span class='op'>)</span>,
+  silent <span class='op'>=</span> <span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span><span class='op'>(</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -130,46 +139,75 @@ if given, and scales this by both the covariances, and the given weights</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
+      <td><p>input/design matrix (already rank-adjusted etc)</p></td>
     </tr>
     <tr>
       <th>cov_x</th>
-      <td><p>covariance of x, calculated potentially with ranks</p></td>
+      <td><p>the (potentially rank-adjusted) covariance of <code>x_mat</code>.
+This means it's possible that <code><a href='https://rdrr.io/r/stats/cor.html'>cov(x_mat)</a></code> is not equal to
+<code>cov_x</code>; see <code>covariance_with_ranks</code> for more details.</p></td>
     </tr>
     <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
+      <th>weight_list</th>
+      <td><p>list of weight vectors. See <code>generate_random_weights</code> to
+automatically generate a reasonable set of vectors.</p></td>
     </tr>
     <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
+      <th>tolerance_list</th>
+      <td><p>See <code>gen_tolerance_list</code></p></td>
     </tr>
     <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or <code>match_list_list</code></p></td>
+      <th>match_method</th>
+      <td><p>This enum corresponds to the three matching methods
+discussed above:</p><dl>
+<dt>"with_replacement"</dt><dd><p>Finds smallest control for each treatment</p></dd>
+<dt>"greedy"</dt><dd><p>Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.</p></dd>
+<dt>"optimal"</dt><dd><p>Minimum total distance</p></dd>
+
+</dl></td>
     </tr>
     <tr>
-      <th>match_list_list</th>
-      <td><p>list of match_list results; provide
-exactly one of this param or <code>match_list</code></p></td>
+      <th>n_sinks</th>
+      <td><p>how many potential matches to not bother with
+NOTE: you can do this as a vector, but not for optimal matching.</p></td>
+    </tr>
+    <tr>
+      <th>caliper_list</th>
+      <td><p>Optional, see <code>gen_caliper_list</code>. Provide
+this to force matches that are close on some metric.</p></td>
+    </tr>
+    <tr>
+      <th>keep_all_with_replacement</th>
+      <td><p>logical, default FALSE.
+When nbp matching with replacement, you can in some cases form nearly
+as many pairs as there are units (if using a tolerance vec, then maybe not
+the lowest value pairs, since they'll have no control unit).
+But this would form a contrast with all other methods, so we will cut
+down to using half by default.</p></td>
+    </tr>
+    <tr>
+      <th>design</th>
+      <td><p>see <code>predict_prepare</code></p></td>
+    </tr>
+    <tr>
+      <th>num_folds</th>
+      <td><p>how many CV folds to use</p></td>
+    </tr>
+    <tr>
+      <th>match_predict_function</th>
+      <td><p>function to predict treated units</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a vector of mahalanobis distances</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <p>List of matches within sink values,
+and brier scores for each.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p>You can provide a single match, or a list of matches</p>
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

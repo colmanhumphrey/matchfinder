@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance • matchfinder</title>
+<title>Builds symmetric pairs of indices for vectors — pair_indexing • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,14 @@
 
 
 
-<meta property="og:title" content="Computes the Mahalanobis Imbalance of a match, or set of matches — mahal_imbalance" />
-<meta property="og:description" content="This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights" />
+<meta property="og:title" content="Builds symmetric pairs of indices for vectors — pair_indexing" />
+<meta property="og:description" content="For a given vector interpreted as indices, e.g.
+c(5, 10, 13), we want all possible pairs that
+aren't the same element, e.g. we want c(5, 10),
+c(5, 13) and c(10, 13). Further, we want
+them in both orders, and then combined into a matrix. Finally,
+we want to do this for multiple vectors from a list, and have a
+single final matrix output." />
 
 
 
@@ -105,71 +109,38 @@ if given, and scales this by both the covariances, and the given weights" />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computes the Mahalanobis Imbalance of a match, or set of matches</h1>
+    <h1>Builds symmetric pairs of indices for vectors</h1>
     
-    <div class="hidden name"><code>mahal_imbalance.Rd</code></div>
+    <div class="hidden name"><code>pair_indexing.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function computes the average distance between treated
-and control (not the average absolute or anything), taking ranks into account
-if given, and scales this by both the covariances, and the given weights</p>
+    <p>For a given vector interpreted as indices, e.g.
+<code><a href='https://rdrr.io/r/base/c.html'>c(5, 10, 13)</a></code>, we want all possible pairs that
+aren't the same element, e.g. we want <code><a href='https://rdrr.io/r/base/c.html'>c(5, 10)</a></code>,
+<code><a href='https://rdrr.io/r/base/c.html'>c(5, 13)</a></code> and <code><a href='https://rdrr.io/r/base/c.html'>c(10, 13)</a></code>. Further, we want
+them in both orders, and then combined into a matrix. Finally,
+we want to do this for multiple vectors from a list, and have a
+single final matrix output.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>mahal_imbalance</span><span class='op'>(</span>
-  <span class='va'>x_mat</span>,
-  <span class='va'>cov_x</span>,
-  weight_vec <span class='op'>=</span> <span class='cn'>NULL</span>,
-  sqrt_mahal <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  match_list <span class='op'>=</span> <span class='cn'>NULL</span>,
-  match_list_list <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>pair_indexing</span><span class='op'>(</span><span class='va'>index_list</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x_mat</th>
-      <td><p>numeric matrix (adjust non-numeric columns prior),
-already rank-adjusted if desired</p></td>
-    </tr>
-    <tr>
-      <th>cov_x</th>
-      <td><p>covariance of x, calculated potentially with ranks</p></td>
-    </tr>
-    <tr>
-      <th>weight_vec</th>
-      <td><p>vector of weights corresponding to columns of x_mat,
-giving weights relative to "raw" (ranked) Mahalanobis.
-Note that the resulting matrix does depend on the scale of the
-weight vector, but the matching won't: scaling the Mahalanobis
-matrix has no effect on distance minimising pairs etc</p></td>
-    </tr>
-    <tr>
-      <th>sqrt_mahal</th>
-      <td><p>logical, default TRUE; do you want regular Mahalanobis:
-\(d(x_i, x_j) = (x_i - x_j)' \Sigma^{-1} (x_i - x_j)\)
-or the square root? (in weighted, \(\Sigma^{-1}\) becomes
-\(W \Sigma^{-1} W\) in the above)</p></td>
-    </tr>
-    <tr>
-      <th>match_list</th>
-      <td><p>Result of any of the matching methods; provide
-exactly one of this param or <code>match_list_list</code></p></td>
-    </tr>
-    <tr>
-      <th>match_list_list</th>
-      <td><p>list of match_list results; provide
-exactly one of this param or <code>match_list</code></p></td>
+      <th>index_list</th>
+      <td><p>List of vectors, interpreted as index locations</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a vector of mahalanobis distances</p>
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <p>Matrix of pairs</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
 
-    <p>You can provide a single match, or a list of matches</p>
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

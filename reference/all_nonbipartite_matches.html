@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Same as <code>all_bipartite_matches</code> but for nbp matching — all_nonbipartite_matches • matchfinder</title>
+<title>Same as all_bipartite_matches but for nbp matching — all_nonbipartite_matches • matchfinder</title>
 
 
 <!-- jquery -->
@@ -39,7 +39,7 @@
 
 
 
-<meta property="og:title" content="Same as <code>all_bipartite_matches</code> but for nbp matching — all_nonbipartite_matches" />
+<meta property="og:title" content="Same as all_bipartite_matches but for nbp matching — all_nonbipartite_matches" />
 <meta property="og:description" content="Same as all_bipartite_matches but for nbp matching" />
 
 
@@ -80,7 +80,7 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -112,18 +112,18 @@
     <p>Same as <code>all_bipartite_matches</code> but for nbp matching</p>
     </div>
 
-    <pre class="usage"><span class='fu'>all_nonbipartite_matches</span>(
-  <span class='no'>x_mat</span>,
-  <span class='no'>cov_x</span>,
-  <span class='no'>weight_list</span>,
-  <span class='kw'>tolerance_list</span> <span class='kw'>=</span> <span class='fu'><a href='gen_tolerance_list.html'>gen_tolerance_list</a></span>(),
-  <span class='kw'>match_method</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"with_replacement"</span>, <span class='st'>"optimal"</span>, <span class='st'>"greedy"</span>),
-  <span class='kw'>n_sinks</span> <span class='kw'>=</span> <span class='fl'>0L</span>,
-  <span class='kw'>caliper_list</span> <span class='kw'>=</span> <span class='fu'><a href='gen_caliper_list.html'>gen_caliper_list</a></span>(),
-  <span class='kw'>propensity_list</span> <span class='kw'>=</span> <span class='fu'><a href='match_propensity_list.html'>match_propensity_list</a></span>(<span class='kw'>NULL</span>),
-  <span class='kw'>sqrt_mahal</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>keep_all_with_replacement</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
-)</pre>
+    <pre class="usage"><span class='fu'>all_nonbipartite_matches</span><span class='op'>(</span>
+  <span class='va'>x_mat</span>,
+  <span class='va'>cov_x</span>,
+  <span class='va'>weight_list</span>,
+  tolerance_list <span class='op'>=</span> <span class='fu'><a href='gen_tolerance_list.html'>gen_tolerance_list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  match_method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"with_replacement"</span>, <span class='st'>"optimal"</span>, <span class='st'>"greedy"</span><span class='op'>)</span>,
+  n_sinks <span class='op'>=</span> <span class='fl'>0L</span>,
+  caliper_list <span class='op'>=</span> <span class='fu'><a href='gen_caliper_list.html'>gen_caliper_list</a></span><span class='op'>(</span><span class='op'>)</span>,
+  propensity_list <span class='op'>=</span> <span class='fu'><a href='match_propensity_list.html'>match_propensity_list</a></span><span class='op'>(</span><span class='cn'>NULL</span><span class='op'>)</span>,
+  sqrt_mahal <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  keep_all_with_replacement <span class='op'>=</span> <span class='cn'>FALSE</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,7 +140,7 @@ This means it's possible that <code><a href='https://rdrr.io/r/stats/cor.html'>c
     </tr>
     <tr>
       <th>weight_list</th>
-      <td><p>list of weight vectors. See `generate_random_weights` to
+      <td><p>list of weight vectors. See <code>generate_random_weights</code> to
 automatically generate a reasonable set of vectors.</p></td>
     </tr>
     <tr>
@@ -150,12 +150,12 @@ automatically generate a reasonable set of vectors.</p></td>
     <tr>
       <th>match_method</th>
       <td><p>This enum corresponds to the three matching methods
-discussed above:</p><dl'>
-  <dt>"with_replacement"</dt><dd><p>Finds smallest control for each treatment</p></dd>
-  <dt>"greedy"</dt><dd><p>Greedily generates pairs. Note that
-  the order for choosing the greedy pairs is random, which is not the only
-  possible solution.</p></dd>
-  <dt>"optimal"</dt><dd><p>Minimum total distance</p></dd>
+discussed above:</p><dl>
+<dt>"with_replacement"</dt><dd><p>Finds smallest control for each treatment</p></dd>
+<dt>"greedy"</dt><dd><p>Greedily generates pairs. Note that
+the order for choosing the greedy pairs is random, which is not the only
+possible solution.</p></dd>
+<dt>"optimal"</dt><dd><p>Minimum total distance</p></dd>
 
 </dl></td>
     </tr>
@@ -196,7 +196,7 @@ down to using half by default.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

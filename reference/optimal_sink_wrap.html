@@ -82,7 +82,7 @@ for each. — optimal_sink_wrap" />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -115,7 +115,7 @@ for each.</h1>
     <p>Will be slow; you can't just generate one match and subset from it.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>optimal_sink_wrap</span>(<span class='no'>dist_mat</span>, <span class='no'>treat_vec</span>, <span class='no'>n_sinks</span>, <span class='no'>tol_val</span>)</pre>
+    <pre class="usage"><span class='fu'>optimal_sink_wrap</span><span class='op'>(</span><span class='va'>dist_mat</span>, <span class='va'>treat_vec</span>, <span class='va'>n_sinks</span>, <span class='va'>tol_val</span>, weight_vec <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,11 +140,20 @@ is acceptable to be from the true optimal value? Speed with large value,
 accuracy with small. Only relevant for <code>!with_replacement &amp;&amp; !greedy</code>.
 Default 1e-4 is reasonable in many cases.</p></td>
     </tr>
+    <tr>
+      <th>weight_vec</th>
+      <td><p>Default <code>NULL</code>: optionally supply the weight vector
+used to generate <code>dist_mat</code> and it'll be returned in the
+<code>match_list</code> generated from this function</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>list of lists; see parent function</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Colman Humphrey</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -161,7 +170,7 @@ Default 1e-4 is reasonable in many cases.</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
