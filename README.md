@@ -252,7 +252,8 @@ The resulting object has two named elements:
 - `permutation_brier_scores`: this is a list with the same shape as
   `all_wr_matches` and `wr_briers`: that is, a list with an element per sink,
   and each of those is a result per match (in this case just a list of vectors). Let's look at this now (this is from a random run; you'll have different results):
-  ```r
+
+```r
 > perm_results$permutation_brier_scores
 $`0`
  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -268,7 +269,8 @@ $`100`
 $`200`
  [1] 0.76 0.84 0.62 0.52 0.64 0.84 0.94 0.54 0.46 0.92 0.85 0.80 1.00 0.67 0.92
 [16] 0.82 0.76 0.88 0.21 0.68 0.93 0.64 0.68 0.82 0.81
-  ```
+```
+
 - `best_matches`: this gives a list with each element being a match, one per
   sink value. That is, we simply choose the best match by Brier score for each
   sink level and return it. Well that would be too little, we actually return a
@@ -298,6 +300,7 @@ I get the following results:
    0    30   100   200
 1.00  0.93  0.81  0.21
 ```
+
 In contrast, drawing a histogram can reveal what's really happening:
 
 ``` r
