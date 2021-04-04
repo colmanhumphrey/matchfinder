@@ -59,15 +59,15 @@ so in general we want:
   x_j' W U^{-1} (U')^{-1} W x_j \\
   - 2 x_i' W U^{-1} (U')^{-1} W x_j
 }
-Solving the above is easy if we have \eqn{y_i = (U')^{-1} W x_i}
-or \eqn{W^{-1} U' y_i = x_i},
+Solving the above is manageable if we have \eqn{y_i = (U')^{-1} W x_i}
+or moving terms around, \eqn{W^{-1} U' y_i = x_i},
 which is simple by \code{forwardsolve}. Then we have:
 \deqn{dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j}
 Letting \eqn{Y = (y_1', y_2', .... ,y_n')'}
-(which can get in one line,
+(which we can get in one line,
 \eqn{Y' = } \code{forwardsolve} \eqn{(W^{-1} U', x_mat')})
 the first two parts are just \code{rowSums}\eqn{(Y^2)}
-(note that code uses \eqn{Y'}, thus \code{colSums})
+(note that the code uses \eqn{Y'}, thus \code{colSums})
 (add \code{outer(.,.)} to finish)
 and the last is \eqn{Y Y'}
 }
