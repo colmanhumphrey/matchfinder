@@ -27,65 +27,52 @@ test_that("testing bipartite_match_sd", {
     boring_sd <- sd(y_vector[match_list[["treat_index"]]] -
                     y_vector[match_list[["control_index"]]])
 
-    match_sd <- bipartite_match_sd(x_mat = x_mat,
-                                   cov_x = cov_x,
-                                   y_vector = y_vector,
-                                   match_list = match_list)
+    match_se <- regression_eval(match_list, y_vector)[["standard_error"]]
+    match_sd <- match_se * sqrt(length(match_list[["treat_index"]]))
+
     expect_equal(match_sd, boring_sd)
 
-    ## actually don't even need x
-    match_sd_no_x <- bipartite_match_sd(x_mat = NULL,
-                                        cov_x = NULL,
-                                        y_vector = y_vector,
-                                        match_list = match_list)
-    expect_equal(match_sd_no_x, boring_sd)
-
     ##------------------------------------
-    ## now with repeats
+    ## now with different number of repeats
 
-    sub_lengths <- c(2L, 10L, 50L, quarter_rows, half_rows - 1L)
+    sub_lengths <- c(1L, 2L, 4L, 10L, 50L, quarter_rows, half_rows - 1L)
 
-    control_lists <- lapply(sub_lengths, function(x) {
-        unique_size_sub((1L:half_rows) + half_rows, x)
+    se_ratios <- lapply(seq_len(10L), function(j_iter) {
+        control_lists <- lapply(sub_lengths, function(x) {
+            unique_size_sub((1L:half_rows) + half_rows, x)
+        })
+        match_lists <- lapply(control_lists, function(cl) {
+            list(
+                treat_index = 1L:half_rows,
+                control_index = cl
+            )
+        })
+
+        naive_ses <- unlist(lapply(control_lists, function(cl) {
+            sd(y_vector[1L:half_rows] - y_vector[cl]) / sqrt(length(cl))
+        }))
+
+        match_ses <- unlist(lapply(match_lists, function(match_list) {
+            regression_eval(match_list, y_vector = y_vector)[["standard_error"]]
+        }))
+
+        match_ses / naive_ses
     })
-    match_lists <- lapply(control_lists, function(cl) {
-        list(
-            treat_index = 1L:half_rows,
-            control_index = cl
-        )
-    })
+    se_ratio_mat <- do.call(rbind, se_ratios)
 
-    ## need treat_vec
-    expect_error(gen_bipartite_repeated_variance(
-        x_mat = x_mat,
-        cov_x = cov_x,
-        y_vector = y_vector,
-        control_index = control_lists[[2]]))
+    ## this should be something like sqrt(500 / sub_lengths) worse
+    ## or... sqrt(500 / sub_lengths + 1) / sqrt(2)?
+    ## TODO: need to work this out in greater detail
+    approx_expect <- sqrt(500 / sub_lengths + 1) / sqrt(2)
+    naive_expect <- sqrt(500 / sub_lengths)
+    ## hmm
+    approx_weight <- (sub_lengths - 1) / (sub_lengths + 1)
+    combined_expect <- approx_expect * approx_weight +
+        naive_expect * (1 - approx_weight)
+    ratio_diffs <- apply(se_ratio_mat, 2, mean) / combined_expect
+    dist_from_one <- abs(ratio_diffs - 1)
 
-    boring_variances <- unlist(lapply(control_lists, function(cl) {
-        var(y_vector[1L:half_rows] - y_vector[cl])
-    }))
-
-    rep_variances <- unlist(lapply(control_lists, function(cl) {
-        gen_bipartite_repeated_variance(x_mat = x_mat,
-                                        cov_x = cov_x,
-                                        y_vector = y_vector,
-                                        control_index = cl,
-                                        treat_vec = treat_vec)
-    }))
-
-    full_variances <- unlist(lapply(match_lists, function(ml) {
-        bipartite_match_sd(x_mat,
-                           cov_x = cov_x,
-                           y_vector = y_vector,
-                           match_list = ml,
-                           treat_vec = treat_vec)
-    }))^2
-
-    should_be_zero <-
-        full_variances - rep_variances - boring_variances
-
-    expect_true(sum(abs(should_be_zero)) < 0.00000001)
+    expect_true(mean(dist_from_one) < 0.05)
 })
 
 
@@ -272,6 +259,8 @@ test_that("testing y_tolerance_diff_ratio_sd", {
         direct_reg <- lm(y_vector ~ tol_vec + x_vec_1 + x_vec_2)
 
         ## fit optimal
+        nonbi_match <- regression_eval
+
         nonbimatch <- nonbipartite_matches(
             dist_mat = dist_mat,
             tolerance_list = tol_list,
@@ -573,66 +562,4 @@ test_that("testing tol_random_sample", {
 
     expect_false(tolerance_check(match_list = any_result,
                                  tolerance_list = hard_tol)[["error"]])
-})
-
-
-test_that("testing gen_[non]bipartite_repeated_variance", {
-    cols <- 5L
-    quarter_rows <- 100L
-    half_rows <- quarter_rows * 2L
-    rows <- half_rows * 2L
-
-    x_mat <- matrix(rnorm(rows * cols), nrow = rows)
-    treat_vec <- rep(c(TRUE, FALSE), times = c(half_rows, half_rows))
-
-    cov_x <- covariance_with_ranks(x_mat)
-    y_vector <- runif(rows) + treat_vec * 0.2
-
-    expect_equal(gen_bipartite_repeated_variance(
-        x_mat = x_mat,
-        cov_x = cov_x,
-        y_vector = y_vector,
-        control_index = (1L:half_rows) + half_rows,
-        treat_vec = treat_vec),
-        0)
-
-    ##----------------
-
-    sub_lengths <- c(2L, 4L, 10L, 20L, 50L, 100L)
-    just_80 <- rep(80L, 10L)
-
-    control_lists <- lapply(sub_lengths, function(x) {
-        unique_size_sub((1L:half_rows) + half_rows, x)
-    })
-    control_80s <- lapply(just_80, function(x) {
-        unique_size_sub((1L:half_rows) + half_rows, x)
-    })
-
-    rep_variances <- unlist(lapply(control_lists, function(cl) {
-        gen_bipartite_repeated_variance(x_mat = x_mat,
-                                        cov_x = cov_x,
-                                        y_vector = y_vector,
-                                        treat_vec = treat_vec,
-                                        control_index = cl)
-    }))
-    rep_80s <- unlist(lapply(control_80s, function(cl) {
-        gen_bipartite_repeated_variance(x_mat = x_mat,
-                                        cov_x = cov_x,
-                                        y_vector = y_vector,
-                                        treat_vec = treat_vec,
-                                        control_index = cl)
-    }))
-
-    res_80 <- mean(sqrt(rep_80s))
-    scale_80s <- sqrt((half_rows - 80L) / 80L) / res_80
-
-    should_be_close <- sqrt((half_rows - sub_lengths) / sub_lengths) /
-        scale_80s
-
-    ratios <- sqrt(rep_variances) / should_be_close
-
-    adjusted_diffs <- abs(ratios - 1) *
-        sqrt(half_rows) / sqrt(half_rows - sub_lengths)
-
-    expect_true(mean(adjusted_diffs) < 0.5)
 })

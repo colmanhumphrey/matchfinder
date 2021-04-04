@@ -107,6 +107,7 @@ gen_bipartite_repeated_variance <- function(x_mat,
                                             weight_vec = NULL,
                                             use_all_controls = TRUE,
                                             sqrt_mahal = TRUE) {
+    .Deprecated()
     all_control_index <- which(treat_vec == 0L)
 
     count_frame <- data.frame(table(control_index))
@@ -208,6 +209,7 @@ nonbipartite_match_sd_scaled <- function(x_mat,
                                          weight_vec = NULL,
                                          use_regression = TRUE,
                                          sqrt_mahal = TRUE) {
+    .Deprecated("regression_eval")
     ## two variance components
 
     ## ------------------------------------
