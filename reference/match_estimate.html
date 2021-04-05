@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Computes a simple mean difference in an outcome vector
+<title>Deprecated Computes a simple mean difference in an outcome vector
 between treatment and control in a paired match — match_estimate • matchfinder</title>
 
 
@@ -40,9 +40,13 @@ between treatment and control in a paired match — match_estimate • matchfind
 
 
 
-<meta property="og:title" content="Computes a simple mean difference in an outcome vector
+<meta property="og:title" content="Deprecated Computes a simple mean difference in an outcome vector
 between treatment and control in a paired match — match_estimate" />
-<meta property="og:description" content="Computes the average difference between the treated units and the
+<meta property="og:description" content="Deprecated: even for comupting the mean we'll now use
+regression_eval, and pull the &quot;estimate&quot; value
+from the resulting list. For situations with no re-use of
+treatments or controls this is the same, but not in general.
+Computes the average difference between the treated units and the
 control units for a match, given as a match list.  Optionally
 confirms that all treated units are indeed treated.  Note that this
 isn't typically suitable for non-bipartite matching." />
@@ -108,14 +112,18 @@ isn't typically suitable for non-bipartite matching." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Computes a simple mean difference in an outcome vector
+    <h1><strong>Deprecated</strong> Computes a simple mean difference in an outcome vector
 between treatment and control in a paired match</h1>
     
     <div class="hidden name"><code>match_estimate.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Computes the average difference between the treated units and the
+    <p><strong>Deprecated</strong>: even for comupting the mean we'll now use
+<code>regression_eval</code>, and pull the <code>"estimate"</code> value
+from the resulting list. For situations with no re-use of
+treatments or controls this is the same, but not in general.
+Computes the average difference between the treated units and the
 control units for a match, given as a match list.  Optionally
 confirms that all treated units are indeed treated.  Note that this
 isn't typically suitable for non-bipartite matching.</p>

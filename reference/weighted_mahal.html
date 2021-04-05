@@ -52,15 +52,15 @@ $$
   x_j' W U^{-1} (U')^{-1} W x_j \\
   - 2 x_i' W U^{-1} (U')^{-1} W x_j
 $$
-Solving the above is easy if we have \(y_i = (U')^{-1} W x_i\)
-or \(W^{-1} U' y_i = x_i\),
+Solving the above is manageable if we have \(y_i = (U')^{-1} W x_i\)
+or moving terms around, \(W^{-1} U' y_i = x_i\),
 which is simple by forwardsolve. Then we have:
 $$dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j$$
 Letting \(Y = (y_1', y_2', .... ,y_n')'\)
-(which can get in one line,
+(which we can get in one line,
 \(Y' = \) forwardsolve \((W^{-1} U', x_mat')\))
 the first two parts are just rowSums\((Y^2)\)
-(note that code uses \(Y'\), thus colSums)
+(note that the code uses \(Y'\), thus colSums)
 (add outer(.,.) to finish)
 and the last is \(Y Y'\)" />
 
@@ -143,15 +143,15 @@ $$
   x_j' W U^{-1} (U')^{-1} W x_j \\
   - 2 x_i' W U^{-1} (U')^{-1} W x_j
 $$
-Solving the above is easy if we have \(y_i = (U')^{-1} W x_i\)
-or \(W^{-1} U' y_i = x_i\),
+Solving the above is manageable if we have \(y_i = (U')^{-1} W x_i\)
+or moving terms around, \(W^{-1} U' y_i = x_i\),
 which is simple by <code>forwardsolve</code>. Then we have:
 $$dist(x_i, x_j) = ||y_i||^2 + ||y_j||^2 - 2 y_i' y_j$$
 Letting \(Y = (y_1', y_2', .... ,y_n')'\)
-(which can get in one line,
+(which we can get in one line,
 \(Y' = \) <code>forwardsolve</code> \((W^{-1} U', x_mat')\))
 the first two parts are just <code>rowSums</code>\((Y^2)\)
-(note that code uses \(Y'\), thus <code>colSums</code>)
+(note that the code uses \(Y'\), thus <code>colSums</code>)
 (add <code><a href='https://rdrr.io/r/base/outer.html'>outer(.,.)</a></code> to finish)
 and the last is \(Y Y'\)</p>
     </div>
