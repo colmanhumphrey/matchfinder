@@ -63,6 +63,7 @@ regression_eval <- function(match_list,
         stop(err_msg)
     }
 
+    ## TODO: treatment duplication, cross-over duplication
     all_unique_controls <- !any(duplicated(match_list[["control_index"]]))
 
     if (all_unique_controls) {

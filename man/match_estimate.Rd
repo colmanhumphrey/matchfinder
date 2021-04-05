@@ -2,7 +2,7 @@
 % Please edit documentation in R/match_eval.R
 \name{match_estimate}
 \alias{match_estimate}
-\title{Computes a simple mean difference in an outcome vector
+\title{\strong{Deprecated} Computes a simple mean difference in an outcome vector
 between treatment and control in a paired match}
 \usage{
 match_estimate(match_list, y_vector, treat_vec = NULL)
@@ -19,6 +19,10 @@ match_estimate(match_list, y_vector, treat_vec = NULL)
 Returns a single number, the mean difference.
 }
 \description{
+\strong{Deprecated}: even for comupting the mean we'll now use
+\code{regression_eval}, and pull the \code{"estimate"} value
+from the resulting list. For situations with no re-use of
+treatments or controls this is the same, but not in general.
 Computes the average difference between the treated units and the
 control units for a match, given as a match list.  Optionally
 confirms that all treated units are indeed treated.  Note that this

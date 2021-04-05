@@ -395,7 +395,10 @@ binary_search <- function(target_value,
 ##' Checks that the differences are all at least
 ##' at the min, and if a max is given, checks that too.
 ##' Gives reasonable error messages on errors
-##' @inheritParams match_estimate_tolerance
+##' @param match_list Typical \code{match_list} object from
+##'     \code{bipartite_matches}.
+##' @param tolerance_list Typical tolerance list, see
+##'   \code{gen_tolerance_list}
 ##' @return List with two elements:
 ##' \itemize{
 ##'  \item{\code{error}}{Boolean - is all good?}

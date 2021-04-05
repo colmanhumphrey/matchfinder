@@ -126,7 +126,8 @@ test_that("testing n_sink_generator", {
 
 
 test_that("testing compute_sim_result and reshape funcs", {
-    sim_results <- compute_sim_result(
+    ## warnings from deprecation
+    sim_results <- suppressWarnings(compute_sim_result(
         x_generator = default_x_generator,
         treat_prob_generator =
             paper_treatment_functions()[["logistic_treat_prob"]],
@@ -140,7 +141,7 @@ test_that("testing compute_sim_result and reshape funcs", {
         n_rows = 100L,
         n_cols = 3L,
         num_weight_vectors = 5L,
-        silent = TRUE)
+        silent = TRUE))
 
     expect_equal(names(sim_results),
                  c("naive_est", "propensity_results",

@@ -30,7 +30,7 @@ reshape_list_of_sims(
 Data frame spreading results...
 }
 \description{
-Reshapes a list of simulations to a nice dataframe
+In the future this should be cleaner
 }
 \author{
 Colman Humphrey

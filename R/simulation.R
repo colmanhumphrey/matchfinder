@@ -269,6 +269,8 @@ compute_sim_result <- function(x_generator = default_x_generator,
     n_sinks <- n_sink_gen(treat_vec)
     match_list_est_func <- (function(y_vector, treat_vec) {
         function(match_list) {
+            ## TODO: this should be regression eval
+            ## leaving here to make current simulations replicable
             match_estimate(
                 match_list = match_list,
                 y_vector = y_vector,
@@ -384,6 +386,8 @@ compute_sim_result <- function(x_generator = default_x_generator,
 
 
 #' Reshapes a list of simulations to a nice dataframe
+#'
+#' In the future this should be cleaner
 #'
 #' @param list_of_sims List of results from \code{compute_sim_results}.
 #' @param treat_model_name Name of the treatment model.
