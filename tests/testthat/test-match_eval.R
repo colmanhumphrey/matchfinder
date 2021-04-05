@@ -11,25 +11,25 @@ test_that("testing match_estimate", {
 
     ##------------------------------------
 
-    expect_equal(match_estimate(match_list = match_list,
-                                y_vector = y_vector),
+    expect_equal(suppressWarnings(match_estimate(match_list = match_list,
+                                                 y_vector = y_vector)),
                  mean(y_vector[1L:200L] - y_vector[201L:400L]))
 
     ##------------------------------------
 
-    expect_error(match_estimate(match_list = match_list,
-                                y_vector = y_vector,
-                                treat_vec = c(0L, 0L, 1L)))
+    expect_error(suppressWarnings(match_estimate(match_list = match_list,
+                                                 y_vector = y_vector,
+                                                 treat_vec = c(0L, 0L, 1L))))
 
-    expect_error(match_estimate(match_list = match_list,
-                                y_vector = y_vector,
-                                treat_vec = c(rep(0L, 200L),
-                                              rep(1L, 200L))))
+    expect_error(suppressWarnings(match_estimate(match_list = match_list,
+                                                 y_vector = y_vector,
+                                                 treat_vec = c(rep(0L, 200L),
+                                                               rep(1L, 200L)))))
 
-    expect_error(match_estimate(match_list = match_list,
-                                y_vector = y_vector,
-                                treat_vec = c(rep(1L, 200L),
-                                              rep(0L, 200L))),
+    expect_error(suppressWarnings(match_estimate(match_list = match_list,
+                                                 y_vector = y_vector,
+                                                 treat_vec = c(rep(1L, 200L),
+                                                               rep(0L, 200L)))),
                  NA)
 })
 
