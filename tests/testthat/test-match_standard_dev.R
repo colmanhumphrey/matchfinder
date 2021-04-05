@@ -75,80 +75,6 @@ test_that("testing bipartite_match_sd", {
     expect_true(mean(dist_from_one) < 0.05)
 })
 
-
-test_that("testing nonbipartite_match_sd_scaled", {
-    ##------------------------------------
-    ## first, using cases with no repeats
-    ## this should be very boring
-
-    cols <- 5L
-    quarter_rows <- 250L
-    half_rows <- quarter_rows * 2L
-    rows <- half_rows * 2L
-
-    x_mat <- matrix(rnorm(rows * cols), nrow = rows)
-
-    cov_x <- covariance_with_ranks(x_mat)
-    treat_vec <- rep(c(TRUE, FALSE), each = half_rows)
-    y_vector <- runif(rows) + treat_vec * 0.2
-
-    ## won't bother with stuff we won't use
-    match_list <- list(
-        treat_index = 1L:half_rows,
-        control_index = (1L:half_rows) + half_rows
-    )
-
-    tol_vec <- rep(rpois(half_rows, 10), times = 2) +
-        (((1L:rows) %in% match_list[["treat_index"]]) *
-         sample(c(1L, 2L), rows, replace = TRUE))
-
-    boring_sd <- sd((y_vector[match_list[["treat_index"]]] -
-                     y_vector[match_list[["control_index"]]]) /
-                    (tol_vec[match_list[["treat_index"]]] -
-                     tol_vec[match_list[["control_index"]]]))
-
-    match_sd <- nonbipartite_match_sd_scaled(
-        x_mat = x_mat,
-        cov_x = cov_x,
-        y_vector = y_vector,
-        match_list = match_list,
-        tolerance_list = gen_tolerance_list(
-            tolerance_vec = tol_vec,
-            tolerance_min = 1),
-        use_regression = FALSE
-        )
-    expect_equal(match_sd, boring_sd)
-
-    ## actually don't even need x
-    match_sd_no_x <- nonbipartite_match_sd_scaled(
-        x_mat = NULL,
-        cov_x = NULL,
-        y_vector = y_vector,
-        match_list = match_list,
-        tolerance_list = gen_tolerance_list(
-            tolerance_vec = tol_vec,
-            tolerance_min = 1),
-        use_regression = FALSE
-    )
-    expect_equal(match_sd_no_x, boring_sd)
-
-    ## but regression is nicer
-    match_sd_with_reg <- nonbipartite_match_sd_scaled(
-        x_mat = NULL,
-        cov_x = NULL,
-        y_vector = y_vector,
-        match_list = match_list,
-        tolerance_list = gen_tolerance_list(
-            tolerance_vec = tol_vec,
-            tolerance_min = 1),
-        use_regression = TRUE
-    )
-    expect_true(match_sd_with_reg < boring_sd)
-
-    ##------------------------------------
-})
-
-
 test_that("testing approx_ratio_sd", {
     ##------------------------------------
     ## value testing
@@ -237,7 +163,7 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     ##------------------------------------
     ## easy tolerance version
     treat_effect <- 0.1
-    opt_test_list <- lapply(1L:20L, function(j) {
+    opt_test_list <- lapply(1L:200L, function(j) {
         rows <- 1000L
         some_noise <- runif(rows, -1, 1)
         x_vec_1 <- runif(rows, -2, 2) + some_noise * 0.5
@@ -259,59 +185,36 @@ test_that("testing y_tolerance_diff_ratio_sd", {
         direct_reg <- lm(y_vector ~ tol_vec + x_vec_1 + x_vec_2)
 
         ## fit optimal
-        nonbi_match <- regression_eval
-
         nonbimatch <- nonbipartite_matches(
             dist_mat = dist_mat,
             tolerance_list = tol_list,
             match_method = "optimal",
             n_sinks = 0L
         )[["0"]]
-        nonbi_sd <- nonbipartite_match_sd_scaled(
-            x_mat = x_mat,
-            cov_x = cov(x_mat),
-            y_vector = y_vector,
-            match_list = nonbimatch,
-            tolerance_list = tol_list,
-            use_regression = TRUE
-        )
-        nonbi_sd_naive <- nonbipartite_match_sd_scaled(
-            x_mat = x_mat,
-            cov_x = cov(x_mat),
-            y_vector = y_vector,
-            match_list = nonbimatch,
-            tolerance_list = tol_list,
-            use_regression = FALSE
-        )
-        nonbi_mean <- match_estimate_tolerance(
+
+        nonbi_eval <- regression_eval(
             match_list = nonbimatch,
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = TRUE
+            tolerance_list = tol_list
         )
-        nonbi_mean_naive <- match_estimate_tolerance(
-            match_list = nonbimatch,
-            y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = FALSE
-        )
+
+        y_diffs <- y_vector[nonbimatch[["treat_index"]]] -
+            y_vector[nonbimatch[["control_index"]]]
+        tol_vec <- tol_list[["tolerance_vec"]]
+        tol_diffs <- tol_vec[nonbimatch[["treat_index"]]] -
+            tol_vec[nonbimatch[["control_index"]]]
+        nonbi_mean_naive <- mean(y_diffs / tol_diffs)
+
         random_match_res <- y_tolerance_diff_ratio(
             y_vector = y_vector,
             tolerance_list = tol_list
         )
-        random_match_res_naive <- y_tolerance_diff_ratio(
-            y_vector = y_vector,
-            tolerance_list = tol_list
-        )
         return(list(
-            match_sd_reg = nonbi_sd,
-            match_mean_reg = nonbi_mean,
-            match_sd_naive = nonbi_sd_naive,
+            match_se = nonbi_eval[["standard_error"]],
+            match_mean = nonbi_eval[["estimate"]],
             match_mean_naive = nonbi_mean_naive,
-            random_sd_reg = random_match_res[["sd"]],
+            random_se_reg = random_match_res[["se"]],
             random_mean_reg = random_match_res[["mean"]],
-            random_sd_naive = random_match_res_naive[["sd"]],
-            random_mean_naive = random_match_res_naive[["mean"]],
             direct_reg_mean = unname(coef(direct_reg)["tol_vec"])
         ))
     })
@@ -326,55 +229,53 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     }
     perc_errors <- list(
         match = list(
-            reg = mean_percent_treat_error(res_frame[["match_mean_reg"]]),
+            reg = mean_percent_treat_error(res_frame[["match_mean"]]),
             naive = mean_percent_treat_error(res_frame[["match_mean_naive"]])
         ),
-        random = list(
-            reg = mean_percent_treat_error(res_frame[["random_mean_reg"]]),
-            naive = mean_percent_treat_error(res_frame[["random_mean_naive"]])
-        ),
+        random_reg = mean_percent_treat_error(res_frame[["random_mean_reg"]]),
         actual_reg = mean_percent_treat_error(res_frame[["direct_reg_mean"]])
     )
     res_means <- colMeans(res_frame)
     perc_bias <- list(
         match = list(
-            reg = mean_percent_treat_error(res_means["match_mean_reg"]),
+            reg = mean_percent_treat_error(res_means["match_mean"]),
             naive = mean_percent_treat_error(res_means["match_mean_naive"])
         ),
-        random = list(
-            reg = mean_percent_treat_error(res_means["random_mean_reg"]),
-            naive = mean_percent_treat_error(res_means["random_mean_naive"])
-        ),
+        random_reg = mean_percent_treat_error(res_means["random_mean_reg"]),
         actual_reg = mean_percent_treat_error(res_means["direct_reg_mean"])
     )
 
-    ## within 50% over the 20 runs - usually better
-    expect_true(perc_errors[["match"]][["reg"]] < 0.5)
+    ## within 50% over the 20 runs - usually better,
+    ## avg 30%
+    expect_true(perc_errors[["match"]][["reg"]] < 0.50)
     ## beats the random
     expect_true(perc_errors[["match"]][["reg"]] <
-                perc_errors[["random"]][["reg"]])
+                perc_errors[["random_reg"]])
     ## beats regression!
     expect_true(perc_errors[["match"]][["reg"]] <
                 perc_errors[["actual_reg"]])
 
-    ## same results for "bias"
-    expect_true(perc_bias[["match"]][["reg"]] < 0.3)
+    ## same results for "bias",
+    ## avg 20%, within 40%
+    expect_true(perc_bias[["match"]][["reg"]] < 0.40)
     ## beats the random
     expect_true(perc_bias[["match"]][["reg"]] <
-                perc_bias[["random"]][["reg"]])
+                perc_bias[["random_reg"]])
     ## beats regression!
     expect_true(perc_bias[["match"]][["reg"]] <
                 perc_bias[["actual_reg"]])
 
     ## now comparing the standard deviations
-    expect_true(res_means["match_sd_reg"] <
-                0.6 * res_means["random_sd_reg"])
+    ## big decrease
+    expect_true(res_means["match_se"] <
+                0.4 * res_means["random_se_reg"])
 
     ## ------------------------------------
     ## simpler overall test, more tricky tolerance
 
     treat_effect <- 0.1
     opt_test_list <- lapply(1L:20L, function(j) {
+        print(j)
         rows <- 300L
         some_noise <- runif(rows, -1, 1)
         x_vec <- runif(rows, -2, 2)
@@ -394,6 +295,8 @@ test_that("testing y_tolerance_diff_ratio_sd", {
 
         y_vector <- treat_effect * tol_vec + 1.2 * x_vec + 0.3 * rnorm(rows)
 
+        direct_reg <- lm(y_vector ~ tol_vec + x_vec)
+
         ## fit optimal
         nonbimatch <- nonbipartite_matches(
             dist_mat = dist_mat,
@@ -401,51 +304,30 @@ test_that("testing y_tolerance_diff_ratio_sd", {
             match_method = "optimal",
             n_sinks = 0L
         )[["0"]]
-        nonbi_sd <- nonbipartite_match_sd_scaled(
-            x_mat = x_mat,
-            cov_x = cov(x_mat),
-            y_vector = y_vector,
-            match_list = nonbimatch,
-            tolerance_list = tol_list,
-            use_regression = TRUE
-        )
-        nonbi_sd_naive <- nonbipartite_match_sd_scaled(
-            x_mat = x_mat,
-            cov_x = cov(x_mat),
-            y_vector = y_vector,
-            match_list = nonbimatch,
-            tolerance_list = tol_list,
-            use_regression = FALSE
-        )
-        nonbi_mean <- match_estimate_tolerance(
+        nonbi_eval <- regression_eval(
             match_list = nonbimatch,
             y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = TRUE
+            tolerance_list = tol_list
         )
-        nonbi_mean_naive <- match_estimate_tolerance(
-            match_list = nonbimatch,
-            y_vector = y_vector,
-            tolerance_list = tol_list,
-            use_regression = FALSE
-        )
+
+        y_diffs <- y_vector[nonbimatch[["treat_index"]]] -
+            y_vector[nonbimatch[["control_index"]]]
+        tol_vec <- tol_list[["tolerance_vec"]]
+        tol_diffs <- tol_vec[nonbimatch[["treat_index"]]] -
+            tol_vec[nonbimatch[["control_index"]]]
+        nonbi_mean_naive <- mean(y_diffs / tol_diffs)
+
         random_match_res <- y_tolerance_diff_ratio(
             y_vector = y_vector,
             tolerance_list = tol_list
         )
-        random_match_res_naive <- y_tolerance_diff_ratio(
-            y_vector = y_vector,
-            tolerance_list = tol_list
-        )
         return(list(
-            match_sd_reg = nonbi_sd,
-            match_mean_reg = nonbi_mean,
-            match_sd_naive = nonbi_sd_naive,
+            match_se = nonbi_eval[["standard_error"]],
+            match_mean = nonbi_eval[["estimate"]],
             match_mean_naive = nonbi_mean_naive,
-            random_sd_reg = random_match_res[["sd"]],
+            random_se_reg = random_match_res[["se"]],
             random_mean_reg = random_match_res[["mean"]],
-            random_sd_naive = random_match_res_naive[["sd"]],
-            random_mean_naive = random_match_res_naive[["mean"]]
+            direct_reg_mean = unname(coef(direct_reg)["tol_vec"])
         ))
     })
 
@@ -459,45 +341,37 @@ test_that("testing y_tolerance_diff_ratio_sd", {
     }
     perc_errors <- list(
         match = list(
-            reg = mean_percent_treat_error(res_frame[["match_mean_reg"]]),
+            reg = mean_percent_treat_error(res_frame[["match_mean"]]),
             naive = mean_percent_treat_error(res_frame[["match_mean_naive"]])
         ),
-        random = list(
-            reg = mean_percent_treat_error(res_frame[["random_mean_reg"]]),
-            naive = mean_percent_treat_error(res_frame[["random_mean_naive"]])
-        )
+        random_reg = mean_percent_treat_error(res_frame[["random_mean_reg"]]),
+        actual_reg = mean_percent_treat_error(res_frame[["direct_reg_mean"]])
     )
     res_means <- colMeans(res_frame)
     perc_bias <- list(
         match = list(
-            reg = mean_percent_treat_error(res_means["match_mean_reg"]),
+            reg = mean_percent_treat_error(res_means["match_mean"]),
             naive = mean_percent_treat_error(res_means["match_mean_naive"])
         ),
-        random = list(
-            reg = mean_percent_treat_error(res_means["random_mean_reg"]),
-            naive = mean_percent_treat_error(res_means["random_mean_naive"])
-        )
+        random_reg = mean_percent_treat_error(res_means["random_mean_reg"]),
+        actual_reg = mean_percent_treat_error(res_means["direct_reg_mean"])
     )
 
     ## within 1% over the 20 runs - usually better
     expect_true(perc_errors[["match"]][["reg"]] < 0.01)
     ## beats the random
     expect_true(perc_errors[["match"]][["reg"]] <
-                perc_errors[["random"]][["reg"]])
-    expect_true(perc_errors[["match"]][["naive"]] <
-                perc_errors[["random"]][["naive"]])
+                perc_errors[["random_reg"]])
+    ## here the regression is better as the setup
+    ## is perfectly suited to it
 
     ## NOT same results for "bias"
     ## random is totally unbiased!
     expect_true(perc_bias[["match"]][["reg"]] < 0.003)
-    ## in this simple example, the naive versions of
-    ## both also perform very well
 
     ## now comparing the standard deviations
-    expect_true(res_means["match_sd_reg"] <
-                0.5 * res_means["random_sd_reg"])
-    expect_true(res_means["match_sd_naive"] <
-                0.5 * res_means["random_sd_naive"])
+    expect_true(res_means["match_se"] <
+                0.5 * res_means["random_se_reg"])
 })
 
 test_that("testing tol_random_sample", {
