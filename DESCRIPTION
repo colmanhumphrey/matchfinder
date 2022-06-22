@@ -2,10 +2,14 @@ Package: matchfinder
 Title: Finding Best Matches Based on Predictability
 Version: 0.0.1
 Authors@R:
-    person(given = "Colman",
+    c(person(given = "Colman",
            family = "Humphrey",
            role = c("aut", "cre"),
            email = "colmanhumphrey@gmail.com")
+      person(given = "Ryan",
+           family = "Gross",
+           role = c("ctb"),
+           email = "ryanzgross@gmail.com"))
 Description: Finds the best set of matches to use in a bipartite (treatment/control) or non-bipartite setting,
     where best refers to predictability.
 License: LGPL (>= 2.1)
