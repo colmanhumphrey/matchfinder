@@ -4,11 +4,19 @@ Version: 0.0.1
 Authors@R:
     c(person(given = "Colman",
            family = "Humphrey",
-           role = c("aut", "cre"),
-           email = "colmanhumphrey@gmail.com")
+<<<<<<< HEAD
+           role = c("aut"),
+           email = "colmanhumphrey@gmail.com"),
       person(given = "Ryan",
            family = "Gross",
-           role = c("ctb"),
+           role = c("ctb", "cre"),
+=======
+           role = c("aut", "cre"),
+           email = "colmanhumphrey@gmail.com"),
+      person(given = "Ryan",
+           family = "Gross",
+           role = c("cre", "ctb"),
+>>>>>>> eeaabf677af577fd4f781b508d0a2284596df027
            email = "ryanzgross@gmail.com"))
 Description: Finds the best set of matches to use in a bipartite (treatment/control) or non-bipartite setting,
     where best refers to predictability.
@@ -17,5 +25,7 @@ Encoding: UTF-8
 LazyData: true
 Suggests:
     testthat (>= 2.1.0)
+Imports: xgboost, optmatch, nbpMatching
 RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
+URL: https://colmanhumphrey.github.io/matchfinder/
